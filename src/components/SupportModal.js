@@ -117,6 +117,9 @@ export function SupportModal(ctx) {
   /** @type {{ el: HTMLElement, sync: () => void, destroy: () => void }|null} */
   let copyControl = null;
 
+  /** @type {HTMLElement|null} */
+  let panelEl = null;
+
   const qrSlot = h('div', { class: 'crypto__qr' });
   const addressEl = h('p', { class: 'crypto__address' });
   const networkEl = h('p', { class: 'crypto__network' });
@@ -126,6 +129,10 @@ export function SupportModal(ctx) {
 
   function renderPanel(target) {
     if (!target) return;
+
+    // A tabpanel is labelled by the tab that selects it, so the association
+    // has to follow the selection rather than being baked in at build time.
+    panelEl?.setAttribute('aria-labelledby', `support-crypto-tab-${target.id}`);
 
     const placeholder = isPlaceholderAddress(target);
 
@@ -180,6 +187,7 @@ export function SupportModal(ctx) {
   let tabs = null;
 
   function buildCryptoSection(body) {
+    // `aria-labelledby` is set by renderPanel, which owns the active tab.
     const panel = h(
       'div',
       { class: 'panel-inset p-4', id: panelId, role: 'tabpanel', tabindex: '0' },
@@ -198,6 +206,8 @@ export function SupportModal(ctx) {
         ),
       ),
     );
+
+    panelEl = panel;
 
     tabs = createTabs({
       id: 'support-crypto',

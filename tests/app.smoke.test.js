@@ -653,6 +653,12 @@ describe('support modal', () => {
     assert.notEqual(qr().outerHTML, solQr, 'QR did not follow the tab');
     assert.equal(tabs[2].getAttribute('aria-selected'), 'true');
     assert.equal(tabs[0].getAttribute('aria-selected'), 'false');
+
+    // A tabpanel is labelled by whichever tab selects it — that association
+    // has to follow the selection, not be frozen at build time.
+    const panel = env.document.querySelector('#overlay-root .modal').querySelector('[role="tabpanel"]');
+    assert.equal(panel.getAttribute('aria-labelledby'), tabs[2].id);
+    assert.equal(tabs[2].getAttribute('aria-controls'), panel.id);
   });
 
   test('closes on request', () => {
