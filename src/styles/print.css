@@ -1,5 +1,5 @@
 /* =============================================================================
-   GitBooklet — Print stylesheet
+   GitBinder — Print stylesheet
    Foundation for the "Classic Book" output. The PDF composer (next milestone)
    renders into an isolated print container; these rules guarantee a clean,
    ink-on-paper result even when a visitor hits Ctrl/Cmd+P manually.

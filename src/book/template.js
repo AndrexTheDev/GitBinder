@@ -54,7 +54,7 @@ function runners({ meta, number }) {
         'span',
         { class: 'book-run__right' },
         // Spelled out in full, the way the brief asks for it:
-        // "Generated with GitBooklet (https://gitbinder.pages.dev)".
+        // "Generated with GitBinder (https://gitbinder.pages.dev)".
         h('span', { class: 'book-run__attr', text: `${meta.attributionLabel} (` }),
         h('a', { class: 'book-run__link', href: safeUrl(meta.attributionUrl, '#'), text: meta.attributionUrl }),
         h('span', { class: 'book-run__parens', text: ')' }),

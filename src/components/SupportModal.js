@@ -1,7 +1,7 @@
 /**
  * Support / crypto donation modal.
  *
- * GitBooklet is free, but the project still costs money to keep alive. This
+ * GitBinder is free, but the project still costs money to keep alive. This
  * dialog collects the ways to give something back: three wallet addresses,
  * each with a scannable QR code and one-click copy, plus the free options
  * (star, sponsor, report).

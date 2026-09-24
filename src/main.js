@@ -1,5 +1,5 @@
 /**
- * GitBooklet entry point.
+ * GitBinder entry point.
  *
  * Vite serves this as a module; `npm run build` bundles it into a static
  * `dist/` that Cloudflare Pages serves with no server involved.
@@ -19,16 +19,16 @@ function start() {
     // Expose a tiny handle for console poking / debugging. Never a leak:
     // everything it exposes is already in the page.
     if (import.meta.env?.DEV) {
-      window.__gitbooklet = app;
+      window.__gitbinder = app;
     }
 
     boot?.remove();
   } catch (error) {
-    console.error('[gitbooklet] failed to start', error);
+    console.error('[gitbinder] failed to start', error);
     if (boot) {
       boot.innerHTML = `
         <div class="mx-auto max-w-md px-6 text-center">
-          <h1 class="font-serif text-xl font-semibold text-ink-900">GitBooklet could not start</h1>
+          <h1 class="font-serif text-xl font-semibold text-ink-900">GitBinder could not start</h1>
           <p class="mt-2 text-sm text-ink-600">
             Something went wrong while initialising the app. Reloading usually fixes it.
           </p>

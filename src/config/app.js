@@ -6,15 +6,28 @@
  * @module config/app
  */
 
-export const APP_NAME = 'GitBooklet';
+export const APP_NAME = 'GitBinder';
 export const APP_VERSION = '0.1.0';
 export const APP_TAGLINE_KEY = 'meta.tagline';
 
 /** localStorage keys — namespaced so multiple tools can coexist on one origin. */
 export const STORAGE_KEYS = {
   /** Persisted user settings + repository overrides. */
-  state: 'gitbooklet:state',
+  state: 'gitbinder:state',
   /** Per-device key used to obfuscate the optional Personal Access Token. */
+  vault: 'gitbinder:vault',
+};
+
+/**
+ * Keys written before the GitBooklet → GitBinder rename.
+ *
+ * A rename must never cost a visitor their work: anyone who used the old build
+ * still has their curated book under the old names, and the app would otherwise
+ * boot empty for them. `migrateStorageKeys()` moves these across once, on the
+ * first load after the rename.
+ */
+export const LEGACY_STORAGE_KEYS = {
+  state: 'gitbooklet:state',
   vault: 'gitbooklet:vault',
 };
 

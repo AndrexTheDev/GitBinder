@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 
 /**
- * GitBooklet is a static, zero-backend app.
+ * GitBinder is a static, zero-backend app.
  * `npm run build` emits a fully static bundle into `dist/`,
  * which is what Cloudflare Pages serves (Build command: `npm run build`, Output dir: `dist`).
  *

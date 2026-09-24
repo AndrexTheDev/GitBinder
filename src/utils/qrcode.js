@@ -6,7 +6,7 @@
  *
  *   • **No network.** An image API (goqr.me, api.qrserver.com, …) would send
  *     every visitor's page — and the intent to donate — to a third party, and
- *     would break the moment GitBooklet is opened offline. GitBooklet's whole
+ *     would break the moment GitBinder is opened offline. GitBinder's whole
  *     pitch is "runs entirely in your browser", so the encoding happens here.
  *   • **No canvas.** SVG scales cleanly on a retina screen, stays crisp, and
  *     costs one DOM node instead of a bitmap.

@@ -119,4 +119,4 @@ export const BOOK_LIMITS = Object.freeze({
 export const BOOK_SUBTITLE_KEY = 'book.cover.subtitle';
 
 /** Default file name stem for the generated PDF (`document.title`). */
-export const BOOK_FILENAME_PREFIX = 'gitbooklet';
+export const BOOK_FILENAME_PREFIX = 'gitbinder';

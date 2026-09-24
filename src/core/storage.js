@@ -35,7 +35,7 @@ export function resolveStorage(global = globalThis) {
     const storage = global.localStorage;
     if (!storage) throw new Error('localStorage missing');
     // Safari throws on *write* when storage is blocked, so probe it.
-    const probe = '__gitbooklet_probe__';
+    const probe = '__gitbinder_probe__';
     storage.setItem(probe, '1');
     storage.removeItem(probe);
     return storage;
@@ -44,8 +44,49 @@ export function resolveStorage(global = globalThis) {
   }
 }
 
+/**
+ * Move values from retired key names to the current ones.
+ *
+ * Renaming a project is not a good reason to wipe somebody's book, so this
+ * runs once at boot: for every current key that is empty, the matching legacy
+ * key is copied across — and only deleted after the copy verifies, so a failed
+ * write leaves the original untouched rather than destroying both.
+ *
+ * @param {Storage} storage
+ * @param {Record<string, string>} mapping  current key → legacy key
+ * @returns {string[]} the current keys that were populated from a legacy one
+ */
+export function migrateStorageKeys(storage, mapping = {}) {
+  /** @type {string[]} */
+  const migrated = [];
+  if (!storage) return migrated;
+
+  for (const [current, legacy] of Object.entries(mapping)) {
+    if (!legacy || legacy === current) continue;
+    let incoming = null;
+    try {
+      if (storage.getItem(current) !== null) continue; // already on the new key
+      incoming = storage.getItem(legacy);
+    } catch {
+      continue; // storage unreadable — nothing safe to do
+    }
+    if (incoming === null) continue;
+
+    try {
+      storage.setItem(current, incoming);
+      // Verify before destroying the only remaining copy.
+      if (storage.getItem(current) !== incoming) continue;
+      storage.removeItem(legacy);
+      migrated.push(current);
+    } catch {
+      /* quota or blocked storage: keep the legacy copy, it is not harmful */
+    }
+  }
+  return migrated;
+}
+
 /** Approximate free space check — returns bytes currently used by our keys. */
-export function storageUsage(storage, prefix = 'gitbooklet:') {
+export function storageUsage(storage, prefix = 'gitbinder:') {
   let bytes = 0;
   let entries = 0;
   try {

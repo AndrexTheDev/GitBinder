@@ -238,7 +238,7 @@ describe('renderBook', () => {
     // `new URL().href` adds the root path; the printed text and the href are
     // normalised to the same string so the paper copy cannot disagree with
     // the link annotation.
-    assert.equal(right.textContent, 'Generated with GitBooklet (https://gitbinder.pages.dev/)');
+    assert.equal(right.textContent, 'Generated with GitBinder (https://gitbinder.pages.dev/)');
     const link = right.querySelector('a');
     assert.equal(link.getAttribute('href'), 'https://gitbinder.pages.dev/');
   });
@@ -333,9 +333,9 @@ describe('renderBook', () => {
 describe('print controller', () => {
   test('derives a sane file name from the book title', async () => {
     const { bookFilename } = await import('../src/services/print.js');
-    assert.equal(bookFilename('My Software Engineering Anthology'), 'gitbooklet-my-software-engineering-anthology');
-    assert.equal(bookFilename('  !!  '), 'gitbooklet');
-    assert.equal(bookFilename('Übermäßig große Titel'), 'gitbooklet-ubermassig-grosse-titel');
+    assert.equal(bookFilename('My Software Engineering Anthology'), 'gitbinder-my-software-engineering-anthology');
+    assert.equal(bookFilename('  !!  '), 'gitbinder');
+    assert.equal(bookFilename('Übermäßig große Titel'), 'gitbinder-ubermassig-grosse-titel');
   });
 
   test('hides the app, renames the document and restores it afterwards', async () => {
@@ -354,14 +354,14 @@ describe('print controller', () => {
       safetyTimeout: 0,
     });
 
-    env.document.title = 'GitBooklet';
+    env.document.title = 'GitBinder';
     assert.equal(controller.print({ title: 'My Anthology' }), true);
     assert.equal(calls, 1);
-    assert.equal(env.document.title, 'gitbooklet-my-anthology');
+    assert.equal(env.document.title, 'gitbinder-my-anthology');
 
     window.dispatchEvent(new window.Event('afterprint'));
     assert.equal(env.document.body.classList.contains(PRINTING_CLASS), false);
-    assert.equal(env.document.title, 'GitBooklet');
+    assert.equal(env.document.title, 'GitBinder');
     assert.equal(controller.isPrinting(), false);
     controller.dispose();
   });
@@ -444,7 +444,7 @@ describe('book studio (integration)', () => {
     const { bootstrap } = await import('../src/app.js');
     const storage = createMemoryStorage();
     storage.setItem(
-      'gitbooklet:state',
+      'gitbinder:state',
       JSON.stringify({ version: 1, data: { githubUsername: 'octo', customBookTitle: 'Test Anthology' } }),
     );
 

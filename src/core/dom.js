@@ -1,7 +1,7 @@
 /**
  * Micro DOM layer.
  *
- * We deliberately ship no framework: GitBooklet is a single-purpose tool and a
+ * We deliberately ship no framework: GitBinder is a single-purpose tool and a
  * ~40 kB bundle that starts instantly is part of the product. These helpers
  * give us declarative-enough rendering plus a keyed list reconciler, which is
  * the one thing hand-rolled UI code usually gets wrong (focus loss on re-render).

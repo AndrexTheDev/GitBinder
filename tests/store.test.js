@@ -192,7 +192,7 @@ describe('createStore — import / export', () => {
     const full = store.exportJSON({ includeSecrets: true });
     assert.equal(safe.data.a, 0);
     assert.equal(full.data.a, 7);
-    assert.equal(safe.$schema, 'gitbooklet/state');
+    assert.equal(safe.$schema, 'gitbinder/state');
   });
 
   test('importJSON accepts an envelope or a bare object', () => {
@@ -202,7 +202,7 @@ describe('createStore — import / export', () => {
     assert.equal(store.get('nested.deep'), 'imported');
 
     const result = store.importJSON({
-      $schema: 'gitbooklet/state',
+      $schema: 'gitbinder/state',
       version: 1,
       data: { a: 7 },
     });
@@ -219,7 +219,7 @@ describe('createStore — import / export', () => {
 
   test('migration runs when versions differ', () => {
     const storage = createMemoryStorage({
-      k: JSON.stringify({ $schema: 'gitbooklet/state', version: 0, data: { legacy: 'yes' } }),
+      k: JSON.stringify({ $schema: 'gitbinder/state', version: 0, data: { legacy: 'yes' } }),
     });
     const store = createStore({
       name: 'test',

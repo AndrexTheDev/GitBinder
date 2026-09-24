@@ -1,9 +1,9 @@
 {
-  "name": "gitbooklet",
+  "name": "gitbinder",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "GitBooklet — turn your GitHub repositories into a printable Classic Book PDF portfolio. 100% free, 100% client-side.",
+  "description": "GitBinder — turn your GitHub repositories into a printable Classic Book PDF portfolio. 100% free, 100% client-side.",
   "license": "MIT",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",

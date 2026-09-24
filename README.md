@@ -1,8 +1,8 @@
-# GitBooklet
+# GitBinder
 
 > Turn your GitHub repositories into a printable **Classic Book** PDF portfolio.
 
-GitBooklet is a **100% free, 100% client-side** web application. It has no backend, no
+GitBinder is a **100% free, 100% client-side** web application. It has no backend, no
 accounts, no cookies and no analytics: your repositories are fetched straight from
 `api.github.com`, curated in your browser, and composed into a book. Settings — including
 an optional Personal Access Token — never leave the device.
@@ -155,7 +155,7 @@ tests/                      node:test suites (jsdom smoke tests included)
 ## State & persistence
 
 Everything the visitor configures lives in `localStorage` under namespaced keys
-(`gitbooklet:state`, `gitbooklet:vault`).
+(`gitbinder:state`, `gitbinder:vault`).
 
 ```js
 {
@@ -285,7 +285,7 @@ keystroke.
 
 ## The Classic Book PDF composer
 
-The book is *composed*, not screenshotted: GitBooklet decides which projects share
+The book is *composed*, not screenshotted: GitBinder decides which projects share
 a sheet and what number that sheet carries, then renders one
 `<section class="book-page">` per physical page. `window.print()` (or the browser's
 "Save as PDF") does the rest — no PDF library, no canvas raster, no server.
@@ -329,7 +329,7 @@ homepages are passed through `safeUrl()` first: anything that is not `http(s)` o
 
 * **Header** — the book title, small and muted.
 * **Footer** — `Author: <name>` on the left, the page number centred, and
-  `Generated with GitBooklet (https://gitbinder.pages.dev)` on the right.
+  `Generated with GitBinder (https://gitbinder.pages.dev)` on the right.
 
 ### Printing
 
@@ -338,7 +338,7 @@ that are easy to get wrong:
 
 1. **The file name** — Chromium seeds "Save as PDF" with `document.title`, so the
    book title is swapped in for the duration of the call
-   (`gitbooklet-my-software-engineering-anthology`) and restored afterwards.
+   (`gitbinder-my-software-engineering-anthology`) and restored afterwards.
 2. **What gets printed** — a `body.is-printing-book` class hides the app chrome and
    reveals the composed book. Nothing is moved in the DOM, so cancelling the dialog
    leaves the app exactly as it was. The book is composed synchronously *before*
@@ -386,7 +386,7 @@ rebuild a 60-page document on every keystroke.
 
 ## Architecture notes
 
-**No framework.** GitBooklet is a single-purpose tool; a ~37 kB gzipped bundle that
+**No framework.** GitBinder is a single-purpose tool; a ~37 kB gzipped bundle that
 starts instantly *is* a feature. `core/dom.js` provides a small `h()` factory and
 `core/list.js` a keyed reconciler — the one piece of hand-rolled UI code that is easy to
 get wrong, because re-rendering a list on every keystroke would steal focus from the

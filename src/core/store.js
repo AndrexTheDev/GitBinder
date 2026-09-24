@@ -166,7 +166,7 @@ export function createStore(config = {}) {
 
   function buildEnvelope(data) {
     return {
-      $schema: 'gitbooklet/state',
+      $schema: 'gitbinder/state',
       name,
       version,
       updatedAt: new Date().toISOString(),
@@ -355,7 +355,7 @@ export function createStore(config = {}) {
     let input = payload;
 
     if (isPlainObject(payload) && isPlainObject(payload.data)) {
-      if (payload.$schema && payload.$schema !== 'gitbooklet/state') {
+      if (payload.$schema && payload.$schema !== 'gitbinder/state') {
         warnings.push(`unexpected-schema:${payload.$schema}`);
       }
       const from = Number(payload.version ?? 0);

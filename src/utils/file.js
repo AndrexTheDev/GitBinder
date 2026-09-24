@@ -71,7 +71,7 @@ export function pickFiles({ accept = '*/*', multiple = false } = {}) {
   });
 }
 
-/** `gitbooklet-settings-2026-09-24.json` */
+/** `gitbinder-settings-2026-09-24.json` */
 export function timestampedFilename(prefix, extension = 'json') {
   const stamp = new Date().toISOString().slice(0, 10);
   return `${prefix}-${stamp}.${extension}`;

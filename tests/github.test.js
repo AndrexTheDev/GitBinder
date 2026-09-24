@@ -294,11 +294,11 @@ describe('normalizeRepo metadata', () => {
   test('maps every field the spec asks for', () => {
     const repo = normalizeRepo({
       id: 42,
-      name: 'gitbooklet',
-      full_name: 'octo/gitbooklet',
+      name: 'gitbinder',
+      full_name: 'octo/gitbinder',
       description: 'A book of your repos',
-      html_url: 'https://github.com/octo/gitbooklet',
-      homepage: 'https://gitbooklet.dev',
+      html_url: 'https://github.com/octo/gitbinder',
+      homepage: 'https://gitbinder.dev',
       language: 'JavaScript',
       stargazers_count: 128,
       forks_count: 7,
@@ -309,11 +309,11 @@ describe('normalizeRepo metadata', () => {
     });
 
     assert.equal(repo.id, 42);
-    assert.equal(repo.name, 'gitbooklet');
-    assert.equal(repo.slug, 'octo/gitbooklet');
+    assert.equal(repo.name, 'gitbinder');
+    assert.equal(repo.slug, 'octo/gitbinder');
     assert.equal(repo.description, 'A book of your repos');
-    assert.equal(repo.url, 'https://github.com/octo/gitbooklet');
-    assert.equal(repo.homepage, 'https://gitbooklet.dev');
+    assert.equal(repo.url, 'https://github.com/octo/gitbinder');
+    assert.equal(repo.homepage, 'https://gitbinder.dev');
     assert.equal(repo.language, 'JavaScript');
     assert.equal(repo.stars, 128);
     assert.equal(repo.forks, 7);

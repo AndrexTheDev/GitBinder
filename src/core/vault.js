@@ -23,7 +23,7 @@
 import { resolveStorage } from './storage.js';
 
 const SEAL_PREFIX = 'enc:v1:';
-const VAULT_STORAGE_KEY = 'gitbooklet:vault';
+const VAULT_STORAGE_KEY = 'gitbinder:vault';
 const MAGIC = [0xa7, 0x5c];
 
 function bytesToBase64(bytes) {

@@ -126,14 +126,14 @@ describe('application bootstrap', () => {
     assert.equal(settings.state.authorEmail, 'hippie.highho@gmail.com');
     assert.equal(settings.state.language, 'en');
     assert.ok(env.document.documentElement.getAttribute('lang') === 'en');
-    assert.ok(env.document.title.startsWith('GitBooklet'));
+    assert.ok(env.document.title.startsWith('GitBinder'));
   });
 
   test('navbar exposes every required control', () => {
     const nav = env.document.querySelector('#navbar-root');
     const labels = [...nav.querySelectorAll('button, a')].map((el) => el.getAttribute('aria-label') ?? el.textContent.trim());
 
-    assert.ok(labels.some((l) => l && l.includes('GitBooklet')), 'no branding');
+    assert.ok(labels.some((l) => l && l.includes('GitBinder')), 'no branding');
     assert.ok(labels.includes('Open settings'), 'no settings button');
     const supportBtn = [...nav.querySelectorAll('button')].find(
       (el) => el.getAttribute('data-tooltip') === 'Support this project' || el.getAttribute('aria-label') === 'Open support dialog',
@@ -227,7 +227,7 @@ describe('settings drawer', () => {
     assert.equal(settings.state.personalAccessToken, 'ghp_smoketoken');
 
     settings.persistNow();
-    const raw = JSON.parse(storage.getItem('gitbooklet:state'));
+    const raw = JSON.parse(storage.getItem('gitbinder:state'));
     assert.notEqual(raw.data.personalAccessToken, 'ghp_smoketoken');
     assert.match(raw.data.personalAccessToken, /^enc:v1:/);
   });
@@ -240,7 +240,7 @@ describe('settings drawer', () => {
   test('export produces a redacted envelope', () => {
     const { settings } = app.ctx;
     const exported = settings.exportJSON();
-    assert.equal(exported.$schema, 'gitbooklet/state');
+    assert.equal(exported.$schema, 'gitbinder/state');
     assert.equal(exported.data.personalAccessToken, '', 'token must not be exported by default');
     assert.equal(exported.data.customBookTitle, 'Anthology of Small Machines');
 
@@ -251,7 +251,7 @@ describe('settings drawer', () => {
   test('import restores a payload', () => {
     const { settings } = app.ctx;
     const result = settings.importJSON({
-      $schema: 'gitbooklet/state',
+      $schema: 'gitbinder/state',
       version: 1,
       data: {
         githubUsername: 'octo',
@@ -618,7 +618,7 @@ describe('support modal', () => {
     assert.ok(modal, 'modal did not open');
 
     const text = modal.textContent;
-    assert.match(text, /Support GitBooklet/);
+    assert.match(text, /Support GitBinder/);
     assert.match(text, /Crypto donation/);
     assert.match(text, /Bitcoin/);
     assert.match(text, /Star the repository/);
@@ -713,7 +713,7 @@ describe('footer and the info modals', () => {
   test('help explains the three steps', () => {
     footerButton('Help').click();
     const text = modal().textContent;
-    assert.match(text, /How GitBooklet works/);
+    assert.match(text, /How GitBinder works/);
     assert.match(text, /Enter your GitHub username/);
     assert.match(text, /Curate descriptions and status/);
     assert.match(text, /Compose and export your PDF/);
@@ -726,7 +726,7 @@ describe('footer and the info modals', () => {
     footerButton('Disclaimer').click();
     assert.match(
       modal().textContent,
-      /GitBooklet operates 100% client-side\. Your Personal Access Token and your data never leave your browser\./,
+      /GitBinder operates 100% client-side\. Your Personal Access Token and your data never leave your browser\./,
     );
     closeModal();
   });
@@ -763,7 +763,7 @@ describe('footer and the info modals', () => {
     const open = [...env.document.querySelectorAll('#overlay-root .modal')];
     assert.ok(open.length >= 2, 'the contact modal should stay open behind the donation modal');
     assert.ok(
-      open.some((m) => /Support GitBooklet/.test(m.textContent)),
+      open.some((m) => /Support GitBinder/.test(m.textContent)),
       'the donation modal did not open',
     );
 
@@ -776,7 +776,7 @@ describe('footer and the info modals', () => {
     app.ctx.i18n.setLocale('de');
 
     for (const [kind, label, expected] of [
-      ['help', 'Hilfe', /So funktioniert GitBooklet/],
+      ['help', 'Hilfe', /So funktioniert GitBinder/],
       ['disclaimer', 'Haftungsausschluss', /arbeitet zu 100 % client-side/],
       ['terms', 'AGB', /Nutzungsbedingungen/],
       ['contact', 'Kontakt', /Am schnellsten erreichst du mich per E-Mail/],

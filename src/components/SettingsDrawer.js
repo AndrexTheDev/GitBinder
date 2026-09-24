@@ -410,7 +410,7 @@ export function SettingsDrawer(ctx) {
         onClick: () => {
           const withSecrets = includeToken.input.checked;
           downloadJSON(
-            timestampedFilename('gitbooklet-settings'),
+            timestampedFilename('gitbinder-settings'),
             settings.exportJSON({ includeSecrets: withSecrets }),
           );
           toaster?.push({

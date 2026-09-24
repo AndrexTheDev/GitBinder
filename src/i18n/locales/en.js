@@ -11,10 +11,10 @@
  */
 export default {
   meta: {
-    title: 'GitBooklet — Your GitHub portfolio as a classic book',
+    title: 'GitBinder — Your GitHub portfolio as a classic book',
     tagline: 'Turn your repositories into a printable Classic Book.',
     description:
-      'GitBooklet is a free, client-side tool that composes your GitHub repositories into a book-like PDF portfolio. Nothing leaves your browser except the requests you trigger yourself.',
+      'GitBinder is a free, client-side tool that composes your GitHub repositories into a book-like PDF portfolio. Nothing leaves your browser except the requests you trigger yourself.',
   },
 
   common: {
@@ -61,7 +61,7 @@ export default {
 
   nav: {
     brand: {
-      name: 'GitBooklet',
+      name: 'GitBinder',
       tagline: 'Your repositories, bound as a book',
     },
     language: {
@@ -178,7 +178,7 @@ export default {
       },
       username: {
         title: 'Who is the author?',
-        body: 'GitBooklet needs a GitHub username to build your library.',
+        body: 'GitBinder needs a GitHub username to build your library.',
       },
     },
     quickFetch: {
@@ -306,7 +306,7 @@ export default {
     },
     runner: {
       author: 'Author: {name}',
-      attribution: 'Generated with GitBooklet',
+      attribution: 'Generated with GitBinder',
     },
     pageLabel: 'Page {page}',
     print: {
@@ -388,7 +388,7 @@ export default {
       import: 'Import settings (JSON)',
       importHint: 'Restores a previously exported configuration file.',
       importSuccess: 'Settings imported.',
-      importInvalid: 'That file is not a valid GitBooklet configuration.',
+      importInvalid: 'That file is not a valid GitBinder configuration.',
       importEmpty: 'The file did not contain any settings.',
       importModeMerge: 'Merge into current settings',
       importModeHint: 'Unticked, an imported file replaces your current settings.',
@@ -397,13 +397,13 @@ export default {
       resetConfirm: 'Reset all settings to their defaults? Repository overrides will be lost.',
       resetSuccess: 'Settings reset to defaults.',
       clear: 'Clear local data',
-      clearHint: 'Removes everything GitBooklet stored in this browser, including the token.',
-      clearConfirm: 'Delete all locally stored GitBooklet data? This cannot be undone.',
+      clearHint: 'Removes everything GitBinder stored in this browser, including the token.',
+      clearConfirm: 'Delete all locally stored GitBinder data? This cannot be undone.',
       clearSuccess: 'Local data cleared.',
     },
     security: {
       title: 'Where your data lives',
-      body: 'GitBooklet has no backend. Settings, tokens and overrides are kept in this browser’s localStorage and are exported only when you ask for it.',
+      body: 'GitBinder has no backend. Settings, tokens and overrides are kept in this browser’s localStorage and are exported only when you ask for it.',
       storageUsed: '{size} used in this browser',
       memoryOnly: 'Storage is blocked in this context — your settings will be lost when you close the tab.',
     },
@@ -411,10 +411,10 @@ export default {
   },
 
   support: {
-    title: 'Support GitBooklet',
+    title: 'Support GitBinder',
     subtitle: 'Free software, real hosting costs.',
     intro:
-      'GitBooklet is and stays free, with no ads and no accounts. If it saves you time, consider supporting the project — or simply star the repository, which costs nothing and helps more people find it.',
+      'GitBinder is and stays free, with no ads and no accounts. If it saves you time, consider supporting the project — or simply star the repository, which costs nothing and helps more people find it.',
     crypto: {
       title: 'Crypto donation',
       hint: 'Send any amount to one of these addresses.',
@@ -444,7 +444,7 @@ export default {
   info: {
     help: {
       footerLink: 'Help',
-      title: 'How GitBooklet works',
+      title: 'How GitBinder works',
       subtitle: 'From your GitHub account to a printed book in three steps.',
       tip: 'Your curation lives in this browser only. Reload the page and it is still here; clear the site data and it is gone for good.',
       steps: {
@@ -456,7 +456,7 @@ export default {
         curate: {
           title: 'Curate descriptions and status',
           body:
-            'Choose which projects make it into the book, correct the status GitBooklet detected, and rewrite the short description that gets printed. Forks are left out by default.',
+            'Choose which projects make it into the book, correct the status GitBinder detected, and rewrite the short description that gets printed. Forks are left out by default.',
         },
         print: {
           title: 'Compose and export your PDF',
@@ -468,9 +468,9 @@ export default {
     disclaimer: {
       footerLink: 'Disclaimer',
       title: 'Disclaimer',
-      subtitle: 'What GitBooklet does — and does not do — with your data.',
+      subtitle: 'What GitBinder does — and does not do — with your data.',
       intro:
-        'GitBooklet operates 100% client-side. Your Personal Access Token and your data never leave your browser.',
+        'GitBinder operates 100% client-side. Your Personal Access Token and your data never leave your browser.',
       sections: {
         clientSide: {
           title: 'No backend, no telemetry',
@@ -485,7 +485,7 @@ export default {
         noWarranty: {
           title: 'No warranty',
           body:
-            'GitBooklet is provided “as is”. Repository data is fetched live from GitHub and can be incomplete, out of date or wrong. Check the generated book before you rely on it.',
+            'GitBinder is provided “as is”. Repository data is fetched live from GitHub and can be incomplete, out of date or wrong. Check the generated book before you rely on it.',
         },
         donations: {
           title: 'Donations',
@@ -495,7 +495,7 @@ export default {
         thirdParty: {
           title: 'Third-party content',
           body:
-            'Project names, descriptions and links belong to their respective owners and are shown exactly as the GitHub API returns them. GitBooklet is not affiliated with GitHub, Inc.',
+            'Project names, descriptions and links belong to their respective owners and are shown exactly as the GitHub API returns them. GitBinder is not affiliated with GitHub, Inc.',
         },
       },
     },
@@ -504,12 +504,12 @@ export default {
       title: 'Terms of service',
       subtitle: 'Short terms for a small open-source tool.',
       intro:
-        'These terms are deliberately short. GitBooklet is a free static web app with no accounts and no server, so there is not much to regulate.',
+        'These terms are deliberately short. GitBinder is a free static web app with no accounts and no server, so there is not much to regulate.',
       sections: {
         scope: {
           title: 'Scope of the service',
           body:
-            'GitBooklet is offered free of charge and may be changed or discontinued at any time. There is no entitlement to availability, support or any particular feature.',
+            'GitBinder is offered free of charge and may be changed or discontinued at any time. There is no entitlement to availability, support or any particular feature.',
         },
         noAccount: {
           title: 'No account, nothing is sold',
@@ -529,7 +529,7 @@ export default {
         openSource: {
           title: 'Open source',
           body:
-            'GitBooklet is released under the MIT licence. You may use, modify and self-host it, including commercially, within the terms of that licence.',
+            'GitBinder is released under the MIT licence. You may use, modify and self-host it, including commercially, within the terms of that licence.',
         },
         changes: {
           title: 'Changes to these terms',

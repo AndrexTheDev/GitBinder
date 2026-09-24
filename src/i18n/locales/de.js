@@ -6,10 +6,10 @@
  */
 export default {
   meta: {
-    title: 'GitBooklet — Dein GitHub-Portfolio als klassisches Buch',
+    title: 'GitBinder — Dein GitHub-Portfolio als klassisches Buch',
     tagline: 'Verwandle deine Repositories in ein druckbares Buch.',
     description:
-      'GitBooklet ist ein kostenloses Client-side-Werkzeug, das deine GitHub-Repositories zu einem buchähnlichen PDF-Portfolio zusammenfügt. Nichts verlässt deinen Browser außer den Anfragen, die du selbst auslöst.',
+      'GitBinder ist ein kostenloses Client-side-Werkzeug, das deine GitHub-Repositories zu einem buchähnlichen PDF-Portfolio zusammenfügt. Nichts verlässt deinen Browser außer den Anfragen, die du selbst auslöst.',
   },
 
   common: {
@@ -56,7 +56,7 @@ export default {
 
   nav: {
     brand: {
-      name: 'GitBooklet',
+      name: 'GitBinder',
       tagline: 'Deine Repositories, gebunden als Buch',
     },
     language: {
@@ -173,7 +173,7 @@ export default {
       },
       username: {
         title: 'Wer ist die Autorin oder der Autor?',
-        body: 'GitBooklet benötigt einen GitHub-Benutzernamen, um deine Bibliothek aufzubauen.',
+        body: 'GitBinder benötigt einen GitHub-Benutzernamen, um deine Bibliothek aufzubauen.',
       },
     },
     quickFetch: {
@@ -302,7 +302,7 @@ export default {
     },
     runner: {
       author: 'Autor: {name}',
-      attribution: 'Erstellt mit GitBooklet',
+      attribution: 'Erstellt mit GitBinder',
     },
     pageLabel: 'Seite {page}',
     print: {
@@ -384,7 +384,7 @@ export default {
       import: 'Einstellungen importieren (JSON)',
       importHint: 'Stellt eine zuvor exportierte Konfigurationsdatei wieder her.',
       importSuccess: 'Einstellungen importiert.',
-      importInvalid: 'Diese Datei ist keine gültige GitBooklet-Konfiguration.',
+      importInvalid: 'Diese Datei ist keine gültige GitBinder-Konfiguration.',
       importEmpty: 'Die Datei enthielt keine Einstellungen.',
       importModeMerge: 'Mit aktuellen Einstellungen zusammenführen',
       importModeHint: 'Ohne Häkchen ersetzt eine importierte Datei deine aktuellen Einstellungen.',
@@ -393,13 +393,13 @@ export default {
       resetConfirm: 'Alle Einstellungen auf die Standardwerte zurücksetzen? Repository-Overrides gehen dabei verloren.',
       resetSuccess: 'Einstellungen auf Standardwerte zurückgesetzt.',
       clear: 'Lokale Daten löschen',
-      clearHint: 'Entfernt alles, was GitBooklet in diesem Browser gespeichert hat — inklusive Token.',
-      clearConfirm: 'Alle lokal gespeicherten GitBooklet-Daten löschen? Das kann nicht rückgängig gemacht werden.',
+      clearHint: 'Entfernt alles, was GitBinder in diesem Browser gespeichert hat — inklusive Token.',
+      clearConfirm: 'Alle lokal gespeicherten GitBinder-Daten löschen? Das kann nicht rückgängig gemacht werden.',
       clearSuccess: 'Lokale Daten gelöscht.',
     },
     security: {
       title: 'Wo deine Daten liegen',
-      body: 'GitBooklet hat kein Backend. Einstellungen, Token und Overrides bleiben im localStorage dieses Browsers und werden nur exportiert, wenn du es anforderst.',
+      body: 'GitBinder hat kein Backend. Einstellungen, Token und Overrides bleiben im localStorage dieses Browsers und werden nur exportiert, wenn du es anforderst.',
       storageUsed: '{size} in diesem Browser belegt',
       memoryOnly: 'Speicher ist in diesem Kontext blockiert — deine Einstellungen gehen beim Schließen des Tabs verloren.',
     },
@@ -407,10 +407,10 @@ export default {
   },
 
   support: {
-    title: 'GitBooklet unterstützen',
+    title: 'GitBinder unterstützen',
     subtitle: 'Freie Software, echte Hosting-Kosten.',
     intro:
-      'GitBooklet ist und bleibt kostenlos, ohne Werbung und ohne Konten. Wenn es dir Zeit spart, unterstütze das Projekt gern — oder vergib einfach einen Stern für das Repository. Das kostet nichts und hilft anderen, es zu finden.',
+      'GitBinder ist und bleibt kostenlos, ohne Werbung und ohne Konten. Wenn es dir Zeit spart, unterstütze das Projekt gern — oder vergib einfach einen Stern für das Repository. Das kostet nichts und hilft anderen, es zu finden.',
     crypto: {
       title: 'Krypto-Spende',
       hint: 'Sende einen beliebigen Betrag an eine dieser Adressen.',
@@ -440,7 +440,7 @@ export default {
   info: {
     help: {
       footerLink: 'Hilfe',
-      title: 'So funktioniert GitBooklet',
+      title: 'So funktioniert GitBinder',
       subtitle: 'In drei Schritten vom GitHub-Konto zum gedruckten Buch.',
       tip: 'Deine Auswahl wird ausschließlich in diesem Browser gespeichert. Nach dem Neuladen ist sie noch da — löschst du die Website-Daten, ist sie endgültig weg.',
       steps: {
@@ -464,9 +464,9 @@ export default {
     disclaimer: {
       footerLink: 'Haftungsausschluss',
       title: 'Haftungsausschluss',
-      subtitle: 'Was GitBooklet mit deinen Daten tut — und was nicht.',
+      subtitle: 'Was GitBinder mit deinen Daten tut — und was nicht.',
       intro:
-        'GitBooklet arbeitet zu 100 % client-side. Dein Personal Access Token und deine Daten verlassen deinen Browser nicht.',
+        'GitBinder arbeitet zu 100 % client-side. Dein Personal Access Token und deine Daten verlassen deinen Browser nicht.',
       sections: {
         clientSide: {
           title: 'Kein Backend, keine Telemetrie',
@@ -481,7 +481,7 @@ export default {
         noWarranty: {
           title: 'Keine Gewähr',
           body:
-            'GitBooklet wird „wie besehen“ bereitgestellt. Repository-Daten werden live von GitHub geladen und können unvollständig, veraltet oder fehlerhaft sein. Prüfe das erzeugte Buch, bevor du dich darauf verlässt.',
+            'GitBinder wird „wie besehen“ bereitgestellt. Repository-Daten werden live von GitHub geladen und können unvollständig, veraltet oder fehlerhaft sein. Prüfe das erzeugte Buch, bevor du dich darauf verlässt.',
         },
         donations: {
           title: 'Spenden',
@@ -491,7 +491,7 @@ export default {
         thirdParty: {
           title: 'Inhalte Dritter',
           body:
-            'Projektnamen, Beschreibungen und Links gehören den jeweiligen Inhabern und werden so angezeigt, wie die GitHub-API sie liefert. GitBooklet steht in keiner Verbindung zur GitHub, Inc.',
+            'Projektnamen, Beschreibungen und Links gehören den jeweiligen Inhabern und werden so angezeigt, wie die GitHub-API sie liefert. GitBinder steht in keiner Verbindung zur GitHub, Inc.',
         },
       },
     },
@@ -500,12 +500,12 @@ export default {
       title: 'Nutzungsbedingungen',
       subtitle: 'Kurze Bedingungen für ein kleines Open-Source-Werkzeug.',
       intro:
-        'Diese Bedingungen sind bewusst kurz. GitBooklet ist eine kostenlose statische Webanwendung ohne Konten und ohne Server — viel zu regeln gibt es nicht.',
+        'Diese Bedingungen sind bewusst kurz. GitBinder ist eine kostenlose statische Webanwendung ohne Konten und ohne Server — viel zu regeln gibt es nicht.',
       sections: {
         scope: {
           title: 'Umfang des Angebots',
           body:
-            'GitBooklet wird kostenlos bereitgestellt und kann jederzeit geändert oder eingestellt werden. Ein Anspruch auf Verfügbarkeit, Support oder bestimmte Funktionen besteht nicht.',
+            'GitBinder wird kostenlos bereitgestellt und kann jederzeit geändert oder eingestellt werden. Ein Anspruch auf Verfügbarkeit, Support oder bestimmte Funktionen besteht nicht.',
         },
         noAccount: {
           title: 'Kein Konto, kein Kaufvertrag',
@@ -525,7 +525,7 @@ export default {
         openSource: {
           title: 'Open Source',
           body:
-            'GitBooklet steht unter der MIT-Lizenz. Du darfst es — auch kommerziell — nutzen, verändern und selbst hosten, im Rahmen dieser Lizenz.',
+            'GitBinder steht unter der MIT-Lizenz. Du darfst es — auch kommerziell — nutzen, verändern und selbst hosten, im Rahmen dieser Lizenz.',
         },
         changes: {
           title: 'Änderungen dieser Bedingungen',

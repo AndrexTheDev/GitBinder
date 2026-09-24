@@ -114,7 +114,7 @@ export function safeUrl(value, fallback = '') {
   const raw = String(value ?? '').trim();
   if (!raw) return fallback;
   try {
-    const url = new URL(raw, typeof location !== 'undefined' ? location.href : 'https://gitbooklet.dev/');
+    const url = new URL(raw, typeof location !== 'undefined' ? location.href : 'https://gitbinder.dev/');
     if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:') {
       return url.href;
     }

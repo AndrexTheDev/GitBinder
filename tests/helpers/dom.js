@@ -25,7 +25,7 @@ export const INDEX_HTML = readFileSync(resolve(root, 'index.html'), 'utf8');
  *             cleanup: () => void, restore: () => void }}
  */
 export function createDomEnvironment(options = {}) {
-  const { languages = ['en-US', 'en'], url = 'https://gitbooklet.test/' } = options;
+  const { languages = ['en-US', 'en'], url = 'https://gitbinder.test/' } = options;
 
   const dom = new JSDOM(INDEX_HTML, { url, pretendToBeVisual: true });
 

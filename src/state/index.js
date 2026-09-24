@@ -14,9 +14,9 @@
 import { createStore } from '../core/store.js';
 import { createVault } from '../core/vault.js';
 import { createEmitter } from '../core/events.js';
-import { resolveStorage } from '../core/storage.js';
+import { migrateStorageKeys, resolveStorage } from '../core/storage.js';
 import { createTranslator } from '../i18n/index.js';
-import { STATE_SCHEMA_VERSION, STORAGE_KEYS } from '../config/app.js';
+import { LEGACY_STORAGE_KEYS, STATE_SCHEMA_VERSION, STORAGE_KEYS } from '../config/app.js';
 import { createCodec } from './codec.js';
 import {
   createDefaultSession,
@@ -31,7 +31,14 @@ import {
  */
 export function createAppContext(options = {}) {
   const storage = options.storage ?? resolveStorage();
-  const onError = options.onError ?? ((error) => console.error('[gitbooklet]', error));
+  const onError = options.onError ?? ((error) => console.error('[gitbinder]', error));
+
+  // Runs before anything reads storage, so the vault and the settings store
+  // both see the migrated data on the very first load after a rename.
+  const migratedKeys = migrateStorageKeys(storage, {
+    [STORAGE_KEYS.state]: LEGACY_STORAGE_KEYS.state,
+    [STORAGE_KEYS.vault]: LEGACY_STORAGE_KEYS.vault,
+  });
 
   const vault = createVault({ storage, key: STORAGE_KEYS.vault });
   const codec = createCodec({ vault });
@@ -88,6 +95,8 @@ export function createAppContext(options = {}) {
     i18n,
     t,
     onError,
+    /** Populated only when data was moved off a retired key name. */
+    migratedKeys,
   };
 }
 
