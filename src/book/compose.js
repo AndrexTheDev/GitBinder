@@ -111,7 +111,12 @@ export function composeBook({
     pageLabel: t('book.pageLabel', { page: '{page}' }),
     generatedAtLabel: t('book.cover.generatedOn', { date: date(generatedAt) }),
     generatedAtISO: generatedAt.toISOString(),
-    attributionLabel: t('book.runner.attribution'),
+    /**
+     * The brand is interpolated rather than baked into the string, so the
+     * running footer, the cover and the text exports all name the app from
+     * the single `APP_NAME` constant.
+     */
+    attributionLabel: t('book.runner.attribution', { app: APP_NAME }),
     attributionUrl,
     attributionHost: prettyUrl(attributionUrl),
     stats: {

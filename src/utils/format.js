@@ -189,3 +189,41 @@ export function humanizeRepoName(name) {
     })
     .join(' ');
 }
+
+/** Letters NFKD leaves alone but ASCII has no equivalent for. */
+const TRANSLITERATE = Object.freeze({
+  ß: 'ss', æ: 'ae', œ: 'oe', ø: 'oe', đ: 'd', ð: 'd', þ: 'th',
+  ł: 'l', ı: 'i', ŋ: 'n', ə: 'e', ĸ: 'k', ŧ: 't',
+});
+
+/**
+ * German umlauts, mapped *before* NFKD runs.
+ *
+ * NFKD turns `ü` into `u` + a combining diaeresis, which the accent strip then
+ * removes — so the letter silently degrades to a bare `u` and `"Über"` becomes
+ * `uber`. German convention (DIN 5007-2) is `ue`, giving `ueber`. The
+ * substitution has to happen first because after decomposition the information
+ * is already gone.
+ */
+const GERMAN_UMLAUTS = Object.freeze({ ä: 'ae', ö: 'oe', ü: 'ue' });
+const UMLAUT_PATTERN = /[äöü]/gi;
+
+export function slugifyTitle(value, max = 60) {
+  return String(value ?? '')
+    .replace(UMLAUT_PATTERN, (char) => {
+      const mapped = GERMAN_UMLAUTS[char.toLowerCase()];
+      return char === char.toLowerCase() ? mapped : mapped.charAt(0).toUpperCase() + mapped.slice(1);
+    })
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '') // strip accents; the base letter survives
+    .replace(/[\u00df\u00e6\u0153\u00f8\u0111\u00f0\u00fe\u0142\u0131\u014b\u018f\u0138\u0167]/gi, (char) => {
+      const mapped = TRANSLITERATE[char.toLowerCase()];
+      // Preserve a capital's position: "Über" → "Ueber", not "ueber".
+      return char === char.toLowerCase() ? mapped : mapped.charAt(0).toUpperCase() + mapped.slice(1);
+    })
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, max)
+    .replace(/-+$/g, '');
+}

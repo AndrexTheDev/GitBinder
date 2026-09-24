@@ -17,6 +17,7 @@
  */
 
 import { BOOK_FILENAME_PREFIX } from '../config/book.js';
+import { slugifyTitle } from '../utils/format.js';
 
 /** `body` class that turns the app into a book for the duration of the print. */
 export const PRINTING_CLASS = 'is-printing-book';
@@ -25,30 +26,15 @@ export const PRINTING_CLASS = 'is-printing-book';
 const SAFETY_TIMEOUT_MS = 2500;
 
 /**
- * Turn arbitrary text into a file-name-safe slug.
+ * The PDF's file name — prefixed so a folder full of downloads is obvious.
+ * The slug itself comes from `slugifyTitle()` so the PDF and the text exports
+ * always agree on what the book is called.
+ *
  * @param {string} value
  * @param {number} [max]
  */
-/** Letters NFKD leaves alone but ASCII has no equivalent for. */
-const TRANSLITERATE = Object.freeze({
-  ß: 'ss', æ: 'ae', œ: 'oe', ø: 'oe', đ: 'd', ð: 'd', þ: 'th',
-  ł: 'l', ı: 'i', ŋ: 'n', ə: 'e', ĸ: 'k', ŧ: 't',
-});
-
 export function bookFilename(value, max = 60) {
-  const slug = String(value ?? '')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '') // strip accents; the base letter survives
-    .replace(/[\u00df\u00e6\u0153\u00f8\u0111\u00f0\u00fe\u0142\u0131\u014b\u018f\u0138\u0167]/gi, (char) => {
-      const mapped = TRANSLITERATE[char.toLowerCase()];
-      // Preserve a capital's position: "Über" → "Ueber", not "ueber".
-      return char === char.toLowerCase() ? mapped : mapped.charAt(0).toUpperCase() + mapped.slice(1);
-    })
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, max)
-    .replace(/-+$/g, '');
+  const slug = slugifyTitle(value, max);
   return slug ? `${BOOK_FILENAME_PREFIX}-${slug}` : BOOK_FILENAME_PREFIX;
 }
 

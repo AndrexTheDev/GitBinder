@@ -335,7 +335,10 @@ describe('print controller', () => {
     const { bookFilename } = await import('../src/services/print.js');
     assert.equal(bookFilename('My Software Engineering Anthology'), 'gitbinder-my-software-engineering-anthology');
     assert.equal(bookFilename('  !!  '), 'gitbinder');
-    assert.equal(bookFilename('Übermäßig große Titel'), 'gitbinder-ubermassig-grosse-titel');
+    // Umlauts follow the German convention (ä→ae, ö→oe, ü→ue), so the file
+    // name stays readable to a German speaker rather than degrading to
+    // "ubermassig" once the diacritics are stripped.
+    assert.equal(bookFilename('Übermäßig große Titel'), 'gitbinder-uebermaessig-grosse-titel');
   });
 
   test('hides the app, renames the document and restores it afterwards', async () => {

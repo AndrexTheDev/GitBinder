@@ -290,6 +290,8 @@ export default {
       bioFallback:
         'A curated selection of public repositories — built, shipped and maintained in the open.',
       generatedOn: 'Generated on {date}',
+      fallbackTitle: 'Selected Works',
+      fallbackAuthor: 'AndrexTheDev',
       stats: '{projects} projects · {languages} languages · {stars} stars',
     },
     toc: {
@@ -310,12 +312,14 @@ export default {
       noDescription: 'No description was provided for this project.',
       notes: 'Notes',
       notesHint: 'Space for your own notes — write on the printout or fill it in with a PDF editor.',
-      forkNote: 'Fork',
+      language: 'Language',
+      status: 'Status',
+      description: 'Description',      forkNote: 'Fork',
       archivedNote: 'Archived',
     },
     runner: {
       author: 'Author: {name}',
-      attribution: 'Generated with GitBinder',
+      attribution: 'Generated with {app}',
     },
     pageLabel: 'Page {page}',
     print: {
@@ -560,6 +564,25 @@ export default {
       supportHint: 'Star the repository or donate — both keep it alive.',
       noSupport:
         'This is a spare-time project: there is no paid support and no guaranteed response time. Please never send personal data or credentials by e-mail.',
+    },
+  },
+  export: {
+    title: 'Export as text',
+    hint: 'Markdown for a README or wiki, plain text for anywhere, CSV for a spreadsheet.',
+    markdown: 'Markdown',
+    text: 'Plain text',
+    csv: 'CSV',
+    empty: 'Include at least one repository before exporting.',
+    done: '{format} exported.',
+    links: 'Links',
+    csv: {
+      chapter: 'Chapter',
+      project: 'Project',
+      slug: 'Slug',
+      license: 'Licence',
+      description: 'Description',
+      repository: 'Repository URL',
+      homepage: 'Homepage',
     },
   },
   errors: {
