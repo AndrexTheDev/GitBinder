@@ -625,3 +625,109 @@
   .toast--warning { border-left: 3px solid var(--color-ember-500); }
   .toast--info { border-left: 3px solid var(--color-azure-500); }
 }
+
+/* ---------------------------------------------------------------------------
+   Ad-blocker gate
+   The whole app is absent behind this screen, so it has to stand on its own:
+   full-height, readable on a phone, and legible against the paper background.
+   ------------------------------------------------------------------------ */
+
+@layer components {
+  .adblock-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 1.5rem 1rem;
+    background-color: var(--color-paper-100);
+  }
+
+  .adblock-notice__card {
+    width: 100%;
+    max-width: 34rem;
+    border: 1px solid var(--color-paper-300);
+    border-radius: 1rem;
+    background-color: var(--color-paper-50);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    box-shadow: 0 24px 60px -40px rgb(13 17 25 / 0.55);
+    text-align: center;
+  }
+
+  .adblock-notice__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-bottom: 1rem;
+    border-radius: 999px;
+    background-color: var(--color-brass-100);
+    color: var(--color-brass-700);
+  }
+
+  .adblock-notice__title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.25rem, 3.5vw, 1.6rem);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--color-ink-900);
+    text-wrap: balance;
+  }
+
+  .adblock-notice__lead {
+    margin-top: 0.625rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-ink-700);
+    text-wrap: pretty;
+  }
+
+  .adblock-notice__body {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-ink-600);
+    text-wrap: pretty;
+  }
+
+  .adblock-notice__steps {
+    margin: 1.25rem auto 0;
+    display: grid;
+    gap: 0.5rem;
+    max-width: 30rem;
+    text-align: left;
+    list-style: decimal;
+    padding-left: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-ink-700);
+  }
+
+  .adblock-notice__status {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-ink-500);
+  }
+
+  .adblock-notice__actions {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.625rem;
+  }
+  /* Full-width buttons on a narrow phone read better than two stubs. */
+  .adblock-notice__actions > * {
+    flex: 1 1 auto;
+    min-width: 10rem;
+  }
+
+  .adblock-notice__foot {
+    margin-top: 1.25rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-400);
+  }
+}

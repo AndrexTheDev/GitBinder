@@ -34,6 +34,21 @@ export const LEGACY_STORAGE_KEYS = {
 /** Schema version of the persisted state envelope. Bump + add a migration. */
 export const STATE_SCHEMA_VERSION = 1;
 
+/**
+ * The ad-blocker gate.
+ *
+ * `enabled: false` switches the whole thing off — the app then boots for
+ * everybody, whatever is hiding the bait elements. Worth knowing before
+ * changing it: detection is heuristic, and privacy tools (Firefox's strict
+ * mode, Brave Shields) hide the same bait elements a filter list does. A
+ * flagged visitor who genuinely runs no ad blocker is locked out until they
+ * act on the notice, which is why the notice explains itself and offers a
+ * re-check rather than a dead end.
+ */
+export const ADBLOCK_GATE = Object.freeze({
+  enabled: true,
+});
+
 export const GITHUB = {
   apiBase: 'https://api.github.com',
   /** Repos per page — 100 is the GitHub maximum and minimises round trips. */
