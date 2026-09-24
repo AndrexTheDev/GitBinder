@@ -96,6 +96,84 @@
     padding: 0.625rem 1rem;
   }
 
+  /* ------------------------------------------------------------------ *
+   * Text export menu
+   * ------------------------------------------------------------------ */
+
+  .book-export {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* Opens upwards: the bar sits at the bottom of the viewport, so a menu
+     dropping down would fall off the screen entirely. */
+  .book-export__menu {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    right: 0;
+    z-index: 60;
+    min-width: 13.5rem;
+    padding: 0.25rem;
+    border: 1px solid var(--color-paper-300);
+    border-radius: 0.75rem;
+    background-color: var(--color-paper-50);
+    box-shadow: 0 18px 40px -22px rgb(13 17 25 / 0.55);
+    animation: book-export-in 140ms ease-out;
+  }
+  .book-export__menu[hidden] {
+    display: none;
+  }
+
+  @keyframes book-export-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .book-export__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-ink-800);
+    text-align: left;
+    /* Roomy enough for a fingertip on a phone. */
+    min-height: 2.5rem;
+  }
+  .book-export__item:hover,
+  .book-export__item:focus-visible {
+    background-color: var(--color-paper-100);
+  }
+
+  .book-export__ext {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--color-ink-400);
+  }
+
+  .book-export__caret {
+    opacity: 0.6;
+  }
+
+  /* On a narrow phone the label is hidden (see the markup), so the menu
+     anchors to the button rather than overflowing the viewport. */
+  @media (max-width: 26rem) {
+    .book-export__menu {
+      right: auto;
+      left: 0;
+      min-width: min(13.5rem, calc(100vw - 2rem));
+    }
+  }
+
   /* The bar overlays the page, so buy the content (and the toasts) some room. */
   body.has-book-bar main {
     padding-bottom: 5rem;

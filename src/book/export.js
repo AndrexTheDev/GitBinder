@@ -232,18 +232,18 @@ function csvCell(value) {
 /** @returns {string} an RFC 4180 CSV document */
 export function toCsv({ settings, chapters, t, locale }) {
   const header = [
-    t('export.csv.chapter'),
-    t('export.csv.project'),
-    t('export.csv.slug'),
+    t('export.columns.chapter'),
+    t('export.columns.project'),
+    t('export.columns.slug'),
     t('book.entry.status'),
     t('book.entry.language'),
     t('book.entry.stars'),
     t('book.entry.forks'),
     t('book.entry.updated'),
-    t('export.csv.license'),
-    t('export.csv.description'),
-    t('export.csv.repository'),
-    t('export.csv.homepage'),
+    t('export.columns.license'),
+    t('export.columns.description'),
+    t('export.columns.repository'),
+    t('export.columns.homepage'),
     t('book.entry.notes'),
   ];
 

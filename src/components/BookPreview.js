@@ -21,6 +21,8 @@ import { h, setAttr, setText } from '../core/dom.js';
 import { UI_EVENTS } from '../core/events.js';
 import { createPrintController } from '../services/print.js';
 import { composeBook } from '../book/compose.js';
+import { EXPORT_FORMATS, buildTextExport } from '../book/export.js';
+import { downloadFile } from '../utils/file.js';
 import { paginateBook } from '../book/paginate.js';
 import { renderBook } from '../book/template.js';
 import { selectChapters, selectViews } from '../state/selectors.js';
@@ -119,6 +121,123 @@ export function BookPreview(ctx) {
     generateLabel,
   );
 
+  /* ── Text export menu ─────────────────────────────────────────────────
+     Markdown, plain text and CSV. A menu rather than three buttons: the
+     action bar has to stay usable on a phone, and the formats are a
+     secondary action next to "Generate PDF". */
+
+  const exportLabel = h('span', {
+    class: 'hidden sm:inline',
+    text: t('export.title'),
+    'data-i18n': 'export.title',
+  });
+
+  const exportMenu = h('div', {
+    class: 'book-export__menu',
+    role: 'menu',
+    'aria-label': t('export.title'),
+    // `hidden` is a DOM property here, not an attribute: `hidden: ''` would
+    // assign `el.hidden = ''`, which coerces to `false` and leaves the menu
+    // wide open on load.
+    hidden: true,
+  });
+
+  for (const format of EXPORT_FORMATS) {
+    exportMenu.append(
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'book-export__item',
+          role: 'menuitem',
+          dataset: { format: format.id },
+          onClick: () => {
+            closeExportMenu();
+            exportAs(format.id);
+          },
+        },
+        icon(format.id === 'csv' ? 'table' : 'fileText', { size: 14 }),
+        h('span', { text: t(`export.${format.id}`) }),
+        h('span', { class: 'book-export__ext', text: `.${format.extension}` }),
+      ),
+    );
+  }
+
+  const exportButton = h(
+    'button',
+    {
+      type: 'button',
+      class: 'btn btn-outline',
+      'aria-haspopup': 'true',
+      'aria-expanded': 'false',
+      title: t('export.title'),
+      onClick: () => (exportMenu.hidden ? openExportMenu() : closeExportMenu()),
+    },
+    icon('download', { size: 16 }),
+    exportLabel,
+    icon('chevronDown', { size: 14, class: 'book-export__caret' }),
+  );
+
+  const exportWrap = h(
+    'div',
+    { class: 'book-export' },
+    exportButton,
+    exportMenu,
+  );
+
+  function openExportMenu() {
+    exportMenu.hidden = false;
+    exportButton.setAttribute('aria-expanded', 'true');
+    doc.addEventListener('pointerdown', onOutsidePress, true);
+    doc.addEventListener('keydown', onMenuKeydown, true);
+    exportMenu.querySelector('[role=menuitem]')?.focus?.();
+  }
+
+  function closeExportMenu({ restoreFocus = false } = {}) {
+    if (exportMenu.hidden) return;
+    exportMenu.hidden = true;
+    exportButton.setAttribute('aria-expanded', 'false');
+    doc.removeEventListener('pointerdown', onOutsidePress, true);
+    doc.removeEventListener('keydown', onMenuKeydown, true);
+    if (restoreFocus) exportButton.focus?.();
+  }
+
+  function onOutsidePress(event) {
+    if (!exportWrap.contains(event.target)) closeExportMenu();
+  }
+
+  function onMenuKeydown(event) {
+    if (event.key === 'Escape') {
+      event.stopPropagation();
+      closeExportMenu({ restoreFocus: true });
+    }
+  }
+
+  /**
+   * Download the book as text. Composes first if needed — the visitor may
+   * never have opened the preview, and exporting an empty book would be a
+   * bug rather than a feature.
+   */
+  function exportAs(format) {
+    const chapters = currentChapters();
+    if (chapters.length === 0) {
+      toaster.push({ tone: 'warning', message: t('export.empty') });
+      return false;
+    }
+
+    const result = buildTextExport(format, {
+      settings: settings.state,
+      chapters,
+      t,
+      locale: i18n.locale,
+    });
+    downloadFile(result.filename, result.content, result.mime);
+
+    const label = t(`export.${format}`);
+    toaster.push({ tone: 'success', message: t('export.done', { format: label }) });
+    return true;
+  }
+
   const barEl = h(
     'div',
     { class: 'book-bar no-print', role: 'region', 'aria-label': t('book.bar.title') },
@@ -136,7 +255,7 @@ export function BookPreview(ctx) {
           barMeta,
         ),
       ),
-      h('div', { class: 'flex shrink-0 items-center gap-2' }, toggleButton, generateButton),
+      h('div', { class: 'flex shrink-0 items-center gap-2' }, exportWrap, toggleButton, generateButton),
     ),
   );
 
@@ -276,6 +395,15 @@ export function BookPreview(ctx) {
     toggleButton.replaceChildren(icon(open ? 'eyeOff' : 'eye', { size: 16 }), toggleLabel);
     setText(toggleLabel, t('book.bar.preview'));
     setText(generateLabel, t('book.bar.generate'));
+
+    // The menu is rebuilt lazily from i18n, so refresh its labels in place
+    // rather than tearing the buttons down mid-interaction.
+    setText(exportLabel, t('export.title'));
+    exportButton.setAttribute('title', t('export.title'));
+    for (const item of exportMenu.querySelectorAll('[role=menuitem]')) {
+      const id = item.dataset.format;
+      setText(item.querySelector('span'), t(`export.${id}`));
+    }
   }
 
   function sync() {
@@ -289,6 +417,7 @@ export function BookPreview(ctx) {
   doc.body?.classList.add('has-book-bar');
 
   const disposers = [
+    () => closeExportMenu(),
     i18n.onChange(() => {
       syncChrome();
       if (isOpen()) compose();

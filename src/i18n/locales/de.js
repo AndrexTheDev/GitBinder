@@ -571,7 +571,7 @@ export default {
     empty: 'Nimm mindestens ein Repository auf, bevor du exportierst.',
     done: '{format} exportiert.',
     links: 'Links',
-    csv: {
+    columns: {
       chapter: 'Kapitel',
       project: 'Projekt',
       slug: 'Slug',

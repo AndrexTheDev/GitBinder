@@ -286,6 +286,88 @@ describe('settings drawer', () => {
   });
 });
 
+describe('text export menu', () => {
+  /** Boots a fresh app on the shared DOM; every test tears it down again. */
+  function mount() {
+    storage = createMemoryStorage();
+    app = bootstrap({ host: env.document, storage });
+    return {
+      bar: () => env.document.querySelector('#book-bar-root'),
+      menu: () => env.document.querySelector('#book-bar-root [role=menu]'),
+      button: () =>
+        [...env.document.querySelectorAll('#book-bar-root button')].find((b) =>
+          b.hasAttribute('aria-haspopup'),
+        ),
+    };
+  }
+
+  test('the menu is closed on first paint', () => {
+    const { menu, button } = mount();
+    // Regression: `hidden: ''` assigns `el.hidden = ''`, which coerces to
+    // `false` and left the menu wide open on load.
+    assert.equal(menu().hidden, true, 'menu should start hidden');
+    assert.equal(button().getAttribute('aria-expanded'), 'false');
+    app.destroy();
+  });
+
+  test('the button opens and closes the menu', () => {
+    const { menu, button } = mount();
+    button().click();
+    assert.equal(menu().hidden, false);
+    assert.equal(button().getAttribute('aria-expanded'), 'true');
+
+    button().click();
+    assert.equal(menu().hidden, true);
+    assert.equal(button().getAttribute('aria-expanded'), 'false');
+    app.destroy();
+  });
+
+  test('one item per export format, labelled from i18n', () => {
+    const { menu } = mount();
+    const items = [...menu().querySelectorAll('[role=menuitem]')];
+    assert.deepEqual(
+      items.map((item) => item.dataset.format),
+      ['markdown', 'text', 'csv'],
+    );
+    for (const item of items) {
+      const label = item.querySelector('span').textContent.trim();
+      assert.ok(label.length > 0, 'empty label');
+      // "Chapter" was what the `export.csv` namespace collision produced.
+      assert.notEqual(label, 'Chapter');
+    }
+    app.destroy();
+  });
+
+  test('Escape closes the menu', () => {
+    const { menu, button } = mount();
+    button().click();
+    assert.equal(menu().hidden, false);
+    env.document.dispatchEvent(new env.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert.equal(menu().hidden, true);
+    assert.equal(button().getAttribute('aria-expanded'), 'false');
+    app.destroy();
+  });
+
+  test('a press outside closes the menu', () => {
+    const { menu, button } = mount();
+    button().click();
+    env.document
+      .querySelector('#main')
+      .dispatchEvent(new env.window.Event('pointerdown', { bubbles: true }));
+    assert.equal(menu().hidden, true);
+    app.destroy();
+  });
+
+  test('exporting with nothing selected warns instead of downloading', () => {
+    const { menu, button } = mount();
+    button().click();
+    menu().querySelector('[role=menuitem]').click();
+    const toast = env.document.querySelector('#toast-root').textContent;
+    assert.match(toast, /\S/, 'expected a warning toast');
+    app.destroy();
+  });
+});
+
 describe('repository fetching', () => {
   test('loads both pages and renders one card per repository', async () => {
     const stub = makeGithubStub();

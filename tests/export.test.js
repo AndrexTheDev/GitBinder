@@ -276,3 +276,70 @@ test('exports follow the requested locale for dates', () => {
   const de = toMarkdown({ settings: SETTINGS, chapters: [chapter()], t, locale: 'de' });
   assert.notEqual(en, de, 'an English and a German export should not be byte-identical');
 });
+
+/* -------------------------------------------------------------------------- *
+ * i18n wiring
+ * -------------------------------------------------------------------------- */
+
+test('the format labels do not collide with the CSV column namespace', () => {
+  // `export.csv` used to hold the column headings, which made
+  // `t('export.csv')` resolve to a heading ("Chapter") instead of the format
+  // name. The columns live under `export.columns` so both can coexist.
+  return import('../src/i18n/locales/en.js').then(({ default: en }) => {
+    assert.equal(typeof en.export.csv, 'string');
+    assert.equal(typeof en.export.markdown, 'string');
+    assert.equal(typeof en.export.text, 'string');
+    assert.equal(typeof en.export.columns, 'object');
+    for (const key of ['chapter', 'project', 'slug', 'license', 'description', 'repository', 'homepage']) {
+      assert.equal(typeof en.export.columns[key], 'string', `export.columns.${key} missing`);
+    }
+  });
+});
+
+test('every key the exporters use resolves to a non-empty string', async () => {
+  const { default: en } = await import('../src/i18n/locales/en.js');
+  const { default: de } = await import('../src/i18n/locales/de.js');
+
+  const keys = [
+    'book.cover.subtitle',
+    'book.toc.title',
+    'book.entry.stars',
+    'book.entry.forks',
+    'book.entry.updated',
+    'book.entry.license',
+    'book.entry.noDescription',
+    'book.entry.notes',
+    'book.entry.language',
+    'book.entry.status',
+    'book.entry.description',
+    'book.runner.attribution',
+    'export.title',
+    'export.empty',
+    'export.done',
+    'export.links',
+    'export.markdown',
+    'export.text',
+    'export.csv',
+    'library.row.openOnGithub',
+    'library.row.homepage',
+  ];
+
+  const get = (obj, path) => path.split('.').reduce((acc, part) => acc?.[part], obj);
+  for (const locale of [en, de]) {
+    for (const key of keys) {
+      const value = get(locale, key);
+      assert.equal(typeof value, 'string', `${key} is not a string`);
+      assert.ok(value.length > 0, `${key} is empty`);
+    }
+  }
+});
+
+test('status labels exist for every status an export can print', async () => {
+  const { default: en } = await import('../src/i18n/locales/en.js');
+  const { REPO_STATUS_IDS } = await import('../src/config/app.js');
+  for (const id of REPO_STATUS_IDS) {
+    const label = en.status?.[id];
+    assert.equal(typeof label, 'string', `status.${id} missing`);
+    assert.ok(label.length > 0);
+  }
+});
