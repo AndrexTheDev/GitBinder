@@ -1,0 +1,19 @@
+# Cloudflare Pages — per-path response headers.
+# The app has no backend, so we can lock everything down aggressively.
+
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: unsafe-none
+  X-Permitted-Cross-Domain-Policies: none
+
+# Hashed, immutable build assets: cache as long as possible.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The HTML shell must always be revalidated so a deploy is picked up.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

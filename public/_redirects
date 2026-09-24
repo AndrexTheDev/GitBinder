@@ -1,0 +1,4 @@
+# Cloudflare Pages redirects.
+# GitBooklet is a single-page app, so unknown paths fall back to index.html.
+
+/*    /index.html   200

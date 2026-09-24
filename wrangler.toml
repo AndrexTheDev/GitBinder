@@ -1,0 +1,11 @@
+# Cloudflare Pages — project configuration.
+# Used by `npm run deploy` (wrangler pages deploy). The dashboard path needs no config.
+# https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+
+name = "gitbooklet"
+pages_build_output_dir = "dist"
+compatibility_date = "2025-01-01"
+
+# Static assets only: the app has no Worker. Hashing is handled by Vite.
+[build]
+command = "npm run build"

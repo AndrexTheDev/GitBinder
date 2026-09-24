@@ -1,0 +1,85 @@
+/* =============================================================================
+   GitBooklet — Print stylesheet
+   Foundation for the "Classic Book" output. The PDF composer (next milestone)
+   renders into an isolated print container; these rules guarantee a clean,
+   ink-on-paper result even when a visitor hits Ctrl/Cmd+P manually.
+   ========================================================================== */
+
+@layer base {
+  @media print {
+    @page {
+      size: A4;
+      margin: 22mm 18mm 20mm 18mm;
+    }
+
+    html,
+    body {
+      background: #fff !important;
+      background-image: none !important;
+      color: #000 !important;
+      font-size: 11pt;
+      line-height: 1.55;
+    }
+
+    /* Never print app chrome or transient UI. */
+    .skip-link,
+    #navbar-root,
+    #footer-root,
+    #toast-root,
+    #overlay-root,
+    .no-print {
+      display: none !important;
+    }
+
+    #app,
+    main,
+    .print-area {
+      display: block !important;
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      box-shadow: none !important;
+    }
+
+    .card,
+    .panel-inset {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-serif);
+      color: #000 !important;
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    /* Every repository starts a fresh chapter. */
+    .print-chapter {
+      break-before: page;
+      page-break-before: always;
+    }
+
+    a {
+      color: #000 !important;
+      text-decoration: underline;
+    }
+    /* Surface the destination of external links on paper. */
+    a[href^='http']::after {
+      content: ' (' attr(href) ')';
+      font-family: var(--font-mono);
+      font-size: 8pt;
+      color: #444 !important;
+      word-break: break-all;
+    }
+
+    img { max-width: 100% !important; }
+
+    ::-webkit-scrollbar { display: none; }
+  }
+}
