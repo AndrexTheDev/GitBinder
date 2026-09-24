@@ -13,7 +13,8 @@
     "deploy": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=gitbinder"
   },
   "dependencies": {
-    "lucide": "^1.48.0"
+    "lucide": "^1.48.0",
+    "qrcode-generator": "^2.0.4"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

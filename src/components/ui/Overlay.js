@@ -14,6 +14,7 @@
  */
 
 import { clear, FOCUSABLE, h, on, qs } from '../../core/dom.js';
+import { icon as defaultIconFactory } from './Icon.js';
 
 /** @type {Array<{ close: () => void }>} */
 const stack = [];
@@ -77,7 +78,10 @@ export function createOverlay(options) {
     onClose,
     host = typeof document !== 'undefined' ? qs('#overlay-root') ?? document.body : null,
     iconName = null,
-    iconFactory = null,
+    // Callers pass only `iconName`; without a default here the header icon is
+    // silently dropped (the icon markup is gated on `iconName && iconFactory`),
+    // which is how every overlay in the app lost its badge.
+    iconFactory = defaultIconFactory,
   } = options;
 
   let returnFocusTo = null;

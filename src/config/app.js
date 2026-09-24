@@ -34,6 +34,17 @@ export const GITHUB = {
   scopeDocsUrl: 'https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps',
 };
 
+/**
+ * The person who built the tool — deliberately separate from the book's
+ * `authorName` setting, which belongs to whoever is curating their portfolio.
+ * The contact modal credits the developer, not the visitor.
+ */
+export const DEVELOPER = Object.freeze({
+  name: 'AndrexTheDev',
+  email: 'hippie.highho@gmail.com',
+  url: 'https://github.com/AndrexTheDev',
+});
+
 export const LINKS = {
   /**
    * Live deployment. Printed in the book's running footer on every page and

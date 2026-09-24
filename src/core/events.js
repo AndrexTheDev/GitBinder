@@ -72,6 +72,11 @@ export const UI_EVENTS = Object.freeze({
   closeSettings: 'ui:settings:close',
   openSupport: 'ui:support:open',
   closeSupport: 'ui:support:close',
+  /**
+   * Open one of the informational overlays.
+   * Payload: `{ kind: 'help'|'disclaimer'|'terms'|'contact' }`.
+   */
+  openInfo: 'ui:info:open',
   fetchRepos: 'ui:repos:fetch',
   /** Compose the book and open the print dialog. */
   printBook: 'ui:book:print',

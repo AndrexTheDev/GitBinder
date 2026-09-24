@@ -1,11 +1,20 @@
 # Cloudflare Pages — project configuration.
-# Used by `npm run deploy` (wrangler pages deploy). The dashboard path needs no config.
+# Used by `npm run deploy` (wrangler pages deploy). The dashboard path needs no
+# config at all: connect the repo, set build command `npm run build` and the
+# output directory `dist`.
 # https://developers.cloudflare.com/pages/functions/wrangler-configuration/
 
-name = "gitbooklet"
+# Must match the Pages project name — it is what produces the *.pages.dev host,
+# and therefore what the book's running footer attributes to (LINKS.deployed in
+# src/config/app.js).
+name = "gitbinder"
 pages_build_output_dir = "dist"
 compatibility_date = "2025-01-01"
 
-# Static assets only: the app has no Worker. Hashing is handled by Vite.
+# Static assets only: the app has no Worker. Hashing and code splitting are
+# handled by Vite, so there is nothing for Pages to compile.
 [build]
 command = "npm run build"
+
+# `public/_headers` and `public/_redirects` are copied through to `dist`
+# untouched by Vite and honoured by Pages; nothing to declare here.

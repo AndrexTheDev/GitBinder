@@ -31,7 +31,9 @@ Book PDF composer** are in.
 | **PDF "Classic Book" composer: cover, contents, catalogue** | ✅ |
 | **Paged-media runners (header / page number / attribution)** | ✅ |
 | **Live A4 preview + sticky print action bar** | ✅ |
-| Deploy to Cloudflare Pages | ⏳ after the placeholders in `config/support.js` are replaced |
+| **Support modal: SOL / BTC / ETH tabs, QR codes, copy feedback** | ✅ |
+| **Footer: Help / Disclaimer / Terms / Contact (EN + DE)** | ✅ |
+| **Cloudflare Pages config: wrangler, _headers, CSP, robots, sitemap** | ✅ |
 
 ---
 
@@ -67,12 +69,22 @@ npm run deploy    # build + `wrangler pages deploy dist`
 **Option B — Wrangler CLI.**
 
 ```bash
-npm run deploy
+npm run deploy          # builds, then `wrangler pages deploy dist --project-name=gitbinder`
 ```
+
+`wrangler.toml` pins the project name (it is what produces the `*.pages.dev`
+host) and the output directory, so the CLI path needs no flags by hand.
 
 `public/_headers` and `public/_redirects` ship with the build: they lock down the
 security headers, cache hashed assets for a year and fall back to `index.html` for
 unknown routes.
+
+**Content-Security-Policy.** The bundle has no inline scripts and only one inline
+`<style>` (the pre-paint boot splash), so `_headers` can — and does — ship a strict
+CSP: `default-src 'self'`, plus `connect-src https://api.github.com` for the one
+outbound call the app makes. If you ever embed a third-party script, font or
+analytics snippet, add its origin in `public/_headers`, or switch the header to
+`Content-Security-Policy-Report-Only` first and watch the console.
 
 **Option C — GitHub Actions.** See `.github/workflows/deploy.yml`; it needs two
 repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
@@ -84,13 +96,13 @@ repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
 ```
 index.html                  Static shell — every mount point lives here
 vite.config.js              Vite 8 + Tailwind v4 (CSS-first config)
-public/                     favicon, _headers, _redirects, robots.txt
+public/                     favicon, _headers, _redirects, robots.txt, sitemap.xml
 src/
 ├── main.js                 Entry point (error boundary + boot splash teardown)
 ├── app.js                  Bootstrap: mounts components, owns the fetch pipeline
 ├── config/
-│   ├── app.js              Constants, storage keys, GitHub config, repo statuses
-│   └── support.js          ⚠️ Crypto addresses — replace the placeholders
+│   ├── app.js              Constants, storage keys, GitHub config, LINKS, DEVELOPER
+│   └── support.js          Crypto addresses + shape checks (test-enforced)
 ├── core/                   Framework-free primitives, usable and testable in Node
 │   ├── store.js            Deep-reactive Proxy store + debounced persistence
 │   ├── i18n.js             Translator: dot paths, plurals, DOM binding applier
@@ -123,17 +135,18 @@ src/
 │   ├── RepoCard.js         One row: visibility, status, custom summary
 │   ├── BookPreview.js      Book studio: live preview + sticky print action bar
 │   ├── BookSummary.js      Live cover + table of contents preview
-│   ├── AppFooter.js        Provenance, privacy line, storage usage
+│   ├── AppFooter.js        Provenance, info links, privacy line, storage usage
 │   ├── SettingsDrawer.js   All persisted configuration + data portability
-│   ├── SupportModal.js     Crypto addresses + free ways to help
+│   ├── SupportModal.js     SOL / BTC / ETH tabs, QR codes, copy feedback
+│   ├── InfoModals.js       Help, Disclaimer, Terms, Contact (built on open)
 │   ├── LanguageToggle.js   EN ⇄ DE segmented control
-│   └── ui/                 Overlay, Toast, Confirm, Field, Icon
+│   └── ui/                 Overlay, Toast, Confirm, Field, Icon, Tabs
 ├── styles/
 │   ├── index.css           Tailwind v4 `@theme` tokens (paper / ink / brass)
 │   ├── components.css      Semantic component classes (.btn, .card, .badge …)
 │   ├── book.css            Classic Book: cream paper, serif, pages, runners
 │   └── print.css           What survives Ctrl/Cmd+P (app chrome vs. the book)
-└── utils/                  object, format, file, clipboard, timing
+└── utils/                  object, format, file, clipboard, timing, qrcode
 tests/                      node:test suites (jsdom smoke tests included)
 ```
 
@@ -429,10 +442,16 @@ The suite includes a regression test for repository names containing a dot
 
 ## Before you deploy
 
-1. Replace the placeholder wallet addresses in `src/config/support.js` — the UI
-   currently labels them as placeholders on purpose.
+1. Check the wallet addresses in `src/config/support.js`. They are real and
+   shape-checked (`npm test` fails if one is malformed or still a placeholder),
+   but they are yours to confirm — a typo here costs a real donation.
 2. Update `LINKS` in `src/config/app.js` if the repository is renamed or moved.
-3. Update the `<link rel="canonical">` in `index.html` to your Pages domain.
+   `LINKS.deployed` is printed in the running footer of every generated page, so
+   it is also the URL you want attributed.
+3. Update the `<link rel="canonical">` in `index.html` and the `Sitemap:` line in
+   `public/robots.txt` to your Pages domain.
+4. Match the Pages project name (`gitbinder` here) in `wrangler.toml`,
+   `package.json` → `scripts.deploy`, and `.github/workflows/deploy.yml`.
 
 ---
 

@@ -423,6 +423,8 @@ export default {
       network: 'Network: {network}',
       placeholder: 'Placeholder address — configure it in src/config/support.js',
       explorer: 'View on explorer',
+      qrLabel: 'QR code for the {coin} donation address',
+      tablist: 'Choose a cryptocurrency',
     },
     links: {
       title: 'Other ways to help',
@@ -439,6 +441,118 @@ export default {
     },
   },
 
+  info: {
+    help: {
+      footerLink: 'Help',
+      title: 'How GitBooklet works',
+      subtitle: 'From your GitHub account to a printed book in three steps.',
+      tip: 'Your curation lives in this browser only. Reload the page and it is still here; clear the site data and it is gone for good.',
+      steps: {
+        connect: {
+          title: 'Enter your GitHub username',
+          body:
+            'Type your username and fetch your repositories. A Personal Access Token is optional and only needed if you want to include private repositories.',
+        },
+        curate: {
+          title: 'Curate descriptions and status',
+          body:
+            'Choose which projects make it into the book, correct the status GitBooklet detected, and rewrite the short description that gets printed. Forks are left out by default.',
+        },
+        print: {
+          title: 'Compose and export your PDF',
+          body:
+            'Open the live preview to see the real book at A4 size, then choose “Generate PDF / Print book” and pick “Save as PDF” in the print dialog.',
+        },
+      },
+    },
+    disclaimer: {
+      footerLink: 'Disclaimer',
+      title: 'Disclaimer',
+      subtitle: 'What GitBooklet does — and does not do — with your data.',
+      intro:
+        'GitBooklet operates 100% client-side. Your Personal Access Token and your data never leave your browser.',
+      sections: {
+        clientSide: {
+          title: 'No backend, no telemetry',
+          body:
+            'The app is a static site. There is no server that could log your requests, and the tool contains no analytics, no cookies and no tracking of any kind.',
+        },
+        token: {
+          title: 'Your Personal Access Token',
+          body:
+            'A token you enter is used solely to call api.github.com from your own browser. It is obfuscated with a device key before being written to local storage — which is not the same as encryption. On a shared computer, leave the field empty.',
+        },
+        noWarranty: {
+          title: 'No warranty',
+          body:
+            'GitBooklet is provided “as is”. Repository data is fetched live from GitHub and can be incomplete, out of date or wrong. Check the generated book before you rely on it.',
+        },
+        donations: {
+          title: 'Donations',
+          body:
+            'Crypto donations are voluntary and non-refundable. Always check the address shown on screen before sending — blockchain transactions cannot be reversed.',
+        },
+        thirdParty: {
+          title: 'Third-party content',
+          body:
+            'Project names, descriptions and links belong to their respective owners and are shown exactly as the GitHub API returns them. GitBooklet is not affiliated with GitHub, Inc.',
+        },
+      },
+    },
+    terms: {
+      footerLink: 'Terms',
+      title: 'Terms of service',
+      subtitle: 'Short terms for a small open-source tool.',
+      intro:
+        'These terms are deliberately short. GitBooklet is a free static web app with no accounts and no server, so there is not much to regulate.',
+      sections: {
+        scope: {
+          title: 'Scope of the service',
+          body:
+            'GitBooklet is offered free of charge and may be changed or discontinued at any time. There is no entitlement to availability, support or any particular feature.',
+        },
+        noAccount: {
+          title: 'No account, nothing is sold',
+          body:
+            'Nothing is sold and no account is created. Because no personal data is transmitted to us, using the tool requires no data-processing agreement.',
+        },
+        yourData: {
+          title: 'Your data stays yours',
+          body:
+            'Everything you type — book title, author name, descriptions, token — is stored in your browser only. You can export it as JSON or delete it at any time in Settings.',
+        },
+        noWarranty: {
+          title: 'Warranty and liability',
+          body:
+            'Liability is limited to intent and gross negligence. In particular we accept no liability for the content of generated PDFs, which is produced from the data you selected and edited.',
+        },
+        openSource: {
+          title: 'Open source',
+          body:
+            'GitBooklet is released under the MIT licence. You may use, modify and self-host it, including commercially, within the terms of that licence.',
+        },
+        changes: {
+          title: 'Changes to these terms',
+          body:
+            'We may update these terms. The version published with the app applies; continuing to use it after a change counts as acceptance.',
+        },
+      },
+    },
+    contact: {
+      footerLink: 'Contact',
+      title: 'Contact',
+      subtitle: 'Questions, bug reports and ideas are welcome.',
+      intro: '{app} is developed by {author}. The quickest way to reach me is by e-mail.',
+      github: 'GitHub profile',
+      githubHint: 'Source code, releases and other projects.',
+      issue: 'Report an issue',
+      issueHint: 'Bugs and feature requests belong in the issue tracker.',
+      support: 'Support the project',
+      supportHint: 'Star the repository or donate — both keep it alive.',
+      noSupport:
+        'This is a spare-time project: there is no paid support and no guaranteed response time. Please never send personal data or credentials by e-mail.',
+    },
+  },
   errors: {
     network: 'Cannot reach GitHub. Check your connection and try again.',
     unauthorized: 'GitHub rejected the credentials. Check the username and token.',
@@ -480,6 +594,7 @@ export default {
     license: 'MIT licensed',
     version: 'Version {version}',
     source: 'Source code',
+    support: 'Support the project',
     storage: 'Local storage: {size}',
   },
 };

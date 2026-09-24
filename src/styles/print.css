@@ -21,13 +21,29 @@
       line-height: 1.55;
     }
 
-    /* Never print app chrome or transient UI. */
+    /* Never print app chrome or transient UI.
+       Modals get the most explicit treatment: an open dialog lives in
+       #overlay-root, so it is already covered, but a drawer or confirm panel
+       left mounted elsewhere would otherwise print *on top of* the book.
+       Interactive controls go too — a printed "Copy address" or "Generate PDF"
+       button is noise on paper, and a form field prints as an empty box. */
     .skip-link,
     #navbar-root,
     #footer-root,
     #toast-root,
     #overlay-root,
-    .no-print {
+    #book-bar-root,
+    .no-print,
+    .overlay-scrim,
+    .modal,
+    .drawer,
+    [role='dialog'],
+    .tabs,
+    button,
+    .btn,
+    input,
+    select,
+    textarea {
       display: none !important;
     }
 

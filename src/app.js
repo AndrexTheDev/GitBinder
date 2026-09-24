@@ -27,6 +27,7 @@ import { BookPreview } from './components/BookPreview.js';
 import { AppFooter } from './components/AppFooter.js';
 import { SettingsDrawer } from './components/SettingsDrawer.js';
 import { SupportModal } from './components/SupportModal.js';
+import { InfoModals } from './components/InfoModals.js';
 
 /**
  * @param {object} [env]
@@ -102,7 +103,10 @@ export function bootstrap(env = {}) {
   // Modeless "layers" — they own an overlay created on demand.
   const settingsDrawer = SettingsDrawer({ ...ctx, t, toaster });
   const supportModal = SupportModal({ ...ctx, t, toaster });
-  components.push(settingsDrawer, supportModal);
+  // Help / Disclaimer / Terms / Contact. Renders no root element; every dialog
+  // is built the first time somebody opens it.
+  const infoModals = InfoModals({ ...ctx, t, toaster });
+  components.push(settingsDrawer, supportModal, infoModals);
 
   /* ── Repository fetching ───────────────────────────────────────────── */
 
@@ -283,7 +287,17 @@ export function bootstrap(env = {}) {
   return {
     ctx,
     fetchRepos,
-    components: { navbar, hero, library, summary, bookPreview, footer, settingsDrawer, supportModal },
+    components: {
+      navbar,
+      hero,
+      library,
+      summary,
+      bookPreview,
+      footer,
+      settingsDrawer,
+      supportModal,
+      infoModals,
+    },
     toaster,
     destroy() {
       inflight?.abort();

@@ -2,27 +2,43 @@
  * Support / crypto donation modal.
  *
  * GitBooklet is free, but the project still costs money to keep alive. This
- * dialog collects the ways to give something back: crypto addresses with
- * one-click copy, plus the free options (star, sponsor, report).
+ * dialog collects the ways to give something back: three wallet addresses,
+ * each with a scannable QR code and one-click copy, plus the free options
+ * (star, sponsor, report).
  *
- * Addresses come from `src/config/support.js` — the shipped values are
- * placeholders and the UI says so out loud instead of silently collecting
- * donations into a dead address.
+ * Three details that matter more than they look:
+ *
+ *   • **The address is never transformed.** The Ethereum address is
+ *     EIP-55 checksummed — its mixed case *is* the checksum, and some wallets
+ *     reject an all-lowercase copy. Nothing here lowercases, trims-for-display
+ *     or "tidies up" an address; what is configured is what is shown, copied
+ *     and encoded.
+ *   • **The QR encodes the bare address**, not a `bitcoin:` style payment URI.
+ *     A URI scans nicer in some wallets and fails in others; the bare address
+ *     always works and always matches the text on screen next to it.
+ *   • **Copy feedback lives on the button**, not only in a toast. A toast in
+ *     the corner is easy to miss; the button flipping to "Copied!" with a check
+ *     mark tells you the thing you actually pressed worked. The toast is kept
+ *     as well, for screen-reader users who get the live-region announcement.
+ *
+ * Addresses come from `src/config/support.js`.
  *
  * @module components/SupportModal
  */
 
 import { h } from '../core/dom.js';
 import { UI_EVENTS } from '../core/events.js';
-import { CRYPTO_TARGETS, SUPPORT_LINKS } from '../config/support.js';
+import { CRYPTO_TARGETS, SUPPORT_LINKS, isPlaceholderAddress } from '../config/support.js';
 import { LINKS } from '../config/app.js';
 import { copyToClipboard } from '../utils/clipboard.js';
+import { qrCodeElement } from '../utils/qrcode.js';
 import { createOverlay } from './ui/Overlay.js';
+import { createTabs } from './ui/Tabs.js';
 import { noteBox } from './ui/Field.js';
 import { icon } from './ui/Icon.js';
 
-const PLACEHOLDER_HINTS = ['example', 'replaceme', '0x0000000000000000000000000000000000000000'];
-const isPlaceholder = (address) => PLACEHOLDER_HINTS.some((hint) => address.toLowerCase().includes(hint.toLowerCase()));
+/** How long the copy button stays in its "Copied!" state. */
+const COPIED_FEEDBACK_MS = 1800;
 
 /**
  * @param {object} ctx
@@ -34,78 +50,188 @@ const isPlaceholder = (address) => PLACEHOLDER_HINTS.some((hint) => address.toLo
 export function SupportModal(ctx) {
   const { i18n, t, bus, toaster } = ctx;
 
-  function buildCryptoCard(target) {
-    const placeholder = isPlaceholder(target.address);
-    const copyLabel = h('span', { text: t('support.crypto.copy') });
+  /**
+   * A copy button that reports success on itself.
+   *
+   * @param {string} value
+   * @param {{ disabled?: boolean, size?: 'sm'|'md' }} [options]
+   */
+  function createCopyButton(value, { disabled = false } = {}) {
+    const label = h('span', { text: t('support.crypto.copy') });
+    const mark = icon('copy', { size: 14 });
+    /** @type {number|null} */
+    let timer = null;
 
-    const copyButton = h(
+    const button = h(
       'button',
       {
         type: 'button',
         class: 'btn btn-outline shrink-0',
-        disabled: placeholder,
+        disabled: disabled || undefined,
         onClick: async () => {
-          const ok = await copyToClipboard(target.address);
+          const ok = await copyToClipboard(value);
+
           toaster?.push(
             ok
               ? { tone: 'success', message: t('support.crypto.copied') }
               : { tone: 'error', message: t('errors.clipboard') },
           );
           if (!ok) return;
-          copyLabel.textContent = t('common.copied');
-          setTimeout(() => {
-            copyLabel.textContent = i18n.t('support.crypto.copy');
-          }, 1600);
+
+          button.replaceChildren(icon('check', { size: 14, class: 'text-forest-500' }), label);
+          label.textContent = t('common.copied');
+          button.classList.add('btn-outline--done');
+
+          if (timer !== null) clearTimeout(timer);
+          timer = setTimeout(revert, COPIED_FEEDBACK_MS);
         },
       },
-      icon('copy', { size: 14 }),
-      copyLabel,
+      mark,
+      label,
     );
 
-    const explorer = target.explorer
-      ? h(
-          'a',
-          {
-            class: 'inline-flex items-center gap-1 text-xs font-semibold text-ink-500 underline underline-offset-2 hover:text-brass-600',
-            href: target.explorer.replace('{address}', encodeURIComponent(target.address)),
-            target: '_blank',
-            rel: 'noopener noreferrer',
-          },
-          h('span', { text: t('support.crypto.explorer'), 'data-i18n': 'support.crypto.explorer' }),
-          icon('external', { size: 12 }),
-        )
-      : null;
+    function revert() {
+      timer = null;
+      button.replaceChildren(mark, label);
+      label.textContent = t('support.crypto.copy');
+      button.classList.remove('btn-outline--done');
+    }
 
-    return h(
-      'li',
-      { class: 'panel-inset p-3' },
+    return {
+      el: button,
+      /** Re-translate and reset after a language switch. */
+      sync() {
+        revert();
+        button.disabled = disabled;
+      },
+      destroy() {
+        if (timer !== null) clearTimeout(timer);
+      },
+    };
+  }
+
+  /* ── Crypto panel: one wallet at a time ────────────────────────────── */
+
+  const panelId = 'support-crypto-panel';
+  let activeId = CRYPTO_TARGETS[0]?.id ?? null;
+  /** @type {{ el: HTMLElement, sync: () => void, destroy: () => void }|null} */
+  let copyControl = null;
+
+  const qrSlot = h('div', { class: 'crypto__qr' });
+  const addressEl = h('p', { class: 'crypto__address' });
+  const networkEl = h('p', { class: 'crypto__network' });
+  const noteEl = h('p', { class: 'crypto__note' });
+  const explorerSlot = h('div', { class: 'crypto__explorer' });
+  const copySlot = h('div', { class: 'crypto__copy' });
+
+  function renderPanel(target) {
+    if (!target) return;
+
+    const placeholder = isPlaceholderAddress(target);
+
+    // The QR is the expensive part (~6 kB of SVG path data), so it is built
+    // only for the wallet the visitor actually opened.
+    qrSlot.replaceChildren(
+      placeholder
+        ? h(
+            'div',
+            { class: 'crypto__qr-empty' },
+            icon('alert', { size: 22 }),
+            h('span', { text: t('support.crypto.placeholder') }),
+          )
+        : qrCodeElement(target.address, {
+            size: 168,
+            label: t('support.crypto.qrLabel', { coin: target.label }),
+          }),
+    );
+
+    addressEl.textContent = target.address;
+    networkEl.replaceChildren(
+      h('span', { class: `badge badge--${target.tone ?? 'neutral'}`, text: target.ticker }),
+      h('span', { text: target.network }),
+    );
+
+    noteEl.textContent = target.note ?? '';
+    noteEl.hidden = !target.note;
+
+    explorerSlot.replaceChildren(
+      target.explorer
+        ? h(
+            'a',
+            {
+              class:
+                'inline-flex items-center gap-1 text-xs font-semibold text-ink-500 underline underline-offset-2 hover:text-brass-600',
+              href: target.explorer.replace('{address}', encodeURIComponent(target.address)),
+              target: '_blank',
+              rel: 'noopener noreferrer',
+            },
+            h('span', { text: t('support.crypto.explorer'), 'data-i18n': 'support.crypto.explorer' }),
+            icon('external', { size: 12 }),
+          )
+        : h('span'),
+    );
+
+    copyControl?.destroy();
+    copyControl = createCopyButton(target.address, { disabled: placeholder });
+    copySlot.replaceChildren(copyControl.el);
+  }
+
+  /** @type {ReturnType<typeof createTabs>|null} */
+  let tabs = null;
+
+  function buildCryptoSection(body) {
+    const panel = h(
+      'div',
+      { class: 'panel-inset p-4', id: panelId, role: 'tabpanel', tabindex: '0' },
       h(
         'div',
-        { class: 'flex items-center justify-between gap-2' },
+        { class: 'flex flex-col gap-4 sm:flex-row sm:items-start' },
+        qrSlot,
         h(
           'div',
-          { class: 'flex min-w-0 items-center gap-2' },
-          h('span', { class: `badge badge--${target.tone ?? 'neutral'}`, text: target.network ?? target.label }),
-          h('span', { class: 'truncate text-sm font-semibold text-ink-800', text: target.label }),
+          { class: 'min-w-0 flex-1 space-y-2.5' },
+          networkEl,
+          addressEl,
+          copySlot,
+          explorerSlot,
+          noteEl,
         ),
-        copyButton,
       ),
+    );
+
+    tabs = createTabs({
+      id: 'support-crypto',
+      panelId,
+      label: t('support.crypto.tablist'),
+      active: activeId,
+      tabs: CRYPTO_TARGETS.map((target) => ({
+        id: target.id,
+        label: target.ticker,
+        badge: target.label,
+      })),
+      onChange: (id) => {
+        activeId = id;
+        renderPanel(CRYPTO_TARGETS.find((target) => target.id === id));
+      },
+    });
+
+    body.append(
       h(
-        'p',
-        {
-          class: 'mt-2 break-all rounded-md bg-paper-200/70 px-2 py-1.5 font-mono text-[11px] leading-relaxed text-ink-700',
-          text: target.address,
-        },
-      ),
-      h(
-        'div',
-        { class: 'mt-2 flex items-center justify-between gap-2' },
-        placeholder
-          ? h('span', { class: 'text-2xs font-semibold uppercase tracking-wide text-ember-500', text: t('support.crypto.placeholder') })
-          : explorer ?? h('span'),
+        'section',
+        { class: 'space-y-2.5' },
+        h('h3', {
+          class: 'text-2xs font-bold uppercase tracking-[0.14em] text-ink-500',
+          text: t('support.crypto.title'),
+          'data-i18n': 'support.crypto.title',
+        }),
+        h('p', { class: 'hint', text: t('support.crypto.hint'), 'data-i18n': 'support.crypto.hint' }),
+        tabs.el,
+        panel,
       ),
     );
   }
+
+  /* ── Free ways to help ─────────────────────────────────────────────── */
 
   function buildLinkRow(link) {
     const meta = {
@@ -148,6 +274,8 @@ export function SupportModal(ctx) {
     );
   }
 
+  /* ── Overlay ───────────────────────────────────────────────────────── */
+
   const overlay = createOverlay({
     variant: 'modal',
     title: t('support.title'),
@@ -159,19 +287,11 @@ export function SupportModal(ctx) {
 
       body.append(
         h('p', { class: 'text-sm leading-relaxed text-ink-600', text: t('support.intro'), 'data-i18n': 'support.intro' }),
+      );
 
-        h(
-          'section',
-          { class: 'space-y-2.5' },
-          h('h3', {
-            class: 'text-2xs font-bold uppercase tracking-[0.14em] text-ink-500',
-            text: t('support.crypto.title'),
-            'data-i18n': 'support.crypto.title',
-          }),
-          h('p', { class: 'hint', text: t('support.crypto.hint'), 'data-i18n': 'support.crypto.hint' }),
-          h('ul', { class: 'space-y-2.5' }, CRYPTO_TARGETS.map(buildCryptoCard)),
-        ),
+      buildCryptoSection(body);
 
+      body.append(
         h(
           'section',
           { class: 'space-y-2.5' },
@@ -182,9 +302,11 @@ export function SupportModal(ctx) {
           }),
           h('ul', { class: 'space-y-2' }, SUPPORT_LINKS.map(buildLinkRow)),
         ),
-
         noteBox({ t, tone: 'success', iconName: 'sparkles', textKey: 'support.free.note' }),
       );
+
+      // Fill the panel for whichever tab is selected on open.
+      renderPanel(CRYPTO_TARGETS.find((target) => target.id === (tabs?.active ?? activeId)));
     },
     onClose: () => bus.emit(UI_EVENTS.closeSupport),
   });
@@ -194,6 +316,9 @@ export function SupportModal(ctx) {
       overlay.setTitle(t('support.title'));
       overlay.setSubtitle(t('support.subtitle'));
       overlay.setCloseLabel(t('common.close'));
+      copyControl?.sync();
+      // The QR label and the note are translated, so rebuild the open panel.
+      if (overlay.isOpen()) renderPanel(CRYPTO_TARGETS.find((target) => target.id === activeId));
     }),
     bus.on(UI_EVENTS.openSupport, () => overlay.open()),
     bus.on(UI_EVENTS.closeSupport, () => overlay.close()),
@@ -205,6 +330,8 @@ export function SupportModal(ctx) {
     close: () => overlay.close(),
     destroy() {
       for (const dispose of disposers) dispose();
+      copyControl?.destroy();
+      tabs?.destroy();
       overlay.destroy();
     },
   };

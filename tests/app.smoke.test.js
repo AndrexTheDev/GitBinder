@@ -624,14 +624,167 @@ describe('support modal', () => {
     assert.match(text, /Star the repository/);
   });
 
-  test('placeholder addresses are called out, not silently shipped', () => {
+  test('a real address is shown verbatim, with no placeholder warning', () => {
     const modal = env.document.querySelector('#overlay-root .modal');
-    assert.match(modal.textContent, /Placeholder address/);
+    assert.doesNotMatch(modal.textContent, /Placeholder address/);
+    // Solana is configured first, so it is what opens.
+    assert.equal(
+      modal.querySelector('.crypto__address').textContent,
+      '79KsqtJJdhKFJ9woxnYgtf3nq7HxQveafWBCtC3mxWi8',
+    );
+  });
+
+  test('shows one wallet at a time, each with its own QR code', () => {
+    const modal = env.document.querySelector('#overlay-root .modal');
+    const tabs = [...modal.querySelectorAll('[role="tab"]')];
+    assert.deepEqual(tabs.map((tab) => tab.textContent.slice(0, 3)), ['SOL', 'BTC', 'ETH']);
+
+    const qr = () => modal.querySelector('.crypto__qr svg');
+    assert.ok(qr(), 'no QR for the initially selected wallet');
+
+    // Selecting a tab swaps the panel — and the QR along with it.
+    const solQr = qr().outerHTML;
+    tabs[2].click();
+    // Mixed case is the EIP-55 checksum: it must survive rendering untouched.
+    assert.equal(
+      modal.querySelector('.crypto__address').textContent,
+      '0xBC3fab34f69bc9f6661608C3FB36dDdC313C42F7',
+    );
+    assert.notEqual(qr().outerHTML, solQr, 'QR did not follow the tab');
+    assert.equal(tabs[2].getAttribute('aria-selected'), 'true');
+    assert.equal(tabs[0].getAttribute('aria-selected'), 'false');
   });
 
   test('closes on request', () => {
     app.ctx.bus.emit('ui:support:close');
     assert.equal(env.document.querySelector('#overlay-root .modal'), null);
+  });
+});
+
+describe('footer and the info modals', () => {
+  before(() => {
+    app.destroy();
+    env.document.body.innerHTML = createShell();
+    app = bootstrap({ host: env.document, storage: createMemoryStorage() });
+  });
+
+  /** @param {string} label */
+  function footerButton(label) {
+    const button = [...env.document.querySelectorAll('#footer-root button')].find((candidate) =>
+      candidate.textContent.includes(label),
+    );
+    assert.ok(button, `no footer button labelled "${label}"`);
+    return button;
+  }
+
+  /** @returns {HTMLElement|null} the open modal, if any */
+  function modal() {
+    return env.document.querySelector('#overlay-root .modal');
+  }
+
+  /** Closes whatever is open, the way a visitor does — via the close button. */
+  function closeModal() {
+    const button = modal()?.querySelector(`button[aria-label="${app.ctx.t('common.close')}"]`);
+    assert.ok(button, 'the modal has no close button');
+    button.click();
+    assert.equal(modal(), null, 'modal did not close');
+  }
+
+  test('nothing is built until the visitor asks for it', () => {
+    assert.equal(env.document.querySelectorAll('#overlay-root *').length, 0);
+  });
+
+  test('the footer offers help, disclaimer, terms and contact', () => {
+    const footer = env.document.querySelector('#footer-root');
+    for (const label of ['Help', 'Disclaimer', 'Terms', 'Contact']) {
+      assert.ok(footerButton(label), `missing ${label} link`);
+    }
+    assert.ok(footerButton('Support the project'), 'missing support link');
+    // The privacy promise is the point of the footer, so keep it visible.
+    assert.match(footer.textContent, /No backend\. No cookies\. No tracking\./);
+  });
+
+  test('help explains the three steps', () => {
+    footerButton('Help').click();
+    const text = modal().textContent;
+    assert.match(text, /How GitBooklet works/);
+    assert.match(text, /Enter your GitHub username/);
+    assert.match(text, /Curate descriptions and status/);
+    assert.match(text, /Compose and export your PDF/);
+    // Rendered as an ordered list, because the order is the instruction.
+    assert.equal(modal().querySelectorAll('ol > li').length, 3);
+    closeModal();
+  });
+
+  test('the disclaimer states the client-side promise', () => {
+    footerButton('Disclaimer').click();
+    assert.match(
+      modal().textContent,
+      /GitBooklet operates 100% client-side\. Your Personal Access Token and your data never leave your browser\./,
+    );
+    closeModal();
+  });
+
+  test('the terms cover the ground a free tool needs to cover', () => {
+    footerButton('Terms').click();
+    const text = modal().textContent;
+    assert.match(text, /Terms of service/);
+    assert.match(text, /MIT licence/);
+    assert.match(text, /stored in your browser only/);
+    closeModal();
+  });
+
+  test('contact shows a real, clickable address', () => {
+    footerButton('Contact').click();
+    const contact = modal();
+    assert.match(contact.textContent, /AndrexTheDev/);
+
+    const mailto = [...contact.querySelectorAll('a')].find((a) => a.getAttribute('href')?.startsWith('mailto:'));
+    assert.equal(mailto.getAttribute('href'), 'mailto:hippie.highho@gmail.com');
+    assert.equal(mailto.textContent, 'hippie.highho@gmail.com');
+    closeModal();
+  });
+
+  test('the contact modal can open the donation modal', () => {
+    footerButton('Contact').click();
+    const supportRow = [...modal().querySelectorAll('button')].find((button) =>
+      button.textContent.includes('Support the project'),
+    );
+    assert.ok(supportRow, 'no route from contact to the donation modal');
+    supportRow.click();
+
+    // Both dialogs are mounted in the same stack, so nothing is destroyed.
+    const open = [...env.document.querySelectorAll('#overlay-root .modal')];
+    assert.ok(open.length >= 2, 'the contact modal should stay open behind the donation modal');
+    assert.ok(
+      open.some((m) => /Support GitBooklet/.test(m.textContent)),
+      'the donation modal did not open',
+    );
+
+    app.components.supportModal.close();
+    app.components.infoModals.close('contact');
+    assert.equal(modal(), null, 'dialogs left open');
+  });
+
+  test('every document has a German counterpart', () => {
+    app.ctx.i18n.setLocale('de');
+
+    for (const [kind, label, expected] of [
+      ['help', 'Hilfe', /So funktioniert GitBooklet/],
+      ['disclaimer', 'Haftungsausschluss', /arbeitet zu 100 % client-side/],
+      ['terms', 'AGB', /Nutzungsbedingungen/],
+      ['contact', 'Kontakt', /Am schnellsten erreichst du mich per E-Mail/],
+    ]) {
+      footerButton(label).click();
+      assert.match(modal().textContent, expected, `${kind} did not translate`);
+      app.components.infoModals.close(kind);
+      assert.equal(modal(), null, `${kind} stayed open`);
+    }
+
+    // And the footer links themselves must follow the locale.
+    assert.ok(footerButton('Projekt unterstützen'), 'support link did not translate');
+
+    app.ctx.i18n.setLocale('en');
   });
 });
 

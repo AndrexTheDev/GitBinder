@@ -22,6 +22,7 @@ import {
   ChevronRight,
   CircleAlert,
   CircleCheck,
+  CircleHelp,
   CircleX,
   Clock,
   CodeXml,
@@ -52,10 +53,15 @@ import {
   NotebookPen,
   PenLine,
   Printer,
+  QrCode,
   RefreshCw,
   RotateCcw,
+  Scale,
+  ScrollText,
   Search,
+  Server,
   Settings2,
+  ShieldAlert,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
@@ -164,6 +170,15 @@ export const Icons = Object.freeze({
   database: Database,
   file: FileJson,
   sparkles: Sparkles,
+
+  // info / legal surfaces
+  help: CircleHelp,
+  terms: Scale,
+  disclaimer: ShieldAlert,
+  contact: Mail,
+  qr: QrCode,
+  server: Server,
+  document: ScrollText,
 });
 
 /** @type {Set<string>} names registered in {@link Icons} */

@@ -1,22 +1,86 @@
 /**
- * Application footer: provenance, privacy statement and storage usage.
+ * Application footer: provenance, the discreet info links, the privacy
+ * statement and live storage usage.
+ *
+ * The link row is deliberately quiet — small type, no boxes, no icons except
+ * the support heart. It is where you look when you need the disclaimer or the
+ * contact address, and it should stay out of the way the rest of the time.
  *
  * @module components/AppFooter
  */
 
 import { h, setText } from '../core/dom.js';
+import { UI_EVENTS } from '../core/events.js';
 import { APP_NAME, APP_VERSION, LINKS } from '../config/app.js';
 import { formatBytes } from '../utils/format.js';
 import { icon } from './ui/Icon.js';
+
+/** The info documents reachable from the footer, in order. */
+const FOOTER_LINKS = Object.freeze([
+  { kind: 'help', labelKey: 'info.help.footerLink' },
+  { kind: 'disclaimer', labelKey: 'info.disclaimer.footerLink' },
+  { kind: 'terms', labelKey: 'info.terms.footerLink' },
+  { kind: 'contact', labelKey: 'info.contact.footerLink' },
+]);
 
 /**
  * @param {object} ctx
  * @param {import('../core/store.js').Store} ctx.settings
  * @param {import('../core/i18n.js').I18n} ctx.i18n
  * @param {(key: string, params?: object) => string} ctx.t
+ * @param {import('../core/events.js').ReturnType} ctx.bus
  */
 export function AppFooter(ctx) {
-  const { settings, i18n, t } = ctx;
+  const { settings, i18n, t, bus } = ctx;
+
+  /* ── Info links ────────────────────────────────────────────────────── */
+
+  /**
+   * @param {string} labelKey
+   * @param {() => void} onClick
+   */
+  function footerLink(labelKey, onClick) {
+    return h(
+      'li',
+      null,
+      h(
+        'button',
+        {
+          type: 'button',
+          class:
+            'rounded text-xs font-medium text-ink-500 underline decoration-paper-400 underline-offset-2 transition-colors hover:text-brass-600 hover:decoration-brass-400',
+          onClick,
+        },
+        h('span', { text: t(labelKey), 'data-i18n': labelKey }),
+      ),
+    );
+  }
+
+  const supportLabel = h('span', { text: t('footer.support'), 'data-i18n': 'footer.support' });
+  const supportButton = h(
+    'li',
+    null,
+    h(
+      'button',
+      {
+        type: 'button',
+        class:
+          'inline-flex items-center gap-1 rounded text-xs font-semibold text-brass-600 underline decoration-brass-300 underline-offset-2 transition-colors hover:text-brass-700 hover:decoration-brass-500',
+        onClick: () => bus.emit(UI_EVENTS.openSupport),
+      },
+      icon('heart', { size: 12, class: 'shrink-0' }),
+      supportLabel,
+    ),
+  );
+
+  const linkRow = h(
+    'ul',
+    { class: 'flex flex-wrap items-center gap-x-3 gap-y-1.5' },
+    ...FOOTER_LINKS.map((link) => footerLink(link.labelKey, () => bus.emit(UI_EVENTS.openInfo, { kind: link.kind }))),
+    supportButton,
+  );
+
+  /* ── Provenance ────────────────────────────────────────────────────── */
 
   const privacy = h('p', {
     class: 'flex items-center gap-1.5 text-xs font-medium text-ink-500',
@@ -58,6 +122,7 @@ export function AppFooter(ctx) {
         sourceLink,
       ),
       h('div', { class: 'gilt-rule' }),
+      linkRow,
       h(
         'div',
         { class: 'flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between' },
@@ -66,6 +131,8 @@ export function AppFooter(ctx) {
       ),
     ),
   );
+
+  /* ── Sync ──────────────────────────────────────────────────────────── */
 
   function sync() {
     builtLine.replaceChildren(
@@ -82,6 +149,7 @@ export function AppFooter(ctx) {
 
     setText(privacy, t('footer.privacy'));
     setText(sourceLink.querySelector('span'), t('footer.source'));
+    setText(supportLabel, t('footer.support'));
   }
 
   const disposers = [

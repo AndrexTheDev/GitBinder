@@ -419,6 +419,8 @@ export default {
       network: 'Netzwerk: {network}',
       placeholder: 'Platzhalter-Adresse — in src/config/support.js konfigurieren',
       explorer: 'Im Explorer ansehen',
+      qrLabel: 'QR-Code für die {coin}-Spendenadresse',
+      tablist: 'Kryptowährung wählen',
     },
     links: {
       title: 'Weitere Möglichkeiten',
@@ -435,6 +437,118 @@ export default {
     },
   },
 
+  info: {
+    help: {
+      footerLink: 'Hilfe',
+      title: 'So funktioniert GitBooklet',
+      subtitle: 'In drei Schritten vom GitHub-Konto zum gedruckten Buch.',
+      tip: 'Deine Auswahl wird ausschließlich in diesem Browser gespeichert. Nach dem Neuladen ist sie noch da — löschst du die Website-Daten, ist sie endgültig weg.',
+      steps: {
+        connect: {
+          title: 'GitHub-Benutzernamen eingeben',
+          body:
+            'Gib deinen Benutzernamen ein und lade deine Repositories. Ein Personal Access Token ist optional und nur nötig, wenn private Repositories enthalten sein sollen.',
+        },
+        curate: {
+          title: 'Beschreibungen und Status pflegen',
+          body:
+            'Wähle die Projekte für dein Buch, korrigiere den erkannten Status und formuliere die Kurzbeschreibung, die gedruckt wird. Forks sind standardmäßig ausgeschlossen.',
+        },
+        print: {
+          title: 'Buch zusammenstellen und PDF exportieren',
+          body:
+            'Öffne die Live-Vorschau, um das echte Buch in A4-Größe zu sehen, wähle dann „PDF erzeugen / Buch drucken“ und im Druckdialog „Als PDF sichern“.',
+        },
+      },
+    },
+    disclaimer: {
+      footerLink: 'Haftungsausschluss',
+      title: 'Haftungsausschluss',
+      subtitle: 'Was GitBooklet mit deinen Daten tut — und was nicht.',
+      intro:
+        'GitBooklet arbeitet zu 100 % client-side. Dein Personal Access Token und deine Daten verlassen deinen Browser nicht.',
+      sections: {
+        clientSide: {
+          title: 'Kein Backend, keine Telemetrie',
+          body:
+            'Die Anwendung ist eine statische Website. Es gibt keinen Server, der deine Anfragen protokollieren könnte, und das Tool enthält keinerlei Analyse-, Cookie- oder Tracking-Funktionen.',
+        },
+        token: {
+          title: 'Dein Personal Access Token',
+          body:
+            'Ein eingegebenes Token wird ausschließlich verwendet, um api.github.com aus deinem eigenen Browser aufzurufen. Vor dem Speichern wird es mit einem gerätespezifischen Schlüssel verschleiert — das ist keine Verschlüsselung. Auf einem gemeinsam genutzten Rechner: Feld leer lassen.',
+        },
+        noWarranty: {
+          title: 'Keine Gewähr',
+          body:
+            'GitBooklet wird „wie besehen“ bereitgestellt. Repository-Daten werden live von GitHub geladen und können unvollständig, veraltet oder fehlerhaft sein. Prüfe das erzeugte Buch, bevor du dich darauf verlässt.',
+        },
+        donations: {
+          title: 'Spenden',
+          body:
+            'Krypto-Spenden sind freiwillig und nicht erstattungsfähig. Prüfe die angezeigte Adresse vor dem Senden — Blockchain-Transaktionen lassen sich nicht rückgängig machen.',
+        },
+        thirdParty: {
+          title: 'Inhalte Dritter',
+          body:
+            'Projektnamen, Beschreibungen und Links gehören den jeweiligen Inhabern und werden so angezeigt, wie die GitHub-API sie liefert. GitBooklet steht in keiner Verbindung zur GitHub, Inc.',
+        },
+      },
+    },
+    terms: {
+      footerLink: 'AGB',
+      title: 'Nutzungsbedingungen',
+      subtitle: 'Kurze Bedingungen für ein kleines Open-Source-Werkzeug.',
+      intro:
+        'Diese Bedingungen sind bewusst kurz. GitBooklet ist eine kostenlose statische Webanwendung ohne Konten und ohne Server — viel zu regeln gibt es nicht.',
+      sections: {
+        scope: {
+          title: 'Umfang des Angebots',
+          body:
+            'GitBooklet wird kostenlos bereitgestellt und kann jederzeit geändert oder eingestellt werden. Ein Anspruch auf Verfügbarkeit, Support oder bestimmte Funktionen besteht nicht.',
+        },
+        noAccount: {
+          title: 'Kein Konto, kein Kaufvertrag',
+          body:
+            'Es wird nichts verkauft und kein Konto angelegt. Da keine personenbezogenen Daten an uns übertragen werden, ist für die Nutzung kein Vertrag zur Datenverarbeitung erforderlich.',
+        },
+        yourData: {
+          title: 'Deine Daten bleiben deine',
+          body:
+            'Alles, was du eingibst — Buchtitel, Autorenname, Beschreibungen, Token — wird ausschließlich in deinem Browser gespeichert. Du kannst es in den Einstellungen jederzeit als JSON exportieren oder löschen.',
+        },
+        noWarranty: {
+          title: 'Gewährleistung und Haftung',
+          body:
+            'Die Haftung beschränkt sich auf Vorsatz und grobe Fahrlässigkeit. Insbesondere übernehmen wir keine Haftung für den Inhalt erzeugter PDFs, der aus den von dir ausgewählten und bearbeiteten Daten entsteht.',
+        },
+        openSource: {
+          title: 'Open Source',
+          body:
+            'GitBooklet steht unter der MIT-Lizenz. Du darfst es — auch kommerziell — nutzen, verändern und selbst hosten, im Rahmen dieser Lizenz.',
+        },
+        changes: {
+          title: 'Änderungen dieser Bedingungen',
+          body:
+            'Wir können diese Bedingungen anpassen. Es gilt die mit der Anwendung veröffentlichte Fassung. Die weitere Nutzung nach einer Änderung gilt als Zustimmung.',
+        },
+      },
+    },
+    contact: {
+      footerLink: 'Kontakt',
+      title: 'Kontakt',
+      subtitle: 'Fragen, Fehlermeldungen und Ideen sind willkommen.',
+      intro: '{app} wird von {author} entwickelt. Am schnellsten erreichst du mich per E-Mail.',
+      github: 'GitHub-Profil',
+      githubHint: 'Quellcode, Releases und weitere Projekte.',
+      issue: 'Fehler melden',
+      issueHint: 'Fehlerberichte und Funktionswünsche gehören in den Issue-Tracker.',
+      support: 'Projekt unterstützen',
+      supportHint: 'Stern vergeben oder spenden — beides hält es am Leben.',
+      noSupport:
+        'Dies ist ein Freizeitprojekt: Es gibt keinen bezahlten Support und keine garantierte Reaktionszeit. Bitte sende niemals persönliche Daten oder Zugangsdaten per E-Mail.',
+    },
+  },
   errors: {
     network: 'GitHub ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.',
     unauthorized: 'GitHub hat die Zugangsdaten abgelehnt. Prüfe Benutzername und Token.',
@@ -476,6 +590,7 @@ export default {
     license: 'MIT-Lizenz',
     version: 'Version {version}',
     source: 'Quellcode',
+    support: 'Projekt unterstützen',
     storage: 'Lokaler Speicher: {size}',
   },
 };
