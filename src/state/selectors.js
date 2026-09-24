@@ -61,6 +61,13 @@ export function resolveRepo(repo, overrides = {}, options = {}) {
     summaryIsCustom: customSummary !== null,
     /** The GitHub description, used by "reset" and by the placeholder text. */
     githubDescription: repo.description ?? '',
+    /**
+     * The visitor's own notes. Sourced only from the override — never from
+     * GitHub — so a re-fetch leaves it exactly as it was typed.
+     */
+    notes: override?.notes ?? '',
+    /** True once the visitor has written something, however short. */
+    hasNotes: typeof override?.notes === 'string' && override.notes.trim() !== '',
     isOverridden: Boolean(override),
   };
 }

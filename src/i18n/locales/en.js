@@ -158,6 +158,13 @@ export default {
         edited: 'edited',
         auto: 'from GitHub',
       },
+      notes: {
+        label: 'Personal notes',
+        labelFor: 'Personal notes for “{name}”',
+        placeholder: 'Your own notes about this project…',
+        hint: 'Printed with the project as a writable block. Yours alone — a re-fetch never touches these notes.',
+        counter: '{count} / 600',
+      },
       status: {
         label: 'Project status',
         labelFor: 'Project status of “{name}”',
@@ -301,6 +308,8 @@ export default {
       repository: 'GitHub repository',
       homepage: 'Live site & docs',
       noDescription: 'No description was provided for this project.',
+      notes: 'Notes',
+      notesHint: 'Space for your own notes — write on the printout or fill it in with a PDF editor.',
       forkNote: 'Fork',
       archivedNote: 'Archived',
     },

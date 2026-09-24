@@ -18,6 +18,7 @@
 
 import { isPlainObject } from '../utils/object.js';
 import { REPO_STATUS_IDS } from '../config/app.js';
+import { BOOK_LIMITS } from '../config/book.js';
 import { migrateLegacyStatus } from '../services/status.js';
 import { detectInitialLanguage, SUPPORTED_LANGUAGES } from '../i18n/index.js';
 
@@ -94,6 +95,9 @@ function oneOf(value, allowed, fallback) {
  * That is GitHub's stable, human-readable identifier — far nicer to review in
  * an exported JSON file than a numeric database id.
  */
+/** Longest personal note, mirrored into `BOOK_LIMITS.notesChars`. */
+export const NOTES_MAX_LENGTH = BOOK_LIMITS.notesChars;
+
 export function sanitizeRepoOverrides(raw) {
   /** @type {Record<string, RepoOverride>} */
   const out = {};
@@ -114,6 +118,19 @@ export function sanitizeRepoOverrides(raw) {
       shortDescription:
         typeof entry.shortDescription === 'string'
           ? text(entry.shortDescription, { max: LIMITS.shortDescription, collapse: false })
+          : null,
+      /**
+       * The visitor's own notes for this project.
+       *
+       * Deliberately user-owned and never derived from GitHub: a re-fetch
+       * must not touch it, and there is no "detect notes" step that could
+       * overwrite what somebody typed. `null` means "never filled in", which
+       * is what tells the book to print an empty, writable block instead of
+       * a heading with nothing under it.
+       */
+      notes:
+        typeof entry.notes === 'string'
+          ? text(entry.notes, { max: BOOK_LIMITS.notesChars, collapse: false })
           : null,
       updatedAt: typeof entry.updatedAt === 'string' ? entry.updatedAt : null,
     };

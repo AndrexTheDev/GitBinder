@@ -59,6 +59,7 @@ export function estimateEntryHeight(repo, options = {}) {
   const lines = Math.max(1, Math.ceil(text.length / weights.descriptionCharsPerLine));
   const topics = (repo?.topics ?? []).length;
   const links = countEntryLinks(repo);
+  const noteLines = countNoteLines(repo?.notes, weights);
 
   return ceil(
     weights.entryChromeMm +
@@ -67,8 +68,38 @@ export function estimateEntryHeight(repo, options = {}) {
       weights.descriptionPadMm +
       lines * weights.descriptionLineMm +
       (topics > 0 ? weights.entryTopicsMm : 0) +
-      links * weights.entryLinkMm,
+      links * weights.entryLinkMm +
+      weights.entryNotesPadMm +
+      weights.entryNotesLabelMm +
+      noteLines * weights.entryNoteLineMm,
   );
+}
+
+/**
+ * How many lines the notes block occupies.
+ *
+ * Notes with no text still take up room: they print as ruled lines so the
+ * visitor can fill them in on paper or in a PDF editor, and the paginator
+ * has to reserve that space or the last entry on a page spills over.
+ *
+ * Explicit newlines are counted, because a note is free-form text and someone
+ * who writes three short lines means three lines — not one wrapped block.
+ *
+ * @param {string|null|undefined} notes
+ * @param {object} weights
+ * @returns {number}
+ */
+export function countNoteLines(notes, weights = {}) {
+  const w = { ...DEFAULTS.weights, ...weights };
+  const raw = typeof notes === 'string' ? notes.trim() : '';
+  if (!raw) return BOOK_LIMITS.noteLines;
+
+  const segments = raw.split('\n');
+  let lines = 0;
+  for (const segment of segments) {
+    lines += Math.max(1, Math.ceil(segment.length / w.notesCharsPerLine));
+  }
+  return Math.max(1, lines);
 }
 
 /**

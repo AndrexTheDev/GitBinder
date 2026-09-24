@@ -160,6 +160,18 @@ export function composeBook({
       links: buildEntryLinks(chapter, t),
       isFork: Boolean(chapter.isFork),
       isArchived: Boolean(chapter.archived),
+      /**
+       * The visitor's own notes, carried through untouched.
+       *
+       * `hasNotes` drives the layout: with notes the block prints the text,
+       * without them it prints ruled blank lines — a writable space that
+       * survives re-exporting, because the emptiness is a deliberate state
+       * rather than a rendering gap.
+       */
+      notes: chapter.notes ?? '',
+      hasNotes: Boolean(chapter.hasNotes),
+      notesLabel: t('book.entry.notes'),
+      notesHint: t('book.entry.notesHint'),
       isFullPage: false, // filled in below
     });
   }

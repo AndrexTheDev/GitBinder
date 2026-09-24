@@ -78,6 +78,19 @@ export const BOOK_WEIGHTS = Object.freeze({
   /** Characters per body line at 174 mm — drives "1 or 2 projects per page". */
   descriptionCharsPerLine: 88,
 
+  /**
+   * The notes block: a labelled box with either the visitor's own text or
+   * ruled lines to write on. Its height has to be part of the estimate,
+   * otherwise a book with notes on every project overruns its last sheet.
+   */
+  entryNotesPadMm: 6,
+  /** The "Notes" caption. */
+  entryNotesLabelMm: 6,
+  /** One line of note text, or one ruled line to write on. */
+  entryNoteLineMm: 6.5,
+  /** Slightly narrower than the body: the box has inner padding. */
+  notesCharsPerLine: 80,
+
   /** "Table of contents" title + rule, first TOC page only. */
   tocHeadingMm: 26,
   /** Smaller continuation title on every further TOC page. */
@@ -113,6 +126,19 @@ export const BOOK_LIMITS = Object.freeze({
    * into a list — the spec asks for 1 to 2, never 3.
    */
   projectsPerPage: 2,
+  /**
+   * Longest handwritten note that goes onto paper. Generous, because these
+   * are the visitor's own words — but bounded, because the notes block is
+   * laid out before pagination runs and an unbounded string would push a
+   * project onto a second sheet without the paginator knowing.
+   */
+  notesChars: 600,
+  /**
+   * Ruled lines printed when a project has no notes yet — enough for a
+   * sentence or two of handwriting, small enough that a full catalogue page
+   * still fits two projects.
+   */
+  noteLines: 3,
 });
 
 /** The subtitle is fixed copy, not user input, but it is translated. */

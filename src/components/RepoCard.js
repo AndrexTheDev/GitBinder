@@ -15,7 +15,7 @@
 
 import { h, setText } from '../core/dom.js';
 import { REPO_STATUSES, TONE_BY_STATUS } from '../config/app.js';
-import { DESCRIPTION_MAX_LENGTH } from '../state/schema.js';
+import { DESCRIPTION_MAX_LENGTH, NOTES_MAX_LENGTH } from '../state/schema.js';
 import {
   formatCompact,
   formatRelativeTime,
@@ -125,6 +125,41 @@ export function RepoCard({ repo, t, locale, onPatch }) {
   const counter = h('span', { class: 'text-2xs tabular-nums text-ink-400' });
   const origin = h('span', { class: 'text-2xs text-ink-400' });
 
+  /* ── Personal notes ──────────────────────────────────────────────────
+     These are the visitor's own words. Nothing here is derived from GitHub,
+     so a re-fetch cannot overwrite them — the only thing that changes a note
+     is the visitor editing it. Emptying the field returns the project to the
+     "writable block" state rather than printing a blank heading. */
+
+  const commitNotes = debounce((value) => onPatch(slug, { notes: value === '' ? null : value }), 220);
+
+  const notes = h('textarea', {
+    class: 'input min-h-[4rem] resize-y py-1.5 text-xs leading-relaxed',
+    rows: '2',
+    maxlength: String(NOTES_MAX_LENGTH),
+    'aria-label': t('library.row.notes.label'),
+    placeholder: t('library.row.notes.placeholder'),
+    text: repo.notes ?? '',
+    onInput: (event) => {
+      commitNotes(event.target.value);
+      renderNotesCounter(event.target.value.length);
+    },
+    onBlur: () => commitNotes.flush(),
+  });
+
+  const notesCounter = h('span', { class: 'text-2xs tabular-nums text-ink-400' });
+  const notesHint = h('span', {
+    class: 'text-2xs leading-relaxed text-ink-400',
+    text: t('library.row.notes.hint'),
+    'data-i18n': 'library.row.notes.hint',
+  });
+
+  function renderNotesCounter(length) {
+    notesCounter.textContent = t('library.row.notes.counter', {
+      count: length ?? notes.value.length,
+    });
+  }
+
   const resetButton = h(
     'button',
     {
@@ -146,6 +181,8 @@ export function RepoCard({ repo, t, locale, onPatch }) {
       count: length ?? description.value.length,
     });
   }
+
+  renderNotesCounter((repo.notes ?? '').length);
 
   /* ── Card ──────────────────────────────────────────────────────────── */
 
@@ -206,6 +243,27 @@ export function RepoCard({ repo, t, locale, onPatch }) {
           h('span', { class: 'ml-auto flex items-center gap-1' }, counter, resetButton),
         ),
       ),
+      h(
+        'div',
+        { class: 'min-w-0 sm:col-span-2' },
+        h(
+          'label',
+          { class: 'mb-1 flex items-center gap-1.5' },
+          h('span', {
+            class: 'text-2xs font-semibold uppercase tracking-wide text-ink-500',
+            text: t('library.row.notes.label'),
+            'data-i18n': 'library.row.notes.label',
+          }),
+          icon('pen', { size: 11, class: 'text-ink-300' }),
+        ),
+        notes,
+        h(
+          'div',
+          { class: 'mt-1 flex items-start gap-2' },
+          notesHint,
+          h('span', { class: 'ml-auto shrink-0' }, notesCounter),
+        ),
+      ),
     ),
   );
 
@@ -234,6 +292,18 @@ export function RepoCard({ repo, t, locale, onPatch }) {
     } else {
       renderCounter();
     }
+    // Same courtesy for the notes: never yank the field out from under
+    // somebody who is mid-sentence.
+    if (document.activeElement !== notes) {
+      const incoming = next.notes ?? '';
+      if (notes.value !== incoming) notes.value = incoming;
+      renderNotesCounter(incoming.length);
+    } else {
+      renderNotesCounter();
+    }
+    notes.setAttribute('aria-label', t('library.row.notes.label'));
+    notes.placeholder = t('library.row.notes.placeholder');
+
     description.placeholder = next.githubDescription || t('library.row.description.placeholder');
     description.setAttribute('aria-label', t('library.row.description.label'));
     resetButton.setAttribute('aria-label', t('library.row.description.resetLabel', { name: next.name }));

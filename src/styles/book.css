@@ -585,6 +585,57 @@
     color: var(--book-ink-soft);
   }
 
+  /* Notes ----------------------------------------------------------------
+     Printed for every project, filled or not. The empty variant is the
+     point: ruled lines you can write on with a pen or fill in with a PDF
+     editor, so the printout is usable as a working document. */
+  .book-notes {
+    margin-top: 3.5mm;
+    border: 0.4pt solid var(--book-rule);
+    border-radius: 1.5pt;
+    background-color: var(--book-paper-edge);
+    padding: 2.5mm 3mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .book-notes__label {
+    font-family: var(--font-sans);
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--book-ink-faint);
+    margin-bottom: 1.5mm;
+  }
+  .book-notes__body {
+    font-size: 9pt;
+    line-height: 1.5;
+  }
+  .book-notes__line {
+    margin: 0;
+    color: var(--book-ink);
+    overflow-wrap: break-word;
+  }
+  /* Ruled lines: a thin baseline the visitor writes above. */
+  .book-notes__rule {
+    position: relative;
+    height: 6.5mm;
+  }
+  .book-notes__rule::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.6mm;
+    border-bottom: 0.4pt dotted var(--book-ink-faint);
+  }
+  .book-notes__hint {
+    margin-top: 1.5mm;
+    font-size: 7pt;
+    font-style: italic;
+    color: var(--book-ink-faint);
+  }
+
   .book-links {
     display: flex;
     flex-direction: column;

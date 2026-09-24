@@ -153,6 +153,13 @@ export default {
         edited: 'bearbeitet',
         auto: 'von GitHub',
       },
+      notes: {
+        label: 'Persönliche Notizen',
+        labelFor: 'Persönliche Notizen zu „{name}“',
+        placeholder: 'Deine eigenen Notizen zu diesem Projekt…',
+        hint: 'Wird als beschreibbarer Block mitgedruckt. Ganz allein deine — ein erneutes Laden überschreibt diese Notizen nie.',
+        counter: '{count} / 600',
+      },
       status: {
         label: 'Projektstatus',
         labelFor: 'Projektstatus von „{name}“',
@@ -297,6 +304,8 @@ export default {
       repository: 'GitHub-Repository',
       homepage: 'Live-Site & Dokumentation',
       noDescription: 'Für dieses Projekt wurde keine Beschreibung hinterlegt.',
+      notes: 'Notizen',
+      notesHint: 'Platz für deine eigenen Notizen — auf dem Ausdruck beschreiben oder im PDF-Programm ausfüllen.',
       forkNote: 'Fork',
       archivedNote: 'Archiviert',
     },

@@ -22,6 +22,7 @@
 
 import { h } from '../core/dom.js';
 import { safeUrl } from '../utils/format.js';
+import { BOOK_LIMITS } from '../config/book.js';
 
 /** Ornamental divider — three brass lozenges, the sort of thing a title page has. */
 function ornament() {
@@ -264,6 +265,50 @@ function entryArticle(entry, t) {
           ),
         )
       : null,
+
+    notesBlock(entry),
+  );
+}
+
+/**
+ * The per-project notes block.
+ *
+ * Two shapes, and the difference is the point of the feature:
+ *
+ *   • **With notes** the visitor's text is printed, line breaks preserved.
+ *   • **Without notes** the block prints ruled blank lines instead — a space
+ *     to be filled in by hand, or with the typewriter/annotation tool of any
+ *     PDF reader. It must be *there* even when empty, because a notes area
+ *     that only appears once filled in is useless for the person who wants
+ *     to fill it in on the printout.
+ *
+ * Either way the block is always rendered in the same place at the same size,
+ * so a book re-exported after a re-fetch looks identical — the notes change
+ * only when the visitor changes them.
+ *
+ * @param {object} entry
+ */
+function notesBlock(entry) {
+  const filled = entry.hasNotes;
+  const lines = filled
+    ? String(entry.notes ?? '')
+        .trim()
+        .split('\n')
+        .map((line) => h('p', { class: 'book-notes__line', text: line || '\u00a0' }))
+    : Array.from({ length: BOOK_LIMITS.noteLines }, () =>
+        h('div', { class: 'book-notes__rule', 'aria-hidden': 'true' }, h('span')),
+      );
+
+  return h(
+    'section',
+    {
+      class: ['book-notes', filled ? 'book-notes--filled' : 'book-notes--empty'],
+      /** Screen readers get the text; the ruled lines are decoration. */
+      'aria-label': entry.notesLabel,
+    },
+    h('p', { class: 'book-notes__label', text: entry.notesLabel }),
+    h('div', { class: 'book-notes__body' }, ...lines),
+    filled ? null : h('p', { class: 'book-notes__hint', text: entry.notesHint }),
   );
 }
 
