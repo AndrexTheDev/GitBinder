@@ -73,6 +73,10 @@ export const UI_EVENTS = Object.freeze({
   openSupport: 'ui:support:open',
   closeSupport: 'ui:support:close',
   fetchRepos: 'ui:repos:fetch',
+  /** Compose the book and open the print dialog. */
+  printBook: 'ui:book:print',
+  /** Show/hide the live book preview. Payload: `{ open?: boolean }`. */
+  toggleBookPreview: 'ui:book:preview',
   buildPdf: 'ui:book:build',
   toast: 'ui:toast',
 });

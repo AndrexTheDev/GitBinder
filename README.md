@@ -13,8 +13,8 @@ Deployed on **Cloudflare Pages** as a static bundle.
 
 ## Status of this milestone
 
-The shell, i18n and state layer are done; **the GitHub integration and the repository
-manager are in**.
+The shell, i18n, state layer, GitHub integration, repository manager **and the Classic
+Book PDF composer** are in.
 
 | Area | State |
 | --- | --- |
@@ -28,7 +28,10 @@ manager are in**.
 | **Project status auto-detection engine** | ✅ |
 | **Repository manager: cards, inline editing, global controls** | ✅ |
 | Support / crypto-donation modal | ✅ |
-| **PDF "Classic Book" composer** | ⏳ next milestone |
+| **PDF "Classic Book" composer: cover, contents, catalogue** | ✅ |
+| **Paged-media runners (header / page number / attribution)** | ✅ |
+| **Live A4 preview + sticky print action bar** | ✅ |
+| Deploy to Cloudflare Pages | ⏳ after the placeholders in `config/support.js` are replaced |
 
 ---
 
@@ -105,14 +108,20 @@ src/
 │   ├── codec.js            seal / open / redact at the storage boundary
 │   ├── selectors.js        Derived state (library, chapters, stats)
 │   └── index.js            Wires storage → vault → codec → stores → i18n
+├── book/                   Classic Book composer (pure, DOM- and store-free)
+│   ├── paginate.js         Geometry: grouping, page packing, TOC sorter
+│   ├── compose.js          settings + chapters → the printable book model
+│   └── template.js         Book model → one <section class="book-page"> per sheet
 ├── services/
 │   ├── github.js           The only network code: endpoints, pagination, errors
-│   └── status.js           Project status auto-detection engine
+│   ├── status.js           Project status auto-detection engine
+│   └── print.js            window.print() trigger: file name, print CSS, cleanup
 ├── components/
 │   ├── AppNavbar.js        Branding, language switch, support, settings, fetch
 │   ├── HeroPanel.js        Product intro + live stat strip
 │   ├── RepositoryLibrary.js Toolbar, counters, keyed rows, empty states
 │   ├── RepoCard.js         One row: visibility, status, custom summary
+│   ├── BookPreview.js      Book studio: live preview + sticky print action bar
 │   ├── BookSummary.js      Live cover + table of contents preview
 │   ├── AppFooter.js        Provenance, privacy line, storage usage
 │   ├── SettingsDrawer.js   All persisted configuration + data portability
@@ -122,7 +131,8 @@ src/
 ├── styles/
 │   ├── index.css           Tailwind v4 `@theme` tokens (paper / ink / brass)
 │   ├── components.css      Semantic component classes (.btn, .card, .badge …)
-│   └── print.css           Print foundation for the Classic Book output
+│   ├── book.css            Classic Book: cream paper, serif, pages, runners
+│   └── print.css           What survives Ctrl/Cmd+P (app chrome vs. the book)
 └── utils/                  object, format, file, clipboard, timing
 tests/                      node:test suites (jsdom smoke tests included)
 ```
@@ -260,6 +270,83 @@ Cards are reconciled by slug (`src/core/list.js`) rather than re-rendered, so ty
 a description never loses the caret — even though the store is written on every
 keystroke.
 
+## The Classic Book PDF composer
+
+The book is *composed*, not screenshotted: GitBooklet decides which projects share
+a sheet and what number that sheet carries, then renders one
+`<section class="book-page">` per physical page. `window.print()` (or the browser's
+"Save as PDF") does the rest — no PDF library, no canvas raster, no server.
+
+### Why it paginates itself
+
+A table of contents must quote the page number of a chapter it has not reached yet,
+and CSS `@page` counters are not readable from JavaScript. So the numbering is
+computed in `book/paginate.js` from the numbers in `config/book.js`, and the
+stylesheet merely executes the decision. Two consequences worth knowing:
+
+* **The cover has no running header or footer.** The runners are absolutely
+  positioned *inside* each page section, hanging into the sheet margin — so they
+  can simply be omitted on page 1. (`position: fixed` would repeat on every sheet
+  including the cover; `@page` margin boxes with `content: string(…)` only work in
+  Prince and WeasyPrint, not in Chromium.)
+* **The geometry is a contract.** `BOOK_PAPER` and `BOOK_WEIGHTS` in
+  `config/book.js` mirror `styles/book.css`. Change a padding, change the weight —
+  `tests/paginate.test.js` pins the relationships, not the millimetres.
+
+### The document
+
+| Page | Content |
+| --- | --- |
+| 1 | Cover: title, the subtitle "Project & Codebase Anthology", author, contact, bio, generation date and a colophon line |
+| 2 … n | Table of contents, grouped by project status (Live → In Development → Beta/MVP → Paused), each row showing chapter number, title, primary language and page number |
+| n+1 … end | Project catalogue: **1–2 projects per page, decided by description length** |
+
+Every project prints its name, a classically styled status badge, its primary
+language, stars / forks / last-updated / licence, the short book description, its
+topics, and its links.
+
+**Links stay clickable.** Each link is a real `<a href>`, and Chromium's
+print-to-PDF preserves link annotations, so the PDF remains navigable. The URL is
+*also* spelled out under its label, so the paper copy is usable too. Untrusted
+homepages are passed through `safeUrl()` first: anything that is not `http(s)` or
+`mailto:` is dropped rather than printed as dead text — or shipped as a clickable
+`javascript:` URL.
+
+### Running header and footer
+
+* **Header** — the book title, small and muted.
+* **Footer** — `Author: <name>` on the left, the page number centred, and
+  `Generated with GitBooklet (https://gitbooklet.pages.dev)` on the right.
+
+### Printing
+
+`services/print.js` wraps the `window.print()` call and handles the three things
+that are easy to get wrong:
+
+1. **The file name** — Chromium seeds "Save as PDF" with `document.title`, so the
+   book title is swapped in for the duration of the call
+   (`gitbooklet-my-software-engineering-anthology`) and restored afterwards.
+2. **What gets printed** — a `body.is-printing-book` class hides the app chrome and
+   reveals the composed book. Nothing is moved in the DOM, so cancelling the dialog
+   leaves the app exactly as it was. The book is composed synchronously *before*
+   the printer snapshots the page, even if the preview was never opened.
+3. **When it finished** — `afterprint` is not fired by every browser, so a safety
+   timer releases the guard.
+
+### Book studio UI
+
+A sticky action bar follows the visitor down the page with the live-preview toggle
+and the **Generate PDF / Print book** button. The preview renders the real book DOM
+at true A4 size through the real print stylesheet — what is on screen is what the
+PDF will contain. Recomposition is animation-frame coalesced and skipped entirely
+while the preview is collapsed, so typing in a description textarea does not
+rebuild a 60-page document on every keystroke.
+
+> **Tip:** `?u=<username>` deep-links straight into a populated book, e.g.
+> `https://gitbooklet.pages.dev/?u=AndrexTheDev`.
+
+---
+
 ## Internationalisation
 
 - Dictionaries are **statically imported**, so the right language is available before the
@@ -313,7 +400,7 @@ which drives the real components against a stubbed GitHub API.
 npm test
 ```
 
-162 tests across six suites:
+221 tests across eight suites:
 
 - `tests/store.test.js` — reactivity paths, batching, persistence, encode/decode,
   import/export, migrations, corrupt-payload survival.
@@ -324,7 +411,13 @@ npm test
 - `tests/github.test.js` — endpoint selection, `Link`-header pagination, the truncation
   cap, abort handling, every error kind, and the metadata allow-list.
 - `tests/schema.test.js` — defaults, hostile input, vault sealing, codec, selectors.
-- `tests/utils.test.js` — object/format helpers, repo normalisation, debounce.
+- `tests/utils.test.js` — object/format helpers, repo normalisation, URL safety, debounce.
+- `tests/paginate.test.js` — the book geometry: entry heights, the 1–2-per-page rule,
+  group ordering, TOC widow control, and the invariant that every page number in the
+  contents points at the sheet that really holds the chapter.
+- `tests/book.test.js` — cover/contents/catalogue rendering, the print controller
+  (file name, chrome hiding, dialog refusal, guard release), and the book studio
+  mounted in the real app under jsdom.
 - `tests/app.smoke.test.js` — **jsdom**: boots the real app, opens the drawer, types,
   fetches 101 repositories across two pages, edits statuses and descriptions, toggles
   the fork filter and sorting, switches language, exports/imports.

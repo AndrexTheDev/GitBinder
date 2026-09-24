@@ -6,6 +6,8 @@
 
 @import 'tailwindcss';
 @import './components.css';
+@import './book.css';
+/* print.css last: it is the one that decides what survives Ctrl/Cmd+P. */
 @import './print.css';
 
 /* ---------------------------------------------------------------------------

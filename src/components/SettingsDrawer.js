@@ -300,6 +300,19 @@ export function SettingsDrawer(ctx) {
       },
     });
 
+    const authorBio = createTextField({
+      t,
+      id: 'settings-author-bio',
+      labelKey: 'settings.authorBio.label',
+      hintKey: 'settings.authorBio.hint',
+      placeholderKey: 'settings.authorBio.placeholder',
+      value: state.authorBio,
+      optional: true,
+      optionalLabel: t('common.optional'),
+      maxlength: 280,
+      onInput: (value) => settings.set('authorBio', value),
+    });
+
     return {
       el: h(
         'section',
@@ -309,11 +322,13 @@ export function SettingsDrawer(ctx) {
         h('div', { class: '-mt-2 flex justify-end' }, resetTitle),
         authorName.el,
         authorEmail.el,
+        authorBio.el,
       ),
       sync() {
         setInputValue(bookTitle.input, settings.state.customBookTitle);
         setInputValue(authorName.input, settings.state.authorName);
         setInputValue(authorEmail.input, settings.state.authorEmail);
+        setInputValue(authorBio.input, settings.state.authorBio);
       },
       destroy() {},
     };
@@ -596,7 +611,15 @@ export function SettingsDrawer(ctx) {
   const disposers = [
     i18n.onChange(sync),
     settings.subscribe(
-      ['githubUsername', 'personalAccessToken', 'customBookTitle', 'authorName', 'authorEmail', 'language'],
+      [
+        'githubUsername',
+        'personalAccessToken',
+        'customBookTitle',
+        'authorName',
+        'authorEmail',
+        'authorBio',
+        'language',
+      ],
       () => {
         if (overlay.isOpen()) sync();
       },

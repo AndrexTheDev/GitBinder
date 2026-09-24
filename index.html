@@ -61,10 +61,19 @@
             <aside id="summary-root" class="lg:sticky lg:top-24" aria-labelledby="summary-title"></aside>
           </div>
         </div>
+
+        <!--
+          Classic Book studio: the live preview renders the real book DOM at
+          true A4 size. In print this is the *only* thing that survives.
+        -->
+        <section id="book-root" aria-labelledby="book-studio-title"></section>
       </main>
 
       <footer id="footer-root"></footer>
     </div>
+
+    <!-- Sticky book studio action bar (preview toggle + print) -->
+    <div id="book-bar-root"></div>
 
     <!-- Floating layers: settings drawer, support modal, confirm dialogs -->
     <div id="overlay-root"></div>

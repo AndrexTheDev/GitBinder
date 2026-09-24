@@ -43,6 +43,7 @@ const LIMITS = Object.freeze({
   customBookTitle: 160,
   authorName: 120,
   authorEmail: 254, // RFC 5321
+  authorBio: 280, // one cover paragraph; anything longer gets clipped in print
   shortDescription: 200,
 });
 
@@ -139,6 +140,7 @@ export function createDefaultState(overrides = {}) {
     customBookTitle: DEFAULT_BOOK_TITLE,
     authorName: DEFAULT_AUTHOR_NAME,
     authorEmail: DEFAULT_AUTHOR_EMAIL,
+    authorBio: '',
 
     // ── Interface ───────────────────────────────────────────────────────
     /** Auto-detected from the browser on first run, then sticky. */
@@ -153,6 +155,10 @@ export function createDefaultState(overrides = {}) {
       sort: DEFAULT_LIBRARY_SORT,
       /** Forks are noise for most portfolios, but "off" keeps them one click away. */
       hideForks: false,
+    },
+    book: {
+      /** Whether the live PDF preview is expanded. */
+      preview: false,
     },
 
     ...overrides,
@@ -188,11 +194,17 @@ export function sanitizeState(raw) {
       max: LIMITS.authorEmail,
       collapse: false,
     }),
+    // Empty means "use the translated default on the cover", so a visitor who
+    // never opens the settings drawer still gets a sensible bio line.
+    authorBio: text(input.authorBio, { max: LIMITS.authorBio }),
     language,
     repoOverrides: sanitizeRepoOverrides(input.repoOverrides),
     library: {
       sort: oneOf(library.sort, LIBRARY_SORTS, defaults.library.sort),
       hideForks: library.hideForks === true,
+    },
+    book: {
+      preview: isPlainObject(input.book) && input.book.preview === true,
     },
   };
 }

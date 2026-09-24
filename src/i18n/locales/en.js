@@ -257,16 +257,63 @@ export default {
     },
     actions: {
       build: 'Compose book PDF',
-      print: 'Print preview',
+      print: 'Print book / Save as PDF',
       editMeta: 'Edit book details',
     },
     build: {
-      pending: 'The PDF composer is the next milestone — the shell, i18n and state layer are ready.',
+      ready: 'The preview renders the real book at A4 size — every link stays clickable in the PDF.',
       noChapters: 'Select at least one repository before composing the book.',
     },
     tip: 'Tip: statuses and summaries are stored per repository in your browser and survive a page reload.',
   },
 
+  book: {
+    bar: {
+      title: 'Book studio',
+      hide: 'Hide preview',
+      preview: 'Live PDF book preview',
+      generate: 'Generate PDF / Print book',
+      pages: { one: '{count} page', other: '{count} pages' },
+      chapters: { one: '{count} chapter', other: '{count} chapters' },
+      built: 'Book composed — {pages} pages are ready to print.',
+    },
+    cover: {
+      subtitle: 'Project & Codebase Anthology',
+      byline: 'by',
+      bioFallback:
+        'A curated selection of public repositories — built, shipped and maintained in the open.',
+      generatedOn: 'Generated on {date}',
+      stats: '{projects} projects · {languages} languages · {stars} stars',
+    },
+    toc: {
+      title: 'Table of contents',
+      continued: 'Table of contents (continued)',
+      groupContinued: '{group} (continued)',
+      pageLabel: 'Page {page}',
+      empty: 'No projects selected yet — include at least one repository in the library above.',
+    },
+    entry: {
+      chapter: 'Chapter {index}',
+      stars: 'Stars',
+      forks: 'Forks',
+      updated: 'Last updated',
+      license: 'Licence',
+      repository: 'GitHub repository',
+      homepage: 'Live site & docs',
+      noDescription: 'No description was provided for this project.',
+      forkNote: 'Fork',
+      archivedNote: 'Archived',
+    },
+    runner: {
+      author: 'Author: {name}',
+      attribution: 'Generated with GitBooklet',
+    },
+    pageLabel: 'Page {page}',
+    print: {
+      empty: 'Your book has no chapters yet — include at least one repository first.',
+      ready: 'Opening the print dialog — choose “Save as PDF” to keep the book.',
+    },
+  },
   settings: {
     title: 'Settings',
     subtitle: 'Everything is stored locally in this browser. Nothing is uploaded.',
@@ -320,6 +367,11 @@ export default {
       placeholder: 'you@example.com',
       hint: 'Optional contact printed in the colophon.',
       invalid: 'That does not look like a valid e-mail address.',
+    },
+    authorBio: {
+      label: 'Author bio',
+      placeholder: 'A short paragraph printed under your name on the cover',
+      hint: 'Optional. Printed on the cover page; leave empty for the default line.',
     },
     language: {
       label: 'Interface language',

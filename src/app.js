@@ -23,10 +23,10 @@ import { AppNavbar } from './components/AppNavbar.js';
 import { HeroPanel } from './components/HeroPanel.js';
 import { RepositoryLibrary } from './components/RepositoryLibrary.js';
 import { BookSummary } from './components/BookSummary.js';
+import { BookPreview } from './components/BookPreview.js';
 import { AppFooter } from './components/AppFooter.js';
 import { SettingsDrawer } from './components/SettingsDrawer.js';
 import { SupportModal } from './components/SupportModal.js';
-import { selectViews } from './state/selectors.js';
 
 /**
  * @param {object} [env]
@@ -89,6 +89,15 @@ export function bootstrap(env = {}) {
   const library = mountComponent('#library-root', RepositoryLibrary);
   const summary = mountComponent('#summary-root', BookSummary);
   const footer = mountComponent('#footer-root', AppFooter);
+
+  // The book studio renders into two hosts: the preview region and the sticky
+  // action bar that follows the visitor down the page.
+  const bookPreview = mountComponent('#book-root', BookPreview);
+  if (bookPreview?.barEl) {
+    const barHost = doc.querySelector('#book-bar-root');
+    if (barHost) barHost.replaceChildren(bookPreview.barEl);
+    else console.warn('[bootstrap] missing host element "#book-bar-root"');
+  }
 
   // Modeless "layers" — they own an overlay created on demand.
   const settingsDrawer = SettingsDrawer({ ...ctx, t, toaster });
@@ -236,14 +245,8 @@ export function bootstrap(env = {}) {
   const busDisposers = [
     bus.on(UI_EVENTS.fetchRepos, () => fetchRepos()),
     bus.on(UI_EVENTS.toast, (payload) => toaster.push(payload)),
-    bus.on(UI_EVENTS.buildPdf, () => {
-      const chapters = selectViews(session.state, settings.state).filter((repo) => repo.visible);
-      toaster.push(
-        chapters.length === 0
-          ? { tone: 'warning', message: t('summary.build.noChapters') }
-          : { tone: 'info', message: t('summary.build.pending'), timeout: 5000 },
-      );
-    }),
+    // `printBook` and `buildPdf` are handled inside the book studio itself —
+    // it owns the print controller, so nothing needs to be forwarded here.
   ];
 
   /* ── First paint housekeeping ──────────────────────────────────────── */
@@ -280,7 +283,7 @@ export function bootstrap(env = {}) {
   return {
     ctx,
     fetchRepos,
-    components: { navbar, hero, library, summary, footer, settingsDrawer, supportModal },
+    components: { navbar, hero, library, summary, bookPreview, footer, settingsDrawer, supportModal },
     toaster,
     destroy() {
       inflight?.abort();

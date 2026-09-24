@@ -78,6 +78,30 @@
       word-break: break-all;
     }
 
+    /* ── Classic Book ────────────────────────────────────────────────
+       When the book is composed, the book *is* the document: everything
+       else on the page is chrome. The class is added and removed by
+       `services/print.js` around the `window.print()` call, so cancelling
+       the dialog leaves the app exactly as it was. */
+    body.is-printing-book #app > *:not(main),
+    body.is-printing-book #main > *:not(#book-root),
+    body.is-printing-book #book-bar-root {
+      display: none !important;
+    }
+
+    body.is-printing-book #app,
+    body.is-printing-book #main,
+    body.is-printing-book #book-root {
+      display: block !important;
+      width: auto !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      background: none !important;
+      box-shadow: none !important;
+    }
+
     img { max-width: 100% !important; }
 
     ::-webkit-scrollbar { display: none; }

@@ -108,8 +108,12 @@ export function BookSummary(ctx) {
 
   const printButton = h(
     'button',
-    { type: 'button', class: 'btn btn-outline w-full', onClick: () => window.print() },
-    icon('external', { size: 15 }),
+    {
+      type: 'button',
+      class: 'btn btn-outline w-full',
+      onClick: () => bus.emit(UI_EVENTS.printBook),
+    },
+    icon('printer', { size: 15 }),
     h('span', { text: t('summary.actions.print'), 'data-i18n': 'summary.actions.print' }),
   );
 
@@ -124,7 +128,7 @@ export function BookSummary(ctx) {
     h('span', { text: t('summary.actions.editMeta'), 'data-i18n': 'summary.actions.editMeta' }),
   );
 
-  const hintBox = noteBox({ t, tone: 'info', iconName: 'info', textKey: 'summary.build.pending' });
+  const hintBox = noteBox({ t, tone: 'info', iconName: 'info', textKey: 'summary.build.ready' });
 
   /* ── Shell ─────────────────────────────────────────────────────────── */
 
@@ -240,7 +244,8 @@ export function BookSummary(ctx) {
     }
 
     const hasChapters = chapters.length > 0;
-    buildButton.disabled = !hasChapters;
+    // Never disabled: a disabled button cannot explain itself. The click is
+    // answered with a toast telling the visitor what to do instead.
     buildButton.setAttribute(
       'title',
       hasChapters ? t('summary.actions.build') : t('summary.build.noChapters'),

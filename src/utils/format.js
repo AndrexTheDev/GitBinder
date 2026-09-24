@@ -98,6 +98,53 @@ export function parseRepoSlug(input, fallbackOwner = '') {
   return fallbackOwner ? `${fallbackOwner}/${raw}` : null;
 }
 
+/**
+ * Guard an untrusted URL before it reaches an `href`.
+ *
+ * Repository homepages are free-form strings typed by whoever owns the repo,
+ * so anything that is not `http:`, `https:` or `mailto:` is dropped — otherwise
+ * a `javascript:` homepage would run in the visitor's session the moment they
+ * clicked it in the generated PDF.
+ *
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string} a safe URL, or `fallback` when the input is not one
+ */
+export function safeUrl(value, fallback = '') {
+  const raw = String(value ?? '').trim();
+  if (!raw) return fallback;
+  try {
+    const url = new URL(raw, typeof location !== 'undefined' ? location.href : 'https://gitbooklet.dev/');
+    if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:') {
+      return url.href;
+    }
+  } catch {
+    /* not a URL at all */
+  }
+  return fallback;
+}
+
+/**
+ * Normalise a URL the way the browser will, so the text printed on paper is
+ * byte-identical to the `href` the PDF annotation points at.
+ *
+ * `new URL('https://a.example.com').href` is `https://a.example.com/` — a
+ * mismatch of one character is invisible on screen but makes the printed URL a
+ * lie, so the model stores the normalised form from the start.
+ *
+ * @param {unknown} value
+ * @returns {string} the normalised URL, or the input when it is not a URL
+ */
+export function normalizeUrl(value) {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  try {
+    return new URL(raw).href;
+  } catch {
+    return raw;
+  }
+}
+
 /** GitHub username sanity check — used for inline validation feedback. */
 export function isValidGithubUsername(value) {
   return /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(String(value ?? '').trim());

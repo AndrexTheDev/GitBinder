@@ -251,17 +251,65 @@ export default {
       stars: 'Stars',
     },
     actions: {
-      build: 'Buch-PDF erstellen',
-      print: 'Druckvorschau',
+      build: 'Buch-PDF zusammenstellen',
+      print: 'Buch drucken / Als PDF sichern',
       editMeta: 'Buchdetails bearbeiten',
     },
     build: {
-      pending: 'Der PDF-Satz ist der nächste Meilenstein — Shell, i18n und State-Ebene stehen bereits.',
-      noChapters: 'Wähle mindestens ein Repository aus, bevor du das Buch erstellst.',
+      ready:
+        'Die Vorschau zeigt das echte Buch in A4-Größe — alle Links bleiben im PDF klickbar.',
+      noChapters: 'Wähle mindestens ein Repository aus, bevor du das Buch zusammenstellst.',
     },
     tip: 'Tipp: Status und Kurzbeschreibungen werden pro Repository im Browser gespeichert und überleben einen Neuladen der Seite.',
   },
 
+  book: {
+    bar: {
+      title: 'Buchwerkstatt',
+      hide: 'Vorschau ausblenden',
+      preview: 'Live-PDF-Vorschau',
+      generate: 'PDF erzeugen / Buch drucken',
+      pages: { one: '{count} Seite', other: '{count} Seiten' },
+      chapters: { one: '{count} Kapitel', other: '{count} Kapitel' },
+      built: 'Buch zusammengestellt — {pages} Seiten sind bereit zum Druck.',
+    },
+    cover: {
+      subtitle: 'Projekt- & Codebase-Anthologie',
+      byline: 'von',
+      bioFallback:
+        'Eine kuratierte Auswahl öffentlicher Repositories — offen gebaut, ausgeliefert und gepflegt.',
+      generatedOn: 'Erstellt am {date}',
+      stats: '{projects} Projekte · {languages} Sprachen · {stars} Sterne',
+    },
+    toc: {
+      title: 'Inhaltsverzeichnis',
+      continued: 'Inhaltsverzeichnis (Fortsetzung)',
+      groupContinued: '{group} (Fortsetzung)',
+      pageLabel: 'Seite {page}',
+      empty: 'Noch keine Projekte ausgewählt — nimm oben mindestens ein Repository auf.',
+    },
+    entry: {
+      chapter: 'Kapitel {index}',
+      stars: 'Sterne',
+      forks: 'Forks',
+      updated: 'Zuletzt aktualisiert',
+      license: 'Lizenz',
+      repository: 'GitHub-Repository',
+      homepage: 'Live-Site & Dokumentation',
+      noDescription: 'Für dieses Projekt wurde keine Beschreibung hinterlegt.',
+      forkNote: 'Fork',
+      archivedNote: 'Archiviert',
+    },
+    runner: {
+      author: 'Autor: {name}',
+      attribution: 'Erstellt mit GitBooklet',
+    },
+    pageLabel: 'Seite {page}',
+    print: {
+      empty: 'Dein Buch hat noch keine Kapitel — nimm zuerst mindestens ein Repository auf.',
+      ready: 'Druckdialog wird geöffnet — wähle „Als PDF sichern“, um das Buch zu behalten.',
+    },
+  },
   settings: {
     title: 'Einstellungen',
     subtitle: 'Alles wird lokal in diesem Browser gespeichert. Nichts wird hochgeladen.',
@@ -315,6 +363,11 @@ export default {
       placeholder: 'du@beispiel.de',
       hint: 'Optionale Kontaktangabe im Kolophon.',
       invalid: 'Das sieht nicht nach einer gültigen E-Mail-Adresse aus.',
+    },
+    authorBio: {
+      label: 'Kurzbiografie',
+      placeholder: 'Ein kurzer Absatz, der auf dem Cover unter deinem Namen steht',
+      hint: 'Optional. Erscheint auf dem Cover; leer lassen für die Standardzeile.',
     },
     language: {
       label: 'Sprache der Oberfläche',
