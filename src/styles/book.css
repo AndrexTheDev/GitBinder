@@ -113,7 +113,9 @@
 
   .book-picker {
     position: absolute;
-    top: calc(100% + 0.5rem);
+    /* Opens upwards: the action bar sits at the bottom of the viewport, so a
+       panel dropping downwards would fall off the screen. */
+    bottom: calc(100% + 0.5rem);
     right: 0;
     z-index: 60;
     width: min(22rem, calc(100vw - 2rem));
@@ -147,7 +149,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    min-height: 2.25rem;
+    min-height: 2.75rem;
     padding: 0.375rem 0.5rem;
     border-radius: 0.5rem;
     cursor: pointer;
@@ -230,8 +232,8 @@
     font-size: 0.8125rem;
     color: var(--color-ink-800);
     text-align: left;
-    /* Roomy enough for a fingertip on a phone. */
-    min-height: 2.5rem;
+    /* 44 px: the smallest target that is reliably tappable on a phone. */
+    min-height: 2.75rem;
   }
   .book-export__item:hover,
   .book-export__item:focus-visible {
@@ -256,6 +258,28 @@
       right: auto;
       left: 0;
       min-width: min(13.5rem, calc(100vw - 2rem));
+    }
+  }
+
+  /* ── Small screens ────────────────────────────────────────────────────
+     The bar carries three actions plus a caption. Below the `sm` breakpoint
+     that does not fit: the caption goes, the labels go, and what is left is
+     three tappable icons that still have accessible names. The page and
+     chapter counts remain available in the Book Studio toolbar. */
+  @media (max-width: 639px) {
+    .book-bar__caption {
+      display: none;
+    }
+    .book-bar__action > span {
+      display: none;
+    }
+    .book-bar__inner {
+      gap: 0.5rem;
+      padding-inline: 0.75rem;
+    }
+    /* Square-ish targets rather than wide pills. */
+    .book-bar__action {
+      padding-inline: 0.625rem;
     }
   }
 

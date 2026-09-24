@@ -117,9 +117,11 @@ export function BookPreview(ctx) {
     'button',
     {
       type: 'button',
-      class: 'btn btn-ghost book-picker__toggle',
+      class: 'btn btn-outline book-picker__toggle',
       'aria-haspopup': 'true',
       'aria-expanded': 'false',
+      'aria-label': t('book.picker.title'),
+      title: t('book.picker.title'),
       onClick: () => (pickerPanel.hidden ? openPicker() : closePicker()),
     },
     icon('listChecks', { size: 15 }),
@@ -243,7 +245,7 @@ export function BookPreview(ctx) {
       h('span', { text: ' · ' }),
       chapterCount,
     ),
-    h('div', { class: 'ml-auto flex items-center gap-2' }, pickerWrap, hideButton),
+    hideButton,
   );
 
   /** The book itself — replaced wholesale on every recomposition. */
@@ -269,8 +271,12 @@ export function BookPreview(ctx) {
     'button',
     {
       type: 'button',
-      class: 'btn btn-outline',
+      class: 'btn btn-outline book-bar__action',
       'aria-pressed': 'false',
+      // With the label hidden on a narrow phone the button is icon-only, so
+      // the accessible name and the tooltip have to carry it.
+      'aria-label': t('book.bar.preview'),
+      title: t('book.bar.preview'),
       onClick: () => setPreview(!isOpen()),
     },
     toggleIcon,
@@ -282,7 +288,9 @@ export function BookPreview(ctx) {
     'button',
     {
       type: 'button',
-      class: 'btn btn-accent',
+      class: 'btn btn-accent book-bar__action',
+      'aria-label': t('book.bar.generate'),
+      title: t('book.bar.generate'),
       onClick: () => bus.emit(UI_EVENTS.printBook),
     },
     icon('printer', { size: 16 }),
@@ -418,12 +426,16 @@ export function BookPreview(ctx) {
         h('span', { class: 'hidden shrink-0 text-brass-500 sm:block' }, icon('feather', { size: 18 })),
         h(
           'div',
-          { class: 'min-w-0' },
+          { class: 'book-bar__caption min-w-0' },
           h('p', { class: 'truncate text-sm font-semibold text-ink-900', text: t('book.bar.title'), 'data-i18n': 'book.bar.title' }),
           barMeta,
         ),
       ),
-      h('div', { class: 'flex shrink-0 items-center gap-2' }, exportWrap, toggleButton, generateButton),
+      // The picker and the export menu live here rather than in the studio
+      // toolbar, because this bar is the only part of the book UI that is
+      // visible when the preview is collapsed — which is the default state,
+      // and exactly when somebody reaches for "Generate PDF".
+      h('div', { class: 'flex shrink-0 items-center gap-2' }, pickerWrap, exportWrap, toggleButton, generateButton),
     ),
   );
 
@@ -530,6 +542,12 @@ export function BookPreview(ctx) {
 
   /** Compose now (even if the preview is closed) and open the print dialog. */
   function print() {
+    // Close the screen-only panels first. CSS hides them in print too, but
+    // leaving an open menu over the page while the dialog appears is both
+    // untidy and a chance for a browser to render it anyway.
+    closeExportMenu();
+    closePicker();
+
     const chapters = currentChapters();
     if (chapters.length === 0) {
       toaster.push({ tone: 'warning', message: t('book.print.empty') });
@@ -562,7 +580,11 @@ export function BookPreview(ctx) {
     setAttr(toggleButton, 'aria-pressed', open ? 'true' : 'false');
     toggleButton.replaceChildren(icon(open ? 'eyeOff' : 'eye', { size: 16 }), toggleLabel);
     setText(toggleLabel, t('book.bar.preview'));
+    toggleButton.setAttribute('aria-label', t('book.bar.preview'));
+    toggleButton.setAttribute('title', t('book.bar.preview'));
     setText(generateLabel, t('book.bar.generate'));
+    generateButton.setAttribute('aria-label', t('book.bar.generate'));
+    generateButton.setAttribute('title', t('book.bar.generate'));
 
     // The menu is rebuilt lazily from i18n, so refresh its labels in place
     // rather than tearing the buttons down mid-interaction.
@@ -576,6 +598,8 @@ export function BookPreview(ctx) {
     // The picker mirrors library state, so it has to follow it — including a
     // language change, which relabels the status chips and the aria labels.
     setText(pickerButton.querySelector('span'), t('book.picker.button'));
+    pickerButton.setAttribute('aria-label', t('book.picker.title'));
+    pickerButton.setAttribute('title', t('book.picker.title'));
     if (!pickerPanel.hidden) renderPicker();
     else syncPickerCount();
   }

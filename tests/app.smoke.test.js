@@ -336,11 +336,13 @@ describe('chapter picker', () => {
     app.ctx.settings.set('book', { preview: true });
   }
 
-  /** The picker lives in the Book Studio toolbar, not the action bar. */
+  /**
+   * The picker lives in the sticky action bar — the one piece of book UI that
+   * stays visible while the preview is collapsed, which is when people reach
+   * for "Generate PDF".
+   */
   const pickerToggle = () =>
-    [...env.document.querySelectorAll('.book-shell__toolbar button')].find((b) =>
-      b.hasAttribute('aria-haspopup'),
-    );
+    [...env.document.querySelectorAll('#book-bar-root button.book-picker__toggle')][0];
   const panel = () => env.document.querySelector('.book-picker');
   const row = (slug) =>
     [...panel().querySelectorAll('.book-picker__row')].find((r) => r.dataset.slug === slug);
@@ -453,13 +455,11 @@ describe('text export menu', () => {
   function mount() {
     storage = createMemoryStorage();
     app = bootstrap({ host: env.document, storage });
+    // Scoped to `.book-export`: the action bar also holds the chapter picker,
+    // which is a second popup button.
     return {
-      bar: () => env.document.querySelector('#book-bar-root'),
-      menu: () => env.document.querySelector('#book-bar-root [role=menu]'),
-      button: () =>
-        [...env.document.querySelectorAll('#book-bar-root button')].find((b) =>
-          b.hasAttribute('aria-haspopup'),
-        ),
+      menu: () => env.document.querySelector('#book-bar-root .book-export [role=menu]'),
+      button: () => env.document.querySelector('#book-bar-root .book-export button[aria-haspopup]'),
     };
   }
 

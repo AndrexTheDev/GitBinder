@@ -34,6 +34,16 @@
     #overlay-root,
     #book-bar-root,
     .no-print,
+    /*
+     * The screen-only parts of the Book Studio. `button` and `input` above
+     * already hide the controls inside them, but these panels also carry
+     * plain text — the picker's heading and project names, the export menu's
+     * file extensions — which would otherwise print over the first page of
+     * the book if either menu happened to be open.
+     */
+    .book-shell__toolbar,
+    .book-picker,
+    .book-export,
     .overlay-scrim,
     .modal,
     .drawer,
