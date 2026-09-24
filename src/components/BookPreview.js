@@ -26,6 +26,7 @@ import { downloadFile } from '../utils/file.js';
 import { paginateBook } from '../book/paginate.js';
 import { renderBook } from '../book/template.js';
 import { selectChapters, selectViews } from '../state/selectors.js';
+import { humanizeRepoName } from '../utils/format.js';
 import { icon } from './ui/Icon.js';
 
 /**
@@ -59,6 +60,173 @@ export function BookPreview(ctx) {
     h('span', { text: t('book.bar.hide'), 'data-i18n': 'book.bar.hide' }),
   );
 
+  /* ── Chapter picker ───────────────────────────────────────────────────
+     Ticking projects directly where the book is made, rather than sending the
+     visitor back up to the library to find the right card. Same store path as
+     the library's own checkbox, so the two views can never disagree. */
+
+  const pickerCount = h('span', { class: 'tabular-nums' });
+  const pickerList = h('div', {
+    class: 'book-picker__list',
+    role: 'group',
+    'aria-label': t('book.picker.title'),
+  });
+
+  const pickerPanel = h(
+    'div',
+    { class: 'book-picker', hidden: true },
+    h(
+      'div',
+      { class: 'book-picker__head' },
+      h('p', {
+        class: 'text-xs font-semibold text-ink-900',
+        text: t('book.picker.title'),
+        'data-i18n': 'book.picker.title',
+      }),
+      h(
+        'div',
+        { class: 'ml-auto flex items-center gap-1' },
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'btn-icon',
+            title: t('book.picker.all'),
+            'aria-label': t('book.picker.all'),
+            onClick: () => setAllChapters(true),
+          },
+          icon('selectAll', { size: 14 }),
+        ),
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'btn-icon',
+            title: t('book.picker.none'),
+            'aria-label': t('book.picker.none'),
+            onClick: () => setAllChapters(false),
+          },
+          icon('selectNone', { size: 14 }),
+        ),
+      ),
+    ),
+    pickerList,
+  );
+
+  const pickerButton = h(
+    'button',
+    {
+      type: 'button',
+      class: 'btn btn-ghost book-picker__toggle',
+      'aria-haspopup': 'true',
+      'aria-expanded': 'false',
+      onClick: () => (pickerPanel.hidden ? openPicker() : closePicker()),
+    },
+    icon('listChecks', { size: 15 }),
+    h('span', { text: t('book.picker.button'), 'data-i18n': 'book.picker.button' }),
+    pickerCount,
+    icon('chevronDown', { size: 13, class: 'opacity-70' }),
+  );
+
+  const pickerWrap = h('div', { class: 'book-picker-wrap' }, pickerButton, pickerPanel);
+
+  function openPicker() {
+    renderPicker();
+    pickerPanel.hidden = false;
+    pickerButton.setAttribute('aria-expanded', 'true');
+    doc.addEventListener('pointerdown', onPickerOutsidePress, true);
+    doc.addEventListener('keydown', onPickerKeydown, true);
+  }
+
+  function closePicker({ restoreFocus = false } = {}) {
+    if (pickerPanel.hidden) return;
+    pickerPanel.hidden = true;
+    pickerButton.setAttribute('aria-expanded', 'false');
+    doc.removeEventListener('pointerdown', onPickerOutsidePress, true);
+    doc.removeEventListener('keydown', onPickerKeydown, true);
+    if (restoreFocus) pickerButton.focus?.();
+  }
+
+  function onPickerOutsidePress(event) {
+    if (!pickerWrap.contains(event.target)) closePicker();
+  }
+
+  function onPickerKeydown(event) {
+    if (event.key !== 'Escape') return;
+    event.stopPropagation();
+    closePicker({ restoreFocus: true });
+  }
+
+  /** One checkbox per fetched repository, in the library's order. */
+  function renderPicker() {
+    const views = selectViews(session.state, settings.state, { now: Date.now() });
+    pickerList.replaceChildren(
+      ...views.map((repo) => {
+        const id = `book-pick-${repo.slug.replace(/[^a-z0-9]+/gi, '-')}`;
+        const box = h('input', {
+          type: 'checkbox',
+          class: 'checkbox',
+          id,
+          checked: repo.visible,
+          'aria-label': t('library.row.includeLabel', { name: repo.name }),
+          onChange: (event) => setChapterVisible(repo.slug, event.target.checked),
+        });
+        return h(
+          'label',
+          { class: 'book-picker__row', for: id, dataset: { slug: repo.slug } },
+          box,
+          h('span', { class: 'book-picker__name', text: humanizeRepoName(repo.name) }),
+          // Deliberately not a `.book-chip`: those are sized for paper and
+          // read their colours from the `.book` scope, neither of which
+          // applies here in the toolbar.
+          h('span', {
+            class: `book-picker__status book-picker__status--${repo.tone}`,
+            text: t(`status.${repo.status}`),
+          }),
+        );
+      }),
+    );
+    if (views.length === 0) {
+      pickerList.append(
+        h('p', { class: 'book-picker__empty', text: t('book.picker.empty') }),
+      );
+    }
+    syncPickerCount();
+  }
+
+  function syncPickerCount() {
+    const views = selectViews(session.state, settings.state, { now: Date.now() });
+    const visible = views.filter((repo) => repo.visible).length;
+    setText(pickerCount, `${visible}/${views.length}`);
+  }
+
+  /** Mirrors the library's patch shape so both write the same override. */
+  function setChapterVisible(slug, visible) {
+    const current = settings.state.repoOverrides[slug] ?? {};
+    settings.set(['repoOverrides', slug], {
+      ...current,
+      visible,
+      updatedAt: new Date().toISOString(),
+    });
+    syncPickerCount();
+  }
+
+  function setAllChapters(visible) {
+    const views = selectViews(session.state, settings.state, { now: Date.now() });
+    if (views.length === 0) return;
+    settings.batch(() => {
+      for (const repo of views) {
+        const current = settings.state.repoOverrides[repo.slug] ?? {};
+        settings.state.repoOverrides[repo.slug] = {
+          ...current,
+          visible,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+    });
+    renderPicker();
+  }
+
   const toolbar = h(
     'div',
     { class: 'book-shell__toolbar' },
@@ -75,7 +243,7 @@ export function BookPreview(ctx) {
       h('span', { text: ' · ' }),
       chapterCount,
     ),
-    hideButton,
+    h('div', { class: 'ml-auto flex items-center gap-2' }, pickerWrap, hideButton),
   );
 
   /** The book itself — replaced wholesale on every recomposition. */
@@ -404,6 +572,12 @@ export function BookPreview(ctx) {
       const id = item.dataset.format;
       setText(item.querySelector('span'), t(`export.${id}`));
     }
+
+    // The picker mirrors library state, so it has to follow it — including a
+    // language change, which relabels the status chips and the aria labels.
+    setText(pickerButton.querySelector('span'), t('book.picker.button'));
+    if (!pickerPanel.hidden) renderPicker();
+    else syncPickerCount();
   }
 
   function sync() {
@@ -417,7 +591,10 @@ export function BookPreview(ctx) {
   doc.body?.classList.add('has-book-bar');
 
   const disposers = [
-    () => closeExportMenu(),
+    () => {
+      closeExportMenu();
+      closePicker();
+    },
     i18n.onChange(() => {
       syncChrome();
       if (isOpen()) compose();

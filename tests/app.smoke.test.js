@@ -286,6 +286,168 @@ describe('settings drawer', () => {
   });
 });
 
+describe('chapter picker', () => {
+  /**
+   * Boots the app on the shared DOM with three repositories, pulled through
+   * the real fetch + normalise path so the session holds exactly the shape
+   * the app produces in production.
+   */
+  async function mount() {
+    // A fresh shell per test: `bootstrap()` mounts into the existing layout
+    // regions, so leftovers from the previous app would be picked up twice.
+    app?.destroy?.();
+    env.document.body.innerHTML = createShell();
+    storage = createMemoryStorage();
+    const names = ['alpha', 'beta', 'gamma'];
+    const fetch = async () => ({
+      ok: true,
+      status: 200,
+      headers: new Map(),
+      async json() {
+        return names.map((name, index) => ({
+          id: index + 1,
+          full_name: `octo/${name}`,
+          name,
+          owner: { login: 'octo' },
+          html_url: `https://github.com/octo/${name}`,
+          description: `Repository ${name}`,
+          language: 'JavaScript',
+          stargazers_count: index + 1,
+          forks_count: 0,
+          open_issues_count: 0,
+          fork: false,
+          private: false,
+          archived: false,
+          disabled: false,
+          default_branch: 'main',
+          homepage: '',
+          topics: [],
+          license: null,
+          created_at: new Date(Date.now() - 900 * DAY).toISOString(),
+          updated_at: new Date(Date.now() - (index + 1) * DAY).toISOString(),
+          pushed_at: new Date(Date.now() - (index + 1) * DAY).toISOString(),
+        }));
+      },
+    });
+
+    app = bootstrap({ host: env.document, storage, fetch });
+    app.ctx.settings.set('githubUsername', 'octo');
+    await app.fetchRepos({ silent: true });
+    app.ctx.settings.set('book', { preview: true });
+  }
+
+  /** The picker lives in the Book Studio toolbar, not the action bar. */
+  const pickerToggle = () =>
+    [...env.document.querySelectorAll('.book-shell__toolbar button')].find((b) =>
+      b.hasAttribute('aria-haspopup'),
+    );
+  const panel = () => env.document.querySelector('.book-picker');
+  const row = (slug) =>
+    [...panel().querySelectorAll('.book-picker__row')].find((r) => r.dataset.slug === slug);
+  /**
+   * The book renders on an animation frame, so tests ask for it directly
+   * rather than sleeping. `recompose()` is that one line.
+   */
+  const recompose = () => app.components.bookPreview.compose();
+  const chapters = () => {
+    recompose();
+    return [...env.document.querySelectorAll('#book-root .book-entry')];
+  };
+
+  test('the picker starts closed', async () => {
+    await mount();
+    assert.equal(panel().hidden, true);
+    assert.equal(pickerToggle().getAttribute('aria-expanded'), 'false');
+    app.destroy();
+  });
+
+  test('it lists every fetched repository with a checkbox', async () => {
+    await mount();
+    pickerToggle().click();
+    assert.equal(panel().hidden, false);
+    const rows = [...panel().querySelectorAll('.book-picker__row')];
+    assert.equal(rows.length, 3);
+    for (const r of rows) {
+      const box = r.querySelector('input[type=checkbox]');
+      assert.ok(box, 'row without a checkbox');
+      assert.equal(box.checked, true, 'everything is in the book by default');
+      // The label must point at its own input, or clicking the row toggles
+      // the wrong project.
+      assert.equal(r.getAttribute('for'), box.id);
+    }
+    app.destroy();
+  });
+
+  test('unticking a project removes it from the book', async () => {
+    await mount();
+    assert.equal(chapters().length, 3);
+    pickerToggle().click();
+
+    const box = row('octo/beta').querySelector('input');
+    box.checked = false;
+    box.dispatchEvent(new env.window.Event('change', { bubbles: true }));
+
+    // Order belongs to the paginator (status rank, then stars), so assert on
+    // membership rather than on a sequence this component does not control.
+    const slugs = chapters().map((entry) => entry.dataset.slug);
+    assert.deepEqual([...slugs].sort(), ['octo/alpha', 'octo/gamma']);
+    app.destroy();
+  });
+
+  test('the counter tracks how many projects are included', async () => {
+    await mount();
+    pickerToggle().click();
+    assert.equal(pickerToggle().querySelector('.tabular-nums').textContent, '3/3');
+
+    const box = row('octo/beta').querySelector('input');
+    box.checked = false;
+    box.dispatchEvent(new env.window.Event('change', { bubbles: true }));
+    assert.equal(pickerToggle().querySelector('.tabular-nums').textContent, '2/3');
+    app.destroy();
+  });
+
+  test('it writes the same override the library checkbox writes', async () => {
+    await mount();
+    pickerToggle().click();
+    const box = row('octo/beta').querySelector('input');
+    box.checked = false;
+    box.dispatchEvent(new env.window.Event('change', { bubbles: true }));
+
+    recompose();
+    // Exactly the override the library's own checkbox writes.
+    assert.equal(app.ctx.settings.state.repoOverrides['octo/beta'].visible, false);
+    assert.ok(app.ctx.settings.state.repoOverrides['octo/beta'].updatedAt, 'edits are timestamped');
+
+    // And the library card for the same repository follows.
+    app.components.library.flush();
+    assert.equal(cardFor('octo/beta').querySelector('input[type=checkbox]').checked, false);
+    app.destroy();
+  });
+
+  test('select-all and select-none work', async () => {
+    await mount();
+    pickerToggle().click();
+    const [all, none] = [...panel().querySelectorAll('.book-picker__head button')];
+
+    none.click();
+    assert.equal(chapters().length, 0);
+    assert.equal(pickerToggle().querySelector('.tabular-nums').textContent, '0/3');
+
+    all.click();
+    assert.equal(chapters().length, 3);
+    assert.equal(pickerToggle().querySelector('.tabular-nums').textContent, '3/3');
+    app.destroy();
+  });
+
+  test('Escape closes it', async () => {
+    await mount();
+    pickerToggle().click();
+    env.document.dispatchEvent(new env.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert.equal(panel().hidden, true);
+    app.destroy();
+  });
+});
+
 describe('text export menu', () => {
   /** Boots a fresh app on the shared DOM; every test tears it down again. */
   function mount() {
@@ -895,16 +1057,26 @@ function allSlugs() {
   );
 }
 
-/** Rebuild the mount points after `app.destroy()` in a fresh bootstrap. */
+/**
+ * Rebuild the mount points after `app.destroy()` in a fresh bootstrap.
+ *
+ * Mirrors the region list in `index.html` — `#book-root` and `#book-bar-root`
+ * included, because `bootstrap()` warns and skips any region it cannot find.
+ */
 function createShell() {
   return `
     <a href="#main" class="skip-link" data-i18n="a11y.skipToContent">Skip to content</a>
     <div id="app">
       <div id="boot"></div>
       <header id="navbar-root"></header>
-      <main id="main"><div id="hero-root"></div><div id="library-root"></div><aside id="summary-root"></aside></main>
+      <main id="main">
+        <section id="hero-root"></section>
+        <div><section id="library-root"></section><aside id="summary-root"></aside></div>
+        <section id="book-root"></section>
+      </main>
       <footer id="footer-root"></footer>
     </div>
+    <div id="book-bar-root"></div>
     <div id="overlay-root"></div>
     <div id="toast-root" role="status" aria-live="polite"></div>
   `;

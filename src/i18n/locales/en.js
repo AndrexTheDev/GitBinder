@@ -275,6 +275,13 @@ export default {
   },
 
   book: {
+    picker: {
+      button: 'Projects',
+      title: 'Projects in this book',
+      all: 'Include every project',
+      none: 'Include no project',
+      empty: 'Fetch your repositories first — there is nothing to choose from yet.',
+    },
     bar: {
       title: 'Book studio',
       hide: 'Hide preview',

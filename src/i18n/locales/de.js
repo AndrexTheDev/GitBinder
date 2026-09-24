@@ -271,6 +271,13 @@ export default {
   },
 
   book: {
+    picker: {
+      button: 'Projekte',
+      title: 'Projekte in diesem Buch',
+      all: 'Alle Projekte aufnehmen',
+      none: 'Kein Projekt aufnehmen',
+      empty: 'Lade zuerst deine Repositories — es gibt noch nichts auszuwählen.',
+    },
     bar: {
       title: 'Buchwerkstatt',
       hide: 'Vorschau ausblenden',
