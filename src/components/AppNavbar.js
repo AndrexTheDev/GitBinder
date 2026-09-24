@@ -13,6 +13,7 @@ import { h, setText } from '../core/dom.js';
 import { UI_EVENTS } from '../core/events.js';
 import { APP_NAME } from '../config/app.js';
 import { icon } from './ui/Icon.js';
+import { BRAND_MARK } from '../config/app.js';
 import { LanguageToggle } from './LanguageToggle.js';
 
 /**
@@ -54,14 +55,18 @@ export function AppNavbar(ctx) {
     h(
       'span',
       {
-        class:
-          'relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[0.6rem] bg-ink-900 text-brass-200 shadow-card transition-transform duration-200 group-hover:-rotate-3',
+        class: 'flex h-10 w-auto shrink-0 transition-transform duration-200 group-hover:-rotate-3',
       },
-      icon('logo', { size: 19, strokeWidth: 1.9 }),
-      // Gilded spine detail
-      h('span', {
-        class: 'absolute inset-y-1.5 left-[3px] w-px rounded-full bg-brass-400/70',
+      // The mark is an <img>, not an inlined icon, so there is exactly one
+      // copy of the artwork: the file in `public/brand/`. Decorative here —
+      // the wordmark beside it already carries the name.
+      h('img', {
+        src: BRAND_MARK,
+        alt: '',
         'aria-hidden': 'true',
+        class: 'h-10 w-auto',
+        width: '40',
+        height: '40',
       }),
     ),
     h('span', { class: 'flex min-w-0 flex-col leading-tight' }, wordmark, tagline),

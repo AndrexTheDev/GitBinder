@@ -403,6 +403,15 @@
     outline-offset: 2.5mm;
   }
 
+  /* Deliberately short: the cover is a fixed A4 page with a fixed amount of
+     copy, so the mark gets a 14 mm slot and the title keeps its room. */
+  .book-cover__mark {
+    display: block;
+    width: auto;
+    height: 14mm;
+    margin: 0 auto 4mm;
+  }
+
   .book-cover__title {
     font-family: var(--font-serif);
     font-size: 30pt;

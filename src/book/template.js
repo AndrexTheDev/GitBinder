@@ -23,6 +23,7 @@
 import { h } from '../core/dom.js';
 import { safeUrl } from '../utils/format.js';
 import { BOOK_LIMITS } from '../config/book.js';
+import { BRAND_MARK } from '../config/app.js';
 
 /** Ornamental divider — three brass lozenges, the sort of thing a title page has. */
 function ornament() {
@@ -104,6 +105,19 @@ function coverPage(book) {
         h(
           'div',
           { class: 'book-cover__frame' },
+          /*
+           * The mark sits above the title, inside the frame. A bound spine on
+           * a title page is a familiar typographic move, and it gives the
+           * cover something that is unmistakably this tool's.
+           *
+           * Same-origin `<img>`: it prints at whatever resolution the printer
+           * has, and there is one copy of the artwork for the whole app.
+           */
+          h('img', {
+            class: 'book-cover__mark',
+            src: BRAND_MARK,
+            alt: meta.appName,
+          }),
           h('h1', { class: 'book-cover__title', text: meta.title }),
           h('p', { class: 'book-cover__subtitle', text: meta.subtitle }),
           ornament(),

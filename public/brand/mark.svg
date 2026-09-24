@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="GitBinder">
+  <title>GitBinder</title>
+  <!--
+    The GitBinder mark: a bound spine, navy cloth with cream tooling.
+
+    Two things are deliberate and worth not "fixing":
+
+      · **The spine is wider than a real one.** A true-to-life 1:4 spine is
+        under 4 px at favicon size and turns to mush. Widening it to a bit
+        over a third of the canvas is what keeps the head bands and the
+        branch legible at 16 px, which is the size that matters most.
+
+      · **It is drawn, not shipped as a bitmap.** Plain shapes stay crisp
+        from a favicon to a poster and cost a few hundred bytes instead of a
+        network request.
+
+    Reading order: page edges combed through the head, a raised band, the
+    branch motif, a second band, then the gilded rule where an imprint line
+    would sit.
+  -->
+  <g fill="none" stroke-linecap="round">
+    <!-- Cloth -->
+    <rect x="19.5" y="2" width="25" height="60" rx="3.2" fill="#1E3A5F" stroke="none" />
+
+    <!-- Page edges, combed through the head of the spine -->
+    <g stroke="#F8F3E4" stroke-width="1.6" opacity="0.9">
+      <path d="M24.4 4.2v6.4M29 3.7v7.4M33.7 3.5v7.8M38.4 3.7v7.4M43 4.2v6.4" />
+    </g>
+
+    <!-- Raised bands at head and foot -->
+    <g fill="#1E3A5F" stroke="none">
+      <rect x="17.8" y="14.4" width="28.4" height="2.9" rx="1.45" />
+      <rect x="17.8" y="50.6" width="28.4" height="2.9" rx="1.45" />
+    </g>
+
+    <!-- Stitching beneath each band -->
+    <g stroke="#F8F3E4" stroke-width="1.25" stroke-dasharray="3 2.6" opacity="0.7">
+      <path d="M23.6 20.2h16.8M23.6 47.4h16.8" />
+    </g>
+
+    <!-- The branch: one stem, alternating shoots, a node at each tip.
+         Deliberately a twig rather than a pair of mirrored curves —
+         mirroring two strands closes them into a leaf, which is what an
+         earlier attempt looked like. Alternating shoots stay readable at
+         favicon size. -->
+    <g stroke="#F8F3E4" stroke-width="1.5">
+      <path d="M32 23.4v22.4" />
+      <path d="M32 27.6 26.6 30.9M32 33 37.4 36.3M32 38.4 26.6 41.7M32 43.8 37.4 47.1" />
+    </g>
+    <g fill="#F8F3E4" stroke="none">
+      <circle cx="32" cy="23.6" r="1.5" />
+      <circle cx="32" cy="45.6" r="1.5" />
+      <circle cx="26.4" cy="31" r="1.25" />
+      <circle cx="37.6" cy="36.4" r="1.25" />
+      <circle cx="26.4" cy="41.8" r="1.25" />
+      <circle cx="37.6" cy="47.2" r="1.25" />
+    </g>
+
+    <!-- Gilded rule closing the foot, where the imprint line would sit -->
+    <rect x="27.4" y="56.6" width="9.2" height="1.4" rx="0.7" fill="#C08A2E" stroke="none" opacity="0.95" />
+  </g>
+</svg>

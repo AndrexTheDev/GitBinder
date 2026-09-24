@@ -11,7 +11,7 @@
 
 import { h, setText } from '../core/dom.js';
 import { UI_EVENTS } from '../core/events.js';
-import { APP_NAME, APP_VERSION, LINKS } from '../config/app.js';
+import { APP_NAME, APP_VERSION, BRAND_MARK, LINKS } from '../config/app.js';
 import { formatBytes } from '../utils/format.js';
 import { icon } from './ui/Icon.js';
 
@@ -115,7 +115,15 @@ export function AppFooter(ctx) {
         h(
           'div',
           { class: 'flex items-center gap-2' },
-          h('span', { class: 'text-brass-500' }, icon('logo', { size: 16 })),
+          // The same mark as the navbar, at footer scale.
+          h('img', {
+            src: BRAND_MARK,
+            alt: '',
+            'aria-hidden': 'true',
+            class: 'h-5 w-auto',
+            width: '20',
+            height: '20',
+          }),
           h('span', { class: 'font-serif text-sm font-semibold text-ink-800', text: APP_NAME }),
           h('span', { class: 'text-2xs text-ink-400', text: t('footer.version', { version: APP_VERSION }) }),
         ),

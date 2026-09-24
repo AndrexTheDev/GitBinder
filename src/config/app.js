@@ -7,6 +7,16 @@
  */
 
 export const APP_NAME = 'GitBinder';
+
+/**
+ * The brand mark, as a same-origin asset.
+ *
+ * Referenced rather than inlined so the artwork exists once: the navbar, the
+ * book cover and the favicon all point at the same file. Plain SVG, so it
+ * stays sharp at every size and costs no extra request weight beyond the
+ * few hundred bytes of the drawing itself.
+ */
+export const BRAND_MARK = '/brand/mark.svg';
 export const APP_VERSION = '0.1.0';
 export const APP_TAGLINE_KEY = 'meta.tagline';
 
