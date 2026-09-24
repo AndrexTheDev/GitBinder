@@ -13,8 +13,9 @@ Deployed on **Cloudflare Pages** as a static bundle.
 
 ## Status of this milestone
 
-The shell, i18n, state layer, GitHub integration, repository manager **and the Classic
-Book PDF composer** are in.
+The shell, i18n, state layer, GitHub integration, repository manager, the Classic Book
+PDF composer, the donations and legal surfaces, **text exports, per-project notes and the
+ad-blocker gate** are in.
 
 | Area | State |
 | --- | --- |
@@ -34,6 +35,11 @@ Book PDF composer** are in.
 | **Support modal: SOL / BTC / ETH tabs, QR codes, copy feedback** | ✅ |
 | **Footer: Help / Disclaimer / Terms / Contact (EN + DE)** | ✅ |
 | **Cloudflare Pages config: wrangler, _headers, CSP, robots, sitemap** | ✅ |
+| **Chapter picker: tick projects for the book from the action bar** | ✅ |
+| **Text exports: Markdown, plain text, CSV** | ✅ |
+| **Per-project notes that survive a re-fetch** | ✅ |
+| **Ad-blocker gate with a friendly, re-checkable notice** | ✅ |
+| GitBinder brand mark (navbar, footer, book cover, favicon) | ✅ |
 
 ---
 
@@ -96,7 +102,7 @@ repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
 ```
 index.html                  Static shell — every mount point lives here
 vite.config.js              Vite 8 + Tailwind v4 (CSS-first config)
-public/                     favicon, _headers, _redirects, robots.txt, sitemap.xml
+public/                     favicon, brand/mark.svg, _headers, _redirects, robots.txt, sitemap.xml
 src/
 ├── main.js                 Entry point (error boundary + boot splash teardown)
 ├── app.js                  Bootstrap: mounts components, owns the fetch pipeline
@@ -123,17 +129,20 @@ src/
 ├── book/                   Classic Book composer (pure, DOM- and store-free)
 │   ├── paginate.js         Geometry: grouping, page packing, TOC sorter
 │   ├── compose.js          settings + chapters → the printable book model
-│   └── template.js         Book model → one <section class="book-page"> per sheet
+│   ├── template.js         Book model → one <section class="book-page"> per sheet
+│   └── export.js           The same model → Markdown / plain text / CSV
 ├── services/
 │   ├── github.js           The only network code: endpoints, pagination, errors
 │   ├── status.js           Project status auto-detection engine
-│   └── print.js            window.print() trigger: file name, print CSS, cleanup
+│   ├── print.js            window.print() trigger: file name, print CSS, cleanup
+│   └── adblock.js          Bait-element detection, no network involved
 ├── components/
 │   ├── AppNavbar.js        Branding, language switch, support, settings, fetch
 │   ├── HeroPanel.js        Product intro + live stat strip
 │   ├── RepositoryLibrary.js Toolbar, counters, keyed rows, empty states
-│   ├── RepoCard.js         One row: visibility, status, custom summary
-│   ├── BookPreview.js      Book studio: live preview + sticky print action bar
+│   ├── RepoCard.js         One row: visibility, status, summary, notes
+│   ├── BookPreview.js      Book studio: live preview, chapter picker, export menu
+│   ├── AdBlockNotice.js    The screen a blocked visitor sees
 │   ├── BookSummary.js      Live cover + table of contents preview
 │   ├── AppFooter.js        Provenance, info links, privacy line, storage usage
 │   ├── SettingsDrawer.js   All persisted configuration + data portability
@@ -212,6 +221,19 @@ The UI states this plainly next to the field. On a shared computer, leave it emp
 public repositories work without any token at all.
 
 ---
+
+### Renamed from GitBooklet
+
+The project was called GitBooklet until Milestone 5. Renaming it must not cost
+anybody their book, so visitors who used the old build keep their curated
+portfolio under the old keys and `migrateStorageKeys()` moves them across on the
+first load after the rename — `gitbooklet:state` → `gitbinder:state`,
+`gitbooklet:vault` → `gitbinder:vault`.
+
+It only deletes the old copy once the new one verifies, so a quota error leaves
+the original intact rather than destroying both. The legacy names are constants
+in `src/config/app.js` and are pinned by `tests/migration.test.js`; they are the
+one place where the old name is still expected to appear.
 
 ## GitHub fetcher
 
@@ -348,17 +370,124 @@ that are easy to get wrong:
 
 ### Book studio UI
 
-A sticky action bar follows the visitor down the page with the live-preview toggle
-and the **Generate PDF / Print book** button. The preview renders the real book DOM
-at true A4 size through the real print stylesheet — what is on screen is what the
-PDF will contain. Recomposition is animation-frame coalesced and skipped entirely
-while the preview is collapsed, so typing in a description textarea does not
-rebuild a 60-page document on every keystroke.
+A sticky action bar follows the visitor down the page, and it is the only part
+of the book UI that stays visible when the preview is collapsed — which is the
+default state, and the state you are in when you reach for the PDF. It carries
+four actions:
+
+* **Projects** — a checkbox per fetched repository, with select-all, select-none
+  and an `included/total` counter. It writes the same
+  `repoOverrides[slug].visible` the library's own checkbox writes, so the two
+  views can never disagree.
+* **Export as text** — Markdown, plain text or CSV (see below).
+* **Preview** — toggle the live A4 preview.
+* **Generate PDF / Print book** — compose, then open the print dialog.
+
+Placing the picker here rather than in the studio toolbar is deliberate: the
+studio shell is hidden while the preview is collapsed, so a picker living there
+would be unreachable exactly when the visitor is about to press Generate.
+
+The preview renders the real book DOM at true A4 size through the real print
+stylesheet — what is on screen is what the PDF will contain. Recomposition is
+animation-frame coalesced and skipped entirely while the preview is collapsed,
+so typing in a description textarea does not rebuild a 60-page document on
+every keystroke. On phones the bar's caption and button labels give way below
+640 px, leaving icon buttons that keep their accessible names.
 
 > **Tip:** `?u=<username>` deep-links straight into a populated book, e.g.
 > `https://gitbinder.pages.dev/?u=AndrexTheDev`.
 
 ---
+
+## Text exports
+
+PDF is the showpiece, but it is not the only thing people want out of a
+portfolio. The export menu in the action bar writes three more formats, each a
+pure function over the same inputs `composeBook()` takes, so an export always
+matches the book on screen:
+
+| Format | Best for | Notes |
+| --- | --- | --- |
+| **Markdown** (`.md`) | READMEs, wikis, static-site generators | Notes become blockquotes, so they read as annotation |
+| **Plain text** (`.txt`) | Terminals, email, anywhere at all | Fixed 72-column wrapping, ruled section breaks |
+| **CSV** (`.csv`) | Sorting, filtering, spreadsheets | RFC 4180: doubled quotes, CRLF, BOM for Excel |
+
+Two details are deliberate rather than incidental:
+
+* **Empty notes still export.** A project with no notes writes a dotted
+  placeholder block, exactly as the PDF prints ruled lines. The file is meant
+  to be a working document, not only a snapshot.
+* **The CSV carries a BOM** and uses CRLF. Without the BOM, Excel on Windows
+  mangles any non-ASCII text — the single most common complaint about exported
+  CSV.
+
+File names come from `slugifyTitle()`, shared with the PDF, so the same book
+downloaded as a PDF and as Markdown is called the same thing. It maps umlauts
+before NFKD decomposition (`ä→ae`, `ö→oe`, `ü→ue`, `ß→ss`, per DIN 5007-2) —
+"Übermäßig" has to become `uebermaessig`, not `ubermassig`.
+
+## Per-project notes
+
+Each project has a notes field in the repository manager, and those notes are
+printed with the project in the book.
+
+**They belong to you, not to GitHub.** They live in `repoOverrides` beside the
+status and the description, nothing derives them from the API, and a re-fetch
+cannot touch them — verified end to end: a repository whose description, stars
+and status all changed on GitHub keeps its notes byte-for-byte.
+
+In the book the block has two shapes, and the difference is the point:
+
+* **With notes** — your text is printed, line breaks preserved.
+* **Without notes** — the block prints ruled lines to write on, by hand or with
+  any PDF reader's annotation tool.
+
+The empty block is there on purpose. A notes area that only appears once filled
+in is useless to the person who wants to fill it in on the printout. The
+paginator reserves the space either way, including explicit newlines, so a book
+with notes on every project does not overrun its last sheet. Notes are capped at
+600 characters so the block cannot outgrow what the paginator measured.
+
+## The ad-blocker gate
+
+Visitors running a content blocker are shown a notice instead of the app: what
+was detected, three steps to allow the page, and a **Check again** button so
+nobody has to hunt for a reload. When the blocker is off, the app boots
+normally.
+
+Three decisions worth knowing before changing anything here:
+
+* **The app is never constructed when blocked** — not merely covered by an
+  overlay. No components mount, no listeners attach, no state is read. An
+  overlay over a running app leaves every feature reachable through the
+  console and the keyboard.
+* **No network.** The usual technique requests a URL that blockers blacklist,
+  which would leak a request from every visitor to a third party. This app's
+  whole promise is that it talks to nobody but `api.github.com`, so detection
+  measures bait elements in the DOM instead.
+* **Computed style, not layout metrics.** `offsetHeight`/`offsetParent` are
+  zero wherever there is no layout engine — including the test suite — so they
+  would flag every visitor. Filter lists hide things with CSS or delete the
+  node, which is exactly what is checked.
+
+Detection is heuristic, and this is the honest caveat: Firefox's strict mode
+and Brave Shields hide the same bait elements a filter list does, so those
+visitors land on the notice too. That is why it explains itself and offers a
+re-check rather than a dead end. Set `ADBLOCK_GATE.enabled = false` in
+`src/config/app.js` to remove the gate entirely.
+
+## Brand mark
+
+The mark lives in `public/brand/mark.svg` and is referenced — never inlined —
+from the navbar, the footer and the book cover, so the artwork exists once.
+`public/favicon.svg` is a deliberately simplified variant of the same drawing:
+a faithful illustration collapses into noise at 16 px, because the combed page
+edges, the stitching and the raised bands are all sub-pixel at favicon size.
+The detailed mark keeps them; the favicon drops them and keeps only what
+survives — silhouette, branch, navy-on-cream contrast.
+
+Both files are plain SVG with no external references, so they stay sharp at any
+size, cost no request beyond the drawing itself, and satisfy the CSP.
 
 ## Internationalisation
 
@@ -413,7 +542,7 @@ which drives the real components against a stubbed GitHub API.
 npm test
 ```
 
-221 tests across eight suites:
+316 tests across twelve suites:
 
 - `tests/store.test.js` — reactivity paths, batching, persistence, encode/decode,
   import/export, migrations, corrupt-payload survival.
@@ -433,7 +562,18 @@ npm test
   mounted in the real app under jsdom.
 - `tests/app.smoke.test.js` — **jsdom**: boots the real app, opens the drawer, types,
   fetches 101 repositories across two pages, edits statuses and descriptions, toggles
-  the fork filter and sorting, switches language, exports/imports.
+  the fork filter and sorting, switches language, exports/imports, ticks projects in
+  the chapter picker, and opens the text export menu.
+- `tests/export.test.js` — Markdown/plain-text/CSV output, RFC 4180 escaping and the
+  Excel BOM, umlaut transliteration, and the i18n keys the exporters depend on.
+- `tests/migration.test.js` — the storage-key hand-off from the pre-rename names,
+  including the failure mode where a failed write must leave the old copy alone.
+- `tests/adblock.test.js` — detection on a clean page and under injected CSS filters,
+  the "no layout engine" trap, and that no bait elements are left behind.
+- `tests/print-overlay.test.js` — screen-only panels are excluded from print, and the
+  print path closes them before the dialog opens.
+- `tests/brand.test.js` — the mark exists at the referenced path, is self-contained
+  SVG, and stays small.
 
 The suite includes a regression test for repository names containing a dot
 (`octo/special.name`), which would be split into nested keys by a naive dot-path write.
