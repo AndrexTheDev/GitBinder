@@ -316,7 +316,7 @@ homepages are passed through `safeUrl()` first: anything that is not `http(s)` o
 
 * **Header** — the book title, small and muted.
 * **Footer** — `Author: <name>` on the left, the page number centred, and
-  `Generated with GitBooklet (https://gitbooklet.pages.dev)` on the right.
+  `Generated with GitBooklet (https://gitbinder.pages.dev)` on the right.
 
 ### Printing
 
@@ -343,7 +343,7 @@ while the preview is collapsed, so typing in a description textarea does not
 rebuild a 60-page document on every keystroke.
 
 > **Tip:** `?u=<username>` deep-links straight into a populated book, e.g.
-> `https://gitbooklet.pages.dev/?u=AndrexTheDev`.
+> `https://gitbinder.pages.dev/?u=AndrexTheDev`.
 
 ---
 

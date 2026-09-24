@@ -26,7 +26,7 @@ function paperText(value, max = BOOK_LIMITS.descriptionChars) {
   return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
 }
 
-/** `https://gitbooklet.pages.dev` → `gitbooklet.pages.dev` for the footer. */
+/** `https://gitbinder.pages.dev` → `gitbinder.pages.dev` for the cover colophon. */
 function prettyUrl(url) {
   return String(url ?? '').replace(/^https?:\/\//, '').replace(/\/$/, '');
 }

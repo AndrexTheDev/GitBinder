@@ -99,7 +99,7 @@ describe('composeBook', () => {
     assert.equal(book.meta.subtitle, t('book.cover.subtitle'));
     assert.equal(book.meta.authorLine, 'Author: AndrexTheDev');
     assert.match(book.meta.generatedAtLabel, /2026/);
-    assert.equal(book.meta.attributionUrl, 'https://gitbooklet.pages.dev/');
+    assert.equal(book.meta.attributionUrl, 'https://gitbinder.pages.dev/');
   });
 
   test('falls back to the translated bio when none is set', async () => {
@@ -238,9 +238,9 @@ describe('renderBook', () => {
     // `new URL().href` adds the root path; the printed text and the href are
     // normalised to the same string so the paper copy cannot disagree with
     // the link annotation.
-    assert.equal(right.textContent, 'Generated with GitBooklet (https://gitbooklet.pages.dev/)');
+    assert.equal(right.textContent, 'Generated with GitBooklet (https://gitbinder.pages.dev/)');
     const link = right.querySelector('a');
-    assert.equal(link.getAttribute('href'), 'https://gitbooklet.pages.dev/');
+    assert.equal(link.getAttribute('href'), 'https://gitbinder.pages.dev/');
   });
 
   test('TOC page numbers point at the section that holds the chapter', async () => {

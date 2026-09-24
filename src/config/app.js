@@ -35,8 +35,11 @@ export const GITHUB = {
 };
 
 export const LINKS = {
-  /** Live deployment. Printed in the book's running footer as attribution. */
-  deployed: 'https://gitbooklet.pages.dev',
+  /**
+   * Live deployment. Printed in the book's running footer on every page and
+   * linked from the cover colophon — change it here and nowhere else.
+   */
+  deployed: 'https://gitbinder.pages.dev',
   repository: 'https://github.com/AndrexTheDev/GitBinder',
   issues: 'https://github.com/AndrexTheDev/GitBinder/issues',
   license: 'https://github.com/AndrexTheDev/GitBinder/blob/main/LICENSE',
