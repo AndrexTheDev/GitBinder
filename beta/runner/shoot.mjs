@@ -356,12 +356,12 @@ async function universalChecks(page) {
               const rect = el.getBoundingClientRect();
               return { el, right: Math.round(rect.right), w: Math.round(rect.width) };
             })
-            .filter((entry) => entry.right > window.innerWidth + 1)
-            .sort((a, b) => b.right - a.right)
-            .slice(0, 4)
+            .filter((entry) => entry.right > window.innerWidth + 1 || entry.w > window.innerWidth + 1)
+            .sort((a, b) => b.w - a.w)
+            .slice(0, 6)
             .map((entry) => {
-              const cls = (entry.el.getAttribute('class') || '').split(/\s+/).slice(0, 3).join('.');
-              return `<${entry.el.tagName.toLowerCase()}${cls ? `.${cls}` : ''}> right=${entry.right}px`;
+              const cls = (entry.el.getAttribute('class') || '').split(/\s+/).slice(0, 5).join('.');
+              return `<${entry.el.tagName.toLowerCase()}.${cls}> w=${entry.w} right=${entry.right}`;
             })
         : [];
 

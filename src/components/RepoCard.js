@@ -78,7 +78,7 @@ export function RepoCard({ repo, t, locale, onPatch }) {
 
   const badges = h('span', { class: 'flex flex-wrap items-center gap-1' });
 
-  const linkBadges = h('span', { class: 'flex shrink-0 items-center gap-1' });
+  const linkBadges = h('span', { class: 'flex flex-wrap items-center justify-end gap-1' });
 
   const metaLine = h('div', { class: 'mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-2xs text-ink-400' });
 
