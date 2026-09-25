@@ -82,11 +82,74 @@ libraries are absent (`libnss3`, `libatk-1`, `libpango`, `libgbm`, `libcairo`,
 rendered by `.github/workflows/screens.yml` on `ubuntu-latest` and committed
 back to `beta/shots/`, which this sandbox can then read via `codeload`.
 
+### First full sweep (all 16 modules, one capture pass)
+
+The harness was then pointed at the whole matrix: **70 captures → 58 pass,
+12 fail**. All 12 remaining failures are the *same* defect (F-03). Every other
+module captured green on the first real-browser pass — including the two
+areas that had looked broken in the pilot run but turned out to be harness
+artefacts (F-04).
+
+| Module | Captures | Failed | Verdict |
+| --- | ---: | ---: | --- |
+| M01 Layout shell | 6 | 2 | F-03 only |
+| M02 i18n | 3 | 1 | F-03 only |
+| M03 GitHub | 13 | 2 | F-03 on mobile; all error kinds green |
+| M04 Manager | 6 | 2 | F-03 on mobile |
+| M05 Card & overrides | 4 | 0 | ✅ |
+| M06 Status engine | 1 | 0 | ✅ all four statuses |
+| M07 Settings | 5 | 1 | F-03 on mobile; token-verify-fail green |
+| M08 Summary + picker | 4 | 1 | F-03 on mobile |
+| M09 Book studio | 4 | 1 | F-03 on mobile; cover/contents/catalogue green |
+| M10 Print / PDF | 2 | 0 | ✅ chrome hidden, A4 PDF produced |
+| M11 Exports | 2 | 0 | ✅ |
+| M12 Support | 4 | 1 | F-03 on mobile; QR + copy green |
+| M13 Legal modals | 5 | 0 | ✅ incl. DE contact + Escape |
+| M14 Ad-block gate | 3 | 0 | ✅ gate shows, re-check boots the app |
+| M15 A11y / responsive | 5 | 1 | F-03 at 320 px; skip-link + focus trap green |
+| M16 Persistence | 3 | 0 | ✅ reload, migration, import |
+
+### Findings (continued)
+
+**F-03 · Horizontal overflow on narrow viewports — the repo card's right column**
+— severity: high, modules: M01/M04/M05/M15, status: open.
+
+Every capture at ≤ ~430 px (`mobile 390`, `small 320`) fails with
+`horizontal-overflow`: the document is ~425 px wide in a 390 px viewport and
+355 px in 320. The runner names the offending nodes, and they are stable across
+shots:
+
+```
+<div.flex.shrink-0.items-center>        right=432px   (link/status badges)
+<span.flex.flex-col.items-end>          right=432px   (card right column)
+<span.text-2xs.text-ink-400>            right=432px
+<span.badge.badge--neutral>             right=432px
+```
+
+i.e. the right-hand badge/meta column of `.repo-card` (`components/RepoCard.js`,
+the `flex flex-col items-end` block holding `linkBadges` + `badges`) never
+shrinks or wraps below ~430 px, so the page scrolls sideways and text is visibly
+clipped (the library header's "Synchronised …" / connection badge are cut off in
+`m03-fetch-loaded@mobile@en`). This is the one genuine app defect the first
+sweep surfaced, and it affects the app's most important surface (the library)
+on phones.
+
+**F-04 · The ad-block gate did NOT crash — the first pilot's M14 failure was the
+runner** — severity: n/a (correction), module: M14, status: resolved (harness).
+
+The pilot run reported `Cannot read properties of null (reading 'append')` in
+all three M14 captures. Root cause: the runner injected its bait-hiding
+`<style>` at `document_start`, where neither `<head>` nor `<html>` exists yet —
+`(document.head ?? document.documentElement).append(...)` threw in the harness,
+not the app. After deferring the style until `<head>` exists, all three M14
+captures pass: the gate renders when baits are hidden and the re-check boots the
+real app. The gate is **not** a bug.
+
 ---
 
 ## Step 2 — M01 Layout shell
 
-_not started_
+_first sweep captured (see table); visual review pending_
 
 ## Step 3 — M02 i18n
 
