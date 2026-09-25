@@ -154,5 +154,8 @@ export async function detectAdBlocker(options = {}) {
   return measure(win, doc);
 }
 
-export const ADBLOCK_BAITS = BAITS;
+/**
+ * The settle window, exported so the test that checks "detection waits for a
+ * filter list to react" can assert against the real value instead of a copy.
+ */
 export const ADBLOCK_SETTLE_MS = SETTLE_MS;

@@ -371,6 +371,29 @@ describe('every key the code asks for exists', () => {
     }
   });
 
+  test('every key held in a constant resolves too', () => {
+    // `APP_TAGLINE_KEY` above is one such constant; `BOOK_SUBTITLE_KEY` is
+    // another. The static scan cannot see them — it looks for `t('…')` and
+    // `data-i18n`, and neither appears where these are used. A wrong constant
+    // prints its own name on the cover of the book.
+    //
+    // The config files are read directly: a key-shaped string there is a key,
+    // which keeps this precise instead of a wildcard hunt through every string
+    // in the project.
+    const candidates = new Set();
+    for (const file of readdirSync(join(ROOT, 'src', 'config'))) {
+      const source = stripComments(readFileSync(join(ROOT, 'src', 'config', file), 'utf8'));
+      for (const match of source.matchAll(/'([a-z][a-z0-9]*(?:\.[a-z0-9]+)+)'/g)) candidates.add(match[1]);
+    }
+
+    assert.ok(candidates.size >= 2, `expected key-shaped constants, found ${candidates.size}`);
+    for (const key of candidates) {
+      for (const [locale, dict] of Object.entries(LOCALES)) {
+        assert.ok(resolves(dict, key), `"${key}" is held in src/config and missing from ${locale}`);
+      }
+    }
+  });
+
   test('a dynamically built key has a namespace to land in', () => {
     // `t(`export.${format}`)` cannot be checked key by key, but a renamed or
     // deleted namespace leaves the prefix matching nothing at all — which is

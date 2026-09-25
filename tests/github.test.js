@@ -15,6 +15,7 @@ import {
   lastPageFromLink,
   normalizeRepo,
   parseLinkHeader,
+  verifyToken,
 } from '../src/services/github.js';
 import { GITHUB } from '../src/config/app.js';
 
@@ -335,3 +336,195 @@ class AbortError extends Error {
     this.name = 'AbortError';
   }
 }
+
+/* -------------------------------------------------------------------------- *
+ * Token verification — the "Sign in" check in the settings drawer
+ * -------------------------------------------------------------------------- */
+
+/**
+ * Build a fake `fetch` that answers `/user` once, recording what it was asked.
+ *
+ * @param {{ status?: number, body?: any, headers?: [string, string][], badJson?: boolean,
+ *           fail?: Error }} [options]
+ */
+function fakeUserEndpoint(options = {}) {
+  const requested = [];
+
+  async function impl(url, init = {}) {
+    requested.push({ url: String(url), init });
+    if (options.fail) throw options.fail;
+
+    const headers = new Map(options.headers ?? []);
+    return {
+      ok: (options.status ?? 200) < 400,
+      status: options.status ?? 200,
+      headers,
+      json: async () => {
+        if (options.badJson) throw new SyntaxError('Unexpected token < in JSON');
+        return options.body ?? {};
+      },
+    };
+  }
+
+  impl.requested = requested;
+  return impl;
+}
+
+describe('verifyToken', () => {
+  const TOKEN = 'ghp_abcdefghijklmnopqrstuvwxyz0123456789';
+
+  test('a valid token reports who it belongs to', async () => {
+    const fetchImpl = fakeUserEndpoint({
+      body: { login: 'AndrexTheDev', name: 'Andre', plan: { name: 'free' } },
+      headers: [['x-oauth-scopes', 'repo, read:user']],
+    });
+
+    const result = await verifyToken(TOKEN, { fetchImpl });
+
+    assert.deepEqual(result, {
+      login: 'AndrexTheDev',
+      name: 'Andre',
+      plan: 'free',
+      scopes: ['repo', 'read:user'],
+    });
+  });
+
+  test('the token travels in the Authorization header, never in the URL', async () => {
+    // A token in a query string ends up in referrers, in logs and in the
+    // browser's history. This is the request that decides whether the visitor
+    // is signed in, so it is the one place that has to be exact.
+    const fetchImpl = fakeUserEndpoint({ body: { login: 'octocat' } });
+    await verifyToken(TOKEN, { fetchImpl });
+
+    const [{ url, init }] = fetchImpl.requested;
+    assert.equal(url, `${GITHUB.apiBase}/user`);
+    assert.equal(url.includes(TOKEN), false, 'the token is in the URL');
+    assert.equal(init.headers.Authorization, `Bearer ${TOKEN}`);
+
+    // And it appears exactly once in the whole request, in that header: a
+    // second copy would mean some other field is carrying it too.
+    const serialised = JSON.stringify(init);
+    assert.equal(
+      serialised.split(TOKEN).length - 1,
+      1,
+      `the token appears ${serialised.split(TOKEN).length - 1} times in the request`,
+    );
+    assert.ok(serialised.includes(`"Authorization":"Bearer ${TOKEN}"`));
+  });
+
+  test('an empty token is refused without asking GitHub', async () => {
+    // Pressing "verify" on an empty field must not send `Authorization: Bearer`
+    // with nothing after it, and must not show a spinner while it does.
+    for (const value of ['', '   ', '\n', null, undefined]) {
+      const fetchImpl = fakeUserEndpoint();
+      await assert.rejects(
+        () => verifyToken(value, { fetchImpl }),
+        (error) => error instanceof GithubError && error.kind === 'unauthorized',
+        `${JSON.stringify(value)} was not refused`,
+      );
+      assert.equal(fetchImpl.requested.length, 0, 'an empty token still hit the network');
+    }
+  });
+
+  test('the scopes are trimmed, and an absent header means no scopes', async () => {
+    // `x-oauth-scopes` is a comma-separated list with spaces after the commas.
+    const withSpaces = await verifyToken(TOKEN, {
+      fetchImpl: fakeUserEndpoint({
+        body: { login: 'octocat' },
+        headers: [['x-oauth-scopes', ' repo ,  user:email ,']],
+      }),
+    });
+    assert.deepEqual(withSpaces.scopes, ['repo', 'user:email']);
+
+    const withoutHeader = await verifyToken(TOKEN, {
+      fetchImpl: fakeUserEndpoint({ body: { login: 'octocat' } }),
+    });
+    assert.deepEqual(withoutHeader.scopes, []);
+  });
+
+  test('a profile without a name or a plan reports null, not undefined', async () => {
+    // The drawer prints these; `undefined` would surface as the string
+    // "undefined" in the greeting.
+    const result = await verifyToken(TOKEN, {
+      fetchImpl: fakeUserEndpoint({ body: { login: 'octocat' } }),
+    });
+
+    assert.equal(result.name, null);
+    assert.equal(result.plan, null);
+  });
+
+  test('a body that is not JSON is not a reason to declare the token invalid', async () => {
+    // A proxy, a captive portal or a maintenance page: the token may well be
+    // fine, and the visitor is told who they are (nobody) rather than being
+    // told their token is wrong.
+    const result = await verifyToken(TOKEN, {
+      fetchImpl: fakeUserEndpoint({ status: 200, badJson: true }),
+    });
+
+    assert.equal(result.login, '');
+    assert.deepEqual(result.scopes, []);
+  });
+
+  test('the error mapping is the same one the fetch path uses', async () => {
+    const cases = [
+      [{ status: 401 }, 'unauthorized'],
+      [
+        {
+          status: 403,
+          headers: [
+            ['x-ratelimit-limit', '60'],
+            ['x-ratelimit-remaining', '0'],
+            ['x-ratelimit-reset', '1717200000'],
+          ],
+        },
+        'rateLimit',
+      ],
+      [{ status: 403, headers: [['x-ratelimit-limit', '60'], ['x-ratelimit-remaining', '42']] }, 'forbidden'],
+      [{ status: 500 }, 'server'],
+    ];
+
+    for (const [options, kind] of cases) {
+      await assert.rejects(
+        () => verifyToken(TOKEN, { fetchImpl: fakeUserEndpoint(options) }),
+        (error) => error instanceof GithubError && error.kind === kind,
+        `status ${options.status} was not reported as ${kind}`,
+      );
+    }
+  });
+
+  test('a cancelled verification says cancelled', async () => {
+    const abort = new Error('aborted');
+    abort.name = 'AbortError';
+
+    await assert.rejects(
+      () => verifyToken(TOKEN, { fetchImpl: fakeUserEndpoint({ fail: abort }) }),
+      (error) => error instanceof GithubError && error.kind === 'aborted',
+    );
+  });
+
+  test('a network failure is reported as network', async () => {
+    await assert.rejects(
+      () => verifyToken(TOKEN, { fetchImpl: fakeUserEndpoint({ fail: new TypeError('Failed to fetch') }) }),
+      (error) => error instanceof GithubError && error.kind === 'network',
+    );
+  });
+
+  test('the caller\u2019s AbortSignal reaches fetch', async () => {
+    // The drawer cancels the previous check when a new one starts; without the
+    // signal, a late answer would overwrite a newer one.
+    const controller = new AbortController();
+    const fetchImpl = fakeUserEndpoint({ body: { login: 'octocat' } });
+    await verifyToken(TOKEN, { fetchImpl, signal: controller.signal });
+
+    assert.equal(fetchImpl.requested[0].init.signal, controller.signal);
+  });
+
+  test('a token with surrounding whitespace is accepted, trimmed', async () => {
+    // Pasting into the field is how tokens arrive, and a trailing newline is
+    // the single most common paste artefact.
+    const fetchImpl = fakeUserEndpoint({ body: { login: 'octocat' } });
+    await verifyToken(`  ${TOKEN}\n`, { fetchImpl });
+
+    assert.equal(fetchImpl.requested[0].init.headers.Authorization, `Bearer ${TOKEN}`);
+  });
+});
