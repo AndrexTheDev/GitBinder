@@ -361,3 +361,173 @@ describe('adversarial GitHub payloads render inert', () => {
     }
   });
 });
+
+
+/**
+ * Phase 2, step 2 — storage & session robustness.
+ *
+ * The app already guards these paths (store.restore/persistNow catch and report,
+ * fetchRepos aborts a superseded request); this block drives them through the
+ * real bootstrap so a future regression cannot quietly reopen the hole.
+ */
+describe('storage & session robustness', () => {
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const slug = (app) => app.ctx.session.state.repos.map((r) => r.slug).sort();
+
+  test('corrupt persisted JSON does not break boot', async () => {
+    const storage = createMemoryStorage();
+    // One persisted store (`gitbinder:state`) holds settings + overrides; repos
+    // are memory-only. Corrupt both the state and the token vault.
+    storage.setItem('gitbinder:state', '{ this is not json');
+    storage.setItem('gitbinder:vault', '[truncated');
+    const env = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const app = bootstrap({ host: env.document, storage, fetch: fixtureFetch('ok').impl });
+    try {
+      assert.equal(app.ctx.settings.state.githubUsername, '', 'corrupt settings fell back to defaults');
+      assert.equal(app.ctx.session.state.repos.length, 0, 'no repos before a fetch');
+      app.ctx.settings.set('githubUsername', DEMO_USER);
+      await app.fetchRepos({ silent: true });
+      app.components.library.flush();
+      assert.equal(env.document.querySelectorAll('.repo-card').length, DEMO_REPOS.length);
+    } finally {
+      app.destroy();
+      env.cleanup();
+    }
+  });
+
+  test('a storage that refuses writes keeps the app usable (quota)', async () => {
+    const readOnly = {
+      getItem: () => null,
+      setItem: () => {
+        throw new Error('QuotaExceededError');
+      },
+      removeItem: () => {},
+      clear: () => {},
+      get length() {
+        return 0;
+      },
+      key: () => null,
+    };
+    const env = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const app = bootstrap({ host: env.document, storage: readOnly, fetch: fixtureFetch('ok').impl });
+    try {
+      app.ctx.settings.set('githubUsername', DEMO_USER); // write throws → caught
+      assert.equal(app.ctx.settings.state.githubUsername, DEMO_USER, 'in-memory state updated despite failed write');
+      await app.fetchRepos({ silent: true });
+      app.components.library.flush();
+      assert.equal(env.document.querySelectorAll('.repo-card').length, DEMO_REPOS.length, 'app still fully usable');
+    } finally {
+      app.destroy();
+      env.cleanup();
+    }
+  });
+
+  test('a superseded fetch does not clobber the newer one', async () => {
+    let reposCall = 0;
+    let releaseFirst;
+    const gate = new Promise((res) => {
+      releaseFirst = res;
+    });
+    const mk = (name) => {
+      const now = Date.now();
+      const iso = (d) => new Date(now - d * 86_400_000).toISOString();
+      return {
+        id: Math.floor(Math.random() * 1e6),
+        full_name: `octodemo/${name}`,
+        name,
+        owner: { login: 'octodemo' },
+        html_url: `https://github.com/octodemo/${name}`,
+        description: '',
+        language: 'Go',
+        fork: false,
+        private: false,
+        archived: false,
+        disabled: false,
+        default_branch: 'main',
+        homepage: '',
+        created_at: iso(300),
+        updated_at: iso(2),
+        pushed_at: iso(2),
+        stargazers_count: 1,
+        forks_count: 0,
+        open_issues_count: 0,
+        size: 5,
+        license: null,
+        topics: [],
+      };
+    };
+    const fetch = async (url, opts) => {
+      if (/\/users\/octodemo$/.test(url)) {
+        return { ok: true, status: 200, headers: new Headers(), json: async () => ({ login: 'octodemo', avatar_url: '' }) };
+      }
+      reposCall += 1;
+      const n = reposCall;
+      if (n === 1) await gate;
+      else await wait(0);
+      if (opts?.signal?.aborted) {
+        const e = new Error('The operation was aborted');
+        e.name = 'AbortError';
+        throw e;
+      }
+      const data = n === 1 ? [mk('slow')] : [mk('fast-1'), mk('fast-2')];
+      return { ok: true, status: 200, headers: new Headers(), json: async () => data };
+    };
+
+    const env = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const app = bootstrap({ host: env.document, storage: createMemoryStorage(), fetch });
+    try {
+      app.ctx.settings.set('githubUsername', 'octodemo');
+      const first = app.fetchRepos({ silent: true });
+      await wait(15); // let the first request reach its stall
+      const second = app.fetchRepos({ silent: true }); // aborts the first
+      await wait(15);
+      releaseFirst();
+      await Promise.all([first, second]);
+      app.components.library.flush();
+      assert.deepEqual(slug(app), ['octodemo/fast-1', 'octodemo/fast-2'], 'the aborted (slow) fetch lost');
+      assert.equal(app.ctx.session.state.status, 'ready');
+    } finally {
+      app.destroy();
+      env.cleanup();
+    }
+  });
+
+  test('unicode survives a storage round-trip and renders intact', async () => {
+    const storage = createMemoryStorage();
+    const env = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const app = bootstrap({ host: env.document, storage, fetch: fixtureFetch('ok').impl });
+    try {
+      app.ctx.settings.set('githubUsername', DEMO_USER);
+      await app.fetchRepos({ silent: true });
+      app.components.library.flush();
+
+      const text = 'Grüße 🚀 日本語 — "quotes" & <angle>';
+      const card = env.document.querySelector('.repo-card[data-slug="octodemo/gitbinder"]');
+      assert.ok(card, 'gitbinder card rendered');
+      const textarea = card.querySelector('textarea');
+      textarea.value = text;
+      textarea.dispatchEvent(new env.window.Event('input', { bubbles: true }));
+      await wait(360); // past the debounce
+      app.components.library.flush();
+
+      assert.equal(
+        app.ctx.settings.state.repoOverrides['octodemo/gitbinder'].shortDescription,
+        text,
+        'stored verbatim in state',
+      );
+      app.ctx.settings.persistNow(); // force the debounced write before reading it back
+      const saved = JSON.parse(storage.getItem('gitbinder:state'));
+      assert.equal(
+        saved.data.repoOverrides['octodemo/gitbinder'].shortDescription,
+        text,
+        'persisted verbatim to storage',
+      );
+      const out = env.document.querySelector('.repo-card[data-slug="octodemo/gitbinder"] textarea');
+      assert.equal(out.value, text, 'rendered intact');
+      assert.equal(out.closest('.repo-card').querySelector('script, img[onerror]'), null, 'nothing injected');
+    } finally {
+      app.destroy();
+      env.cleanup();
+    }
+  });
+});
