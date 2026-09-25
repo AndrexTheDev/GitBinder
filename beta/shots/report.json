@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-25T09:50:38.423Z",
+  "generatedAt": "2026-09-25T10:02:03.515Z",
   "base": "http://127.0.0.1:4173",
   "total": 70,
-  "passed": 40,
-  "failed": 30,
+  "passed": 58,
+  "failed": 12,
   "warnings": 0,
   "byModule": [
     {
@@ -14,12 +14,12 @@
     {
       "module": "M02",
       "total": 3,
-      "fail": 2
+      "fail": 1
     },
     {
       "module": "M03",
       "total": 13,
-      "fail": 11
+      "fail": 2
     },
     {
       "module": "M04",
@@ -34,17 +34,17 @@
     {
       "module": "M06",
       "total": 1,
-      "fail": 1
+      "fail": 0
     },
     {
       "module": "M07",
       "total": 5,
-      "fail": 2
+      "fail": 1
     },
     {
       "module": "M08",
       "total": 4,
-      "fail": 2
+      "fail": 1
     },
     {
       "module": "M09",
@@ -74,17 +74,17 @@
     {
       "module": "M14",
       "total": 3,
-      "fail": 3
+      "fail": 0
     },
     {
       "module": "M15",
       "total": 5,
-      "fail": 2
+      "fail": 1
     },
     {
       "module": "M16",
       "total": 3,
-      "fail": 1
+      "fail": 0
     }
   ],
   "results": [
@@ -99,7 +99,7 @@
       "files": [
         "m01-shell-empty@desktop@en.png"
       ],
-      "ms": 536,
+      "ms": 1006,
       "findings": [],
       "status": "pass"
     },
@@ -114,7 +114,7 @@
       "files": [
         "m01-shell-empty@tablet@en.png"
       ],
-      "ms": 469,
+      "ms": 919,
       "findings": [],
       "status": "pass"
     },
@@ -129,7 +129,7 @@
       "files": [
         "m01-shell-empty@mobile@en.png"
       ],
-      "ms": 431,
+      "ms": 882,
       "findings": [
         {
           "severity": "error",
@@ -150,7 +150,7 @@
       "files": [
         "m01-shell-empty-de@desktop@de.png"
       ],
-      "ms": 510,
+      "ms": 947,
       "findings": [],
       "status": "pass"
     },
@@ -165,7 +165,7 @@
       "files": [
         "m01-shell-empty-de@mobile@de.png"
       ],
-      "ms": 426,
+      "ms": 869,
       "findings": [
         {
           "severity": "error",
@@ -186,7 +186,7 @@
       "files": [
         "m01-shell-scrolled@desktop@en.png"
       ],
-      "ms": 873,
+      "ms": 1416,
       "findings": [],
       "status": "pass"
     },
@@ -201,15 +201,9 @@
       "files": [
         "m02-i18n-loaded-de@desktop@de.png"
       ],
-      "ms": 594,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 12, found 5"
-        }
-      ],
-      "status": "fail"
+      "ms": 1450,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m02-i18n-loaded-de",
@@ -222,17 +216,12 @@
       "files": [
         "m02-i18n-loaded-de@mobile@de.png"
       ],
-      "ms": 485,
+      "ms": 1385,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 441px wide in a 390px viewport"
-        },
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 12, found 5"
+          "message": "content is 424px wide in a 390px viewport — widest: <div.flex.shrink-0.items-center> right=408px; <span.flex.flex-col.items-end> right=408px; <span.text-2xs.text-ink-400> right=408px; <span.badge.badge--neutral> right=408px"
         }
       ],
       "status": "fail"
@@ -248,7 +237,7 @@
       "files": [
         "m02-i18n-toggle@desktop@en.png"
       ],
-      "ms": 1112,
+      "ms": 1583,
       "findings": [],
       "status": "pass"
     },
@@ -263,7 +252,7 @@
       "files": [
         "m03-fetch-loading@desktop@en.png"
       ],
-      "ms": 202,
+      "ms": 204,
       "findings": [],
       "status": "pass"
     },
@@ -278,7 +267,7 @@
       "files": [
         "m03-fetch-loaded@desktop@en.png"
       ],
-      "ms": 585,
+      "ms": 1457,
       "findings": [],
       "status": "pass"
     },
@@ -293,25 +282,9 @@
       "files": [
         "m03-fetch-loaded@tablet@en.png"
       ],
-      "ms": 525,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "horizontal-overflow",
-          "message": "content is 828px wide in a 820px viewport"
-        },
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\".repo-card[data-slug=\"octodemo/gitbinder\"]\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 12, found 5"
-        }
-      ],
-      "status": "fail"
+      "ms": 1423,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m03-fetch-loaded",
@@ -324,22 +297,12 @@
       "files": [
         "m03-fetch-loaded@mobile@en.png"
       ],
-      "ms": 491,
+      "ms": 1381,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 440px wide in a 390px viewport"
-        },
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\".repo-card[data-slug=\"octodemo/gitbinder\"]\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 12, found 5"
+          "message": "content is 425px wide in a 390px viewport — widest: <div.flex.shrink-0.items-center> right=432px; <span.flex.flex-col.items-end> right=432px; <span.text-2xs.text-ink-400> right=432px; <span.badge.badge--neutral> right=432px"
         }
       ],
       "status": "fail"
@@ -355,15 +318,9 @@
       "files": [
         "m03-fetch-paged@desktop@en.png"
       ],
-      "ms": 696,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 103, found 5"
-        }
-      ],
-      "status": "fail"
+      "ms": 1496,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m03-fetch-empty",
@@ -376,15 +333,9 @@
       "files": [
         "m03-fetch-empty@desktop@en.png"
       ],
-      "ms": 542,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 0, found 5"
-        }
-      ],
-      "status": "fail"
+      "ms": 1444,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m03-error-notfound",
@@ -397,15 +348,9 @@
       "files": [
         "m03-error-notfound@desktop@en.png"
       ],
-      "ms": 534,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "console-error",
-          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
-        }
-      ],
-      "status": "fail"
+      "ms": 1482,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m03-error-notfound",
@@ -418,17 +363,12 @@
       "files": [
         "m03-error-notfound@mobile@en.png"
       ],
-      "ms": 458,
+      "ms": 1423,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
           "message": "content is 425px wide in a 390px viewport"
-        },
-        {
-          "severity": "error",
-          "code": "console-error",
-          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
         }
       ],
       "status": "fail"
@@ -444,15 +384,9 @@
       "files": [
         "m03-error-ratelimit@desktop@en.png"
       ],
-      "ms": 510,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "console-error",
-          "message": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
-        }
-      ],
-      "status": "fail"
+      "ms": 1493,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m03-error-unauthorized",
@@ -465,15 +399,9 @@
       "files": [
         "m03-error-unauthorized@desktop@en.png"
       ],
-      "ms": 559,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "console-error",
-          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
-        }
-      ],
-      "status": "fail"
+      "ms": 1482,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m03-error-offline",
@@ -486,15 +414,9 @@
       "files": [
         "m03-error-offline@desktop@en.png"
       ],
-      "ms": 536,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "console-error",
-          "message": "Failed to load resource: net::ERR_FAILED"
-        }
-      ],
-      "status": "fail"
+      "ms": 1433,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m03-error-server",
@@ -507,15 +429,9 @@
       "files": [
         "m03-error-server@desktop@en.png"
       ],
-      "ms": 522,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "console-error",
-          "message": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
-        }
-      ],
-      "status": "fail"
+      "ms": 1483,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m03-fetch-private",
@@ -528,20 +444,9 @@
       "files": [
         "m03-fetch-private@desktop@en.png"
       ],
-      "ms": 574,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\".repo-card[data-slug=\"octodemo/private-vault\"]\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 13, found 5"
-        }
-      ],
-      "status": "fail"
+      "ms": 1452,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m04-search",
@@ -554,7 +459,7 @@
       "files": [
         "m04-search@desktop@en.png"
       ],
-      "ms": 1040,
+      "ms": 1521,
       "findings": [],
       "status": "pass"
     },
@@ -569,12 +474,12 @@
       "files": [
         "m04-search@mobile@en.png"
       ],
-      "ms": 960,
+      "ms": 1420,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — widest: <div.flex.shrink-0.items-center> right=432px; <span.flex.flex-col.items-end> right=432px; <span.text-2xs.text-ink-400> right=432px; <span.badge.badge--neutral> right=432px"
         }
       ],
       "status": "fail"
@@ -590,12 +495,12 @@
       "files": [
         "m04-search-noresult@mobile@en.png"
       ],
-      "ms": 948,
+      "ms": 1398,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — widest: <div.flex.shrink-0.items-center> right=432px; <span.flex.flex-col.items-end> right=432px; <span.text-2xs.text-ink-400> right=432px; <span.badge.badge--neutral> right=432px"
         }
       ],
       "status": "fail"
@@ -611,7 +516,7 @@
       "files": [
         "m04-sort-name@desktop@en.png"
       ],
-      "ms": 944,
+      "ms": 1445,
       "findings": [],
       "status": "pass"
     },
@@ -626,7 +531,7 @@
       "files": [
         "m04-hide-forks@desktop@en.png"
       ],
-      "ms": 981,
+      "ms": 1451,
       "findings": [],
       "status": "pass"
     },
@@ -642,7 +547,7 @@
         "m04-select-all--all@desktop@en.png",
         "m04-select-all@desktop@en.png"
       ],
-      "ms": 1368,
+      "ms": 1860,
       "findings": [],
       "status": "pass"
     },
@@ -657,7 +562,7 @@
       "files": [
         "m05-card-description@desktop@en.png"
       ],
-      "ms": 1033,
+      "ms": 1438,
       "findings": [],
       "status": "pass"
     },
@@ -672,7 +577,7 @@
       "files": [
         "m05-card-status-override@desktop@en.png"
       ],
-      "ms": 1025,
+      "ms": 1449,
       "findings": [],
       "status": "pass"
     },
@@ -687,7 +592,7 @@
       "files": [
         "m05-card-notes@desktop@en.png"
       ],
-      "ms": 950,
+      "ms": 1447,
       "findings": [],
       "status": "pass"
     },
@@ -702,7 +607,7 @@
       "files": [
         "m05-card-keyboard@desktop@en.png"
       ],
-      "ms": 790,
+      "ms": 1468,
       "findings": [],
       "status": "pass"
     },
@@ -717,20 +622,9 @@
       "files": [
         "m06-status-matrix@desktop@en.png"
       ],
-      "ms": 904,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\".repo-card[data-status=\"live\"]\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\".repo-card[data-status=\"development\"]\" is not in the DOM"
-        }
-      ],
-      "status": "fail"
+      "ms": 1732,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m07-settings-top",
@@ -743,7 +637,7 @@
       "files": [
         "m07-settings-top@desktop@en.png"
       ],
-      "ms": 1211,
+      "ms": 1623,
       "findings": [],
       "status": "pass"
     },
@@ -758,12 +652,12 @@
       "files": [
         "m07-settings-top@mobile@en.png"
       ],
-      "ms": 1025,
+      "ms": 1478,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — widest: <span.badge.badge--neutral> right=505px; <div.flex.shrink-0.items-center> right=432px; <span.flex.flex-col.items-end> right=432px; <span.text-2xs.text-ink-400> right=432px"
         }
       ],
       "status": "fail"
@@ -779,7 +673,7 @@
       "files": [
         "m07-settings-book-meta@desktop@en.png"
       ],
-      "ms": 1709,
+      "ms": 2039,
       "findings": [],
       "status": "pass"
     },
@@ -794,7 +688,7 @@
       "files": [
         "m07-settings-data@desktop@en.png"
       ],
-      "ms": 1496,
+      "ms": 1985,
       "findings": [],
       "status": "pass"
     },
@@ -809,20 +703,9 @@
       "files": [
         "m07-settings-token-verify-fail@desktop@en.png"
       ],
-      "ms": 2601,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "console-error",
-          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
-        },
-        {
-          "severity": "error",
-          "code": "console-error",
-          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
-        }
-      ],
-      "status": "fail"
+      "ms": 3032,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m08-summary-chapters",
@@ -835,7 +718,7 @@
       "files": [
         "m08-summary-chapters@desktop@en.png"
       ],
-      "ms": 1378,
+      "ms": 1820,
       "findings": [],
       "status": "pass"
     },
@@ -848,17 +731,11 @@
       "lang": "en",
       "fixture": "ok",
       "files": [
-        "m08-summary-chapters@tablet@en--FAILED.png"
+        "m08-summary-chapters@tablet@en.png"
       ],
-      "ms": 30429,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "step-failed",
-          "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('[data-i18n=\"library.toolbar.selectAll\"], [data-i18n-aria-label=\"library.toolbar.selectAll\"]').first()\n    - locator resolved to <span class=\"hidden xl:inline\" data-i18n=\"library.toolbar.selectAll\">Select all</span>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not visible\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not visible\n    - retrying click action\n      - waiting 100ms\n    58 × waiting for element to be visible, enabled and stable\n       - element is not visible\n     - retrying click action\n       - waiting 500ms\n"
-        }
-      ],
-      "status": "fail"
+      "ms": 1785,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m08-chapter-picker",
@@ -871,7 +748,7 @@
       "files": [
         "m08-chapter-picker@desktop@en.png"
       ],
-      "ms": 1107,
+      "ms": 1545,
       "findings": [],
       "status": "pass"
     },
@@ -886,12 +763,12 @@
       "files": [
         "m08-chapter-picker@mobile@en.png"
       ],
-      "ms": 1013,
+      "ms": 1451,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — widest: <div.flex.shrink-0.items-center> right=432px; <span.flex.flex-col.items-end> right=432px; <span.text-2xs.text-ink-400> right=432px; <span.badge.badge--neutral> right=432px"
         }
       ],
       "status": "fail"
@@ -907,7 +784,7 @@
       "files": [
         "m09-book-cover@desktop@en.png"
       ],
-      "ms": 2885,
+      "ms": 3381,
       "findings": [],
       "status": "pass"
     },
@@ -922,7 +799,7 @@
       "files": [
         "m09-book-contents@desktop@en.png"
       ],
-      "ms": 2904,
+      "ms": 3362,
       "findings": [],
       "status": "pass"
     },
@@ -937,7 +814,7 @@
       "files": [
         "m09-book-catalogue@desktop@en.png"
       ],
-      "ms": 2832,
+      "ms": 3310,
       "findings": [],
       "status": "pass"
     },
@@ -952,12 +829,12 @@
       "files": [
         "m09-book-bar@mobile@en.png"
       ],
-      "ms": 810,
+      "ms": 1358,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — widest: <div.flex.shrink-0.items-center> right=432px; <span.flex.flex-col.items-end> right=432px; <span.text-2xs.text-ink-400> right=432px; <span.badge.badge--neutral> right=432px"
         }
       ],
       "status": "fail"
@@ -973,7 +850,7 @@
       "files": [
         "m10-print-emulate@desktop@en.png"
       ],
-      "ms": 2411,
+      "ms": 2825,
       "findings": [],
       "status": "pass"
     },
@@ -988,7 +865,7 @@
       "files": [
         "m10-print-pdf@desktop@en.pdf"
       ],
-      "ms": 2617,
+      "ms": 3071,
       "findings": [],
       "status": "pass"
     },
@@ -1003,7 +880,7 @@
       "files": [
         "m11-export-menu@desktop@en.png"
       ],
-      "ms": 1454,
+      "ms": 1886,
       "findings": [],
       "status": "pass"
     },
@@ -1018,7 +895,7 @@
       "files": [
         "m11-export-toast@desktop@en.png"
       ],
-      "ms": 1946,
+      "ms": 2399,
       "findings": [],
       "status": "pass"
     },
@@ -1033,7 +910,7 @@
       "files": [
         "m12-support-modal@desktop@en.png"
       ],
-      "ms": 1225,
+      "ms": 1667,
       "findings": [],
       "status": "pass"
     },
@@ -1048,7 +925,7 @@
       "files": [
         "m12-support-modal@mobile@en.png"
       ],
-      "ms": 1092,
+      "ms": 1561,
       "findings": [
         {
           "severity": "error",
@@ -1069,7 +946,7 @@
       "files": [
         "m12-support-qr@desktop@en.png"
       ],
-      "ms": 1622,
+      "ms": 2063,
       "findings": [],
       "status": "pass"
     },
@@ -1084,7 +961,7 @@
       "files": [
         "m12-support-copy@desktop@en.png"
       ],
-      "ms": 2182,
+      "ms": 2629,
       "findings": [],
       "status": "pass"
     },
@@ -1099,7 +976,7 @@
       "files": [
         "m13-info-help@desktop@en.png"
       ],
-      "ms": 1027,
+      "ms": 1491,
       "findings": [],
       "status": "pass"
     },
@@ -1114,7 +991,7 @@
       "files": [
         "m13-info-disclaimer@desktop@en.png"
       ],
-      "ms": 1037,
+      "ms": 1472,
       "findings": [],
       "status": "pass"
     },
@@ -1129,7 +1006,7 @@
       "files": [
         "m13-info-terms@desktop@en.png"
       ],
-      "ms": 1034,
+      "ms": 1515,
       "findings": [],
       "status": "pass"
     },
@@ -1144,7 +1021,7 @@
       "files": [
         "m13-info-contact@desktop@de.png"
       ],
-      "ms": 1029,
+      "ms": 1500,
       "findings": [],
       "status": "pass"
     },
@@ -1160,7 +1037,7 @@
         "m13-info-escape--open@desktop@en.png",
         "m13-info-escape@desktop@en.png"
       ],
-      "ms": 1582,
+      "ms": 2042,
       "findings": [],
       "status": "pass"
     },
@@ -1175,30 +1052,9 @@
       "files": [
         "m14-gate-blocked@desktop@en.png"
       ],
-      "ms": 477,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\".adblock-notice\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\"#adblock-title\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\"#navbar-root > *\": expected 0, found 1"
-        },
-        {
-          "severity": "error",
-          "code": "page-error",
-          "message": "Cannot read properties of null (reading 'append')"
-        }
-      ],
-      "status": "fail"
+      "ms": 829,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m14-gate-blocked",
@@ -1211,35 +1067,9 @@
       "files": [
         "m14-gate-blocked@mobile@en.png"
       ],
-      "ms": 418,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
-        },
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\".adblock-notice\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\"#adblock-title\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\"#navbar-root > *\": expected 0, found 1"
-        },
-        {
-          "severity": "error",
-          "code": "page-error",
-          "message": "Cannot read properties of null (reading 'append')"
-        }
-      ],
-      "status": "fail"
+      "ms": 804,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m14-gate-recheck",
@@ -1251,22 +1081,11 @@
       "fixture": null,
       "files": [
         "m14-gate-recheck--blocked@desktop@en.png",
-        "m14-gate-recheck@desktop@en--FAILED.png"
+        "m14-gate-recheck@desktop@en.png"
       ],
-      "ms": 30600,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "step-failed",
-          "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('.adblock-notice button.btn-accent').first()\n"
-        },
-        {
-          "severity": "error",
-          "code": "page-error",
-          "message": "Cannot read properties of null (reading 'append')"
-        }
-      ],
-      "status": "fail"
+      "ms": 2504,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m15-a11y-skip-link",
@@ -1279,7 +1098,7 @@
       "files": [
         "m15-a11y-skip-link@desktop@en.png"
       ],
-      "ms": 798,
+      "ms": 1216,
       "findings": [],
       "status": "pass"
     },
@@ -1294,7 +1113,7 @@
       "files": [
         "m15-a11y-modal-focus@desktop@en.png"
       ],
-      "ms": 1362,
+      "ms": 1803,
       "findings": [],
       "status": "pass"
     },
@@ -1309,17 +1128,12 @@
       "files": [
         "m15-responsive-small@small@en.png"
       ],
-      "ms": 703,
+      "ms": 1583,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 370px wide in a 320px viewport"
-        },
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 12, found 5"
+          "message": "content is 355px wide in a 320px viewport — widest: <div.flex.shrink-0.items-center> right=432px; <span.flex.flex-col.items-end> right=432px; <span.text-2xs.text-ink-400> right=432px; <span.badge.badge--neutral> right=432px"
         },
         {
           "severity": "error",
@@ -1340,15 +1154,9 @@
       "files": [
         "m15-responsive-wide@wide@en.png"
       ],
-      "ms": 638,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 12, found 5"
-        }
-      ],
-      "status": "fail"
+      "ms": 1489,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m15-reduced-motion",
@@ -1361,7 +1169,7 @@
       "files": [
         "m15-reduced-motion@desktop@en.png"
       ],
-      "ms": 577,
+      "ms": 1442,
       "findings": [],
       "status": "pass"
     },
@@ -1376,7 +1184,7 @@
       "files": [
         "m16-persistence-reload@desktop@en.png"
       ],
-      "ms": 3066,
+      "ms": 3527,
       "findings": [],
       "status": "pass"
     },
@@ -1391,20 +1199,9 @@
       "files": [
         "m16-legacy-migration@desktop@en.png"
       ],
-      "ms": 578,
-      "findings": [
-        {
-          "severity": "error",
-          "code": "missing-selector",
-          "message": "\".repo-card[data-slug=\"octodemo/gitbinder\"][data-status=\"live\"]\" is not in the DOM"
-        },
-        {
-          "severity": "error",
-          "code": "wrong-count",
-          "message": "\".repo-card\": expected 12, found 5"
-        }
-      ],
-      "status": "fail"
+      "ms": 1455,
+      "findings": [],
+      "status": "pass"
     },
     {
       "id": "m16-import-settings",
@@ -1417,7 +1214,7 @@
       "files": [
         "m16-import-settings@desktop@en.png"
       ],
-      "ms": 2123,
+      "ms": 2563,
       "findings": [],
       "status": "pass"
     }
