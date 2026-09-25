@@ -106,6 +106,14 @@ export function parseRepoSlug(input, fallbackOwner = '') {
  * a `javascript:` homepage would run in the visitor's session the moment they
  * clicked it in the generated PDF.
  *
+ * A value with no scheme at all is *not* resolved against the current page.
+ * `new URL('example.com', location.href)` succeeds and quietly yields
+ * `https://<this app>/example.com`, so a homepage typed the way GitHub users
+ * usually type it — `example.com`, no scheme — would print that wrong URL in
+ * the book and point its link annotation at this app's own domain instead of
+ * the user's site. A bare hostname is therefore read as the `https:` address it
+ * was meant to be, and anything that does not look like a host is refused.
+ *
  * @param {unknown} value
  * @param {string} [fallback]
  * @returns {string} a safe URL, or `fallback` when the input is not one
@@ -113,8 +121,20 @@ export function parseRepoSlug(input, fallbackOwner = '') {
 export function safeUrl(value, fallback = '') {
   const raw = String(value ?? '').trim();
   if (!raw) return fallback;
+
+  // Whitespace means prose, not an address: "coming soon" is a valid relative
+  // reference to the WHATWG parser and must not become a link.
+  if (/\s/.test(raw)) return fallback;
+
+  const hasScheme = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(raw);
+  const candidate = hasScheme ? raw : `https://${raw}`;
+
+  // Only a dotted host counts as a typed address; `my-project` is a path
+  // fragment or a typo, not a domain.
+  if (!hasScheme && !/^[^\s/?#]+\.[^\s/?#]{2,}(?:[/?#]|$)/.test(raw)) return fallback;
+
   try {
-    const url = new URL(raw, typeof location !== 'undefined' ? location.href : 'https://gitbinder.dev/');
+    const url = new URL(candidate);
     if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'mailto:') {
       return url.href;
     }
