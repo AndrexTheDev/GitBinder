@@ -134,6 +134,23 @@ clipped (the library header's "Synchronised …" / connection badge are cut off 
 sweep surfaced, and it affects the app's most important surface (the library)
 on phones.
 
+**F-03 status (after fix attempts).** Two distinct contributors, fixed / open:
+
+1. *Library header — fixed.* `components/RepositoryLibrary.js` rendered the
+   "N repositories · M in the book" chip **and** the long, unbreakable
+   "Synchronised … / Public" detail in a `shrink-0` block. The fix hides the
+   secondary detail below `sm` (`hidden … sm:flex`) and lets the right block
+   wrap (`min-w-0 flex-wrap justify-end`). Verified: the card/header offenders
+   disappeared from the matrix.
+
+2. *Navbar — open, precisely localised.* The runner's layer diagnosis shows that
+   on every ≤ 390 px capture, hiding `#navbar-root` alone drops `scrollWidth`
+   from ~425 px to exactly 390 px — the navbar is the remaining constant
+   overflow. An icon-only-Fetch attempt *regressed* it (425→451) and was
+   reverted; the navbar needs an interactive pass to compress its
+   wordmark+EN/DE+actions row without removing affordances. Kept as an open,
+   reproducible finding rather than guessed at blind.
+
 **F-04 · The ad-block gate did NOT crash — the first pilot's M14 failure was the
 runner** — severity: n/a (correction), module: M14, status: resolved (harness).
 
@@ -147,9 +164,34 @@ real app. The gate is **not** a bug.
 
 ---
 
+### Visual review notes (first pass, desktop + the failing mobile set)
+
+Reviewed by eye from `beta/shots/`:
+
+* **M01 shell** — desktop empty state is clean and well balanced; hero, stat
+  tiles, fetch card, three-step strip, library + sticky summary all present.
+* **M05/M06/M08** — the full-page matrix shows every status badge (LIVE /
+  IN DEVELOPMENT / BETA·MVP / PAUSED), per-card override dropdowns, short
+  descriptions and notes, and the summary's chapter list grouped by status.
+* **M09 book cover** — the seeded custom title + author flow onto a properly
+  typeset cover (spine mark, small-caps, blurb) on the dark studio backdrop.
+* **M10 print** — `print.css` strips navbar/footer/book-bar; catalogue pages
+  keep topics, repo/docs links and the ruled NOTES box; running footer prints.
+* **M12 support** — BTC tab renders a real client-side QR + bech32 address,
+  copy/explorer actions and the SOL/BTC/ETH tabs; no blank QR.
+* **M14 gate** — friendly notice, no app chrome behind it; re-check boots the
+  app (F-04).
+* **M01/M03/M15 mobile** — content reads fine but the navbar introduces a
+  ~35 px horizontal scroll (F-03.2); text near the right edge is clipped.
+
+Everything else on desktop passed both the assertions and the eye. The single
+cross-cutting defect to fix next is the mobile navbar overflow.
+
+---
+
 ## Step 2 — M01 Layout shell
 
-_first sweep captured (see table); visual review pending_
+_sweep captured + visually reviewed; open: F-03.2 (navbar overflow)_
 
 ## Step 3 — M02 i18n
 
