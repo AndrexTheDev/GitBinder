@@ -106,7 +106,9 @@ export function AppNavbar(ctx) {
   );
 
   const fetchLabel = h('span', { class: 'hidden sm:inline', text: t('nav.fetch.label') });
-  const fetchLabelShort = h('span', { class: 'sm:hidden', text: t('nav.fetch.short') });
+  // Icon-only on phones: the wordmark plus three actions left no room for the
+  // short "Fetch" label at 390 px (F-03). The aria-label + tooltip carry the name.
+  const fetchLabelShort = h('span', { class: 'hidden', text: t('nav.fetch.short') });
   const fetchIcon = icon('fetch', { size: 16 });
 
   const fetchBtn = h(
@@ -137,7 +139,7 @@ export function AppNavbar(ctx) {
     'div',
     {
       class:
-        'mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8',
+        'mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-4 sm:gap-3 sm:px-6 lg:px-8',
     },
     brand,
     actions,
