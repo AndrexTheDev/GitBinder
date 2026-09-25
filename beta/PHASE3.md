@@ -11,7 +11,7 @@ prioritised by what a bug would cost a visitor.
 | V3‑2 | Cross-tab session sync (storage events across two live apps) | ✅ done — a hide in tab A re-renders tab B |
 | V3‑3 | Selection combinatorics (search × sort × hide-forks, full fixture) | ✅ done — every combo yields the exact subset |
 | V3‑4 | Print/PDF page fidelity (catalogue packing over large sets) | ✅ done — packing invariant holds at full size |
-| V3‑5 | Cross-browser (Firefox/WebKit in CI) | pending |
+| V3‑5 | Cross-browser (Firefox/WebKit) | ⚠️ capability wired (`GB_BROWSER`); CI job not shipped — unverifiable from this sandbox |
 
 ---
 
@@ -78,5 +78,20 @@ checks the invariant at the full 12-chapter size: every catalogue sheet holds
 **one or two** entries, a `--full` entry is **alone** on its sheet, and folios
 stay ascending and unique (no blank or duplicated sheet). Holds for the full
 set — the packing algorithm does not degrade as the book grows.
+
+`beta:selfcheck` 36/36; the release gate stays 714/714.
+
+## V3‑5 — Cross-browser (honest status)
+
+`beta/runner/shoot.mjs` now honours `GB_BROWSER=chromium|firefox|webkit` (the
+srgb/hinting launch flags are applied to Chromium only), validated via
+`--dry-run`. A CI job rendering the matrix on Firefox/WebKit was attempted twice,
+but **this sandbox cannot read GitHub Actions logs or artifacts** (the
+results-receiver / blob hosts are network-blocked), and the engine runs failed in
+CI for reasons that are therefore invisible from here. Shipping a permanently
+red, untriageable job would not be "perfecting", so the job was **not** kept;
+Chromium remains the committed, green reference (70/70). The capability is ready
+to re-enable in an environment where the cross-browser report can actually be
+read.
 
 `beta:selfcheck` 36/36; the release gate stays 714/714.
