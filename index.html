@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#141922" />
+
+    <title>GitBinder — Your GitHub portfolio as a classic book</title>
+    <!-- The static `content` is the English default, and is what a crawler that
+         does not run JavaScript sees. `data-i18n-content` re-points it at the
+         active locale like the title, so a German visitor's link preview and
+         search result are German too. -->
+    <meta
+      name="description"
+      data-i18n-content="meta.description"
+      content="GitBinder is a free, client-side tool that composes your GitHub repositories into a book-like PDF portfolio. Nothing leaves your browser except the requests you trigger yourself."
+    />
+    <meta name="author" content="AndrexTheDev" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / social cards -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GitBinder" />
+    <meta property="og:title" content="GitBinder — Your GitHub portfolio as a classic book" />
+    <meta
+      property="og:description"
+      content="Turn your GitHub repositories into a printable Classic Book PDF portfolio. Runs entirely in your browser."
+    />
+    <meta property="og:url" content="https://gitbinder.pages.dev/" />
+    <meta property="og:image" content="https://gitbinder.pages.dev/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The GitBinder spine mark beside the name GitBinder." />
+    <meta property="og:locale" content="en" />
+    <meta property="og:locale:alternate" content="de" />
+
+    <!-- `summary_large_image`: the card is 1200×630, so the wide layout is the
+         one that shows the mark and the tagline rather than a thumbnail. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://gitbinder.pages.dev/og.png" />
+    <meta name="twitter:image:alt" content="The GitBinder spine mark beside the name GitBinder." />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="mask-icon" href="/favicon.svg" color="#C08A2E" />
+    <link rel="canonical" href="https://gitbinder.pages.dev/" />
+
+    <!-- Pre-paint background so there is never a white flash on slow connections. -->
+    <style>
+      html { background-color: #f6f1e6; }
+      #boot { display: flex; min-height: 100vh; align-items: center; justify-content: center; }
+      #boot p { font: 500 14px/1.5 ui-sans-serif, system-ui, sans-serif; color: #6b7488; letter-spacing: .08em; text-transform: uppercase; }
+      @media (prefers-reduced-motion: no-preference) {
+        #boot p::after { content: ''; animation: boot-dots 1.2s steps(4, end) infinite; }
+        @keyframes boot-dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+      }
+    </style>
+
+    <link rel="stylesheet" href="/src/styles/index.css" />
+  </head>
+
+  <body class="h-full bg-paper-100 text-ink-800 antialiased">
+    <!-- Accessibility: keyboard users can jump straight past the navbar. -->
+    <a href="#main" class="skip-link" data-i18n="a11y.skipToContent">Skip to content</a>
+
+    <div id="app" class="flex min-h-full flex-col">
+      <!-- Boot splash — replaced by the mounted app shell in src/app.js -->
+      <div id="boot"><p>Loading GitBinder</p></div>
+
+      <header id="navbar-root" class="sticky top-0 z-40"></header>
+
+      <main id="main" class="flex-1" tabindex="-1">
+        <div class="mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+          <section id="hero-root" aria-labelledby="hero-title"></section>
+
+          <div class="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+            <section id="library-root" aria-labelledby="library-title"></section>
+            <aside id="summary-root" class="lg:sticky lg:top-24" aria-labelledby="summary-title"></aside>
+          </div>
+        </div>
+
+        <!--
+          Classic Book studio: the live preview renders the real book DOM at
+          true A4 size. In print this is the *only* thing that survives.
+        -->
+        <section id="book-root" aria-labelledby="book-studio-title"></section>
+      </main>
+
+      <footer id="footer-root"></footer>
+    </div>
+
+    <!-- Sticky book studio action bar (preview toggle + print) -->
+    <div id="book-bar-root"></div>
+
+    <!-- Floating layers: settings drawer, support modal, confirm dialogs -->
+    <div id="overlay-root"></div>
+    <!-- Transient notifications -->
+    <div id="toast-root" role="status" aria-live="polite" aria-atomic="false"></div>
+
+    <noscript>
+      <div class="mx-auto max-w-xl px-6 py-24 text-center">
+        <h1 class="font-serif text-2xl font-semibold text-ink-900">GitBinder needs JavaScript</h1>
+        <p class="mt-3 text-ink-600">
+          GitBinder is a 100% client-side application: your repositories are fetched, formatted and
+          printed entirely inside your browser. Please enable JavaScript to continue.
+        </p>
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

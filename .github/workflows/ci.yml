@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  test:
+    name: Test & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint the module graph (no unused exports policy is manual)
+        run: npm test
+
+      - name: Build the static bundle
+        run: npm run build
+
+      # Kept as a plain artifact for inspection. `upload-pages-artifact` is
+      # for GitHub Pages, which this project does not use — Cloudflare Pages
+      # builds `dist/` itself, so the job above is the real gate.
+      - name: Upload the bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7

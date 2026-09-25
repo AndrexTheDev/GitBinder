@@ -1,0 +1,27 @@
+# Cloudflare Pages — project configuration.
+# Used by `npm run deploy` (wrangler pages deploy). The dashboard path needs no
+# config at all: connect the repo, set build command `npm run build` and the
+# output directory `dist`.
+# https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+
+# Must match the Pages project name — it is what produces the *.pages.dev host,
+# and therefore what the book's running footer attributes to (LINKS.deployed in
+# src/config/app.js).
+name = "gitbinder"
+pages_build_output_dir = "dist"
+compatibility_date = "2025-01-01"
+
+# Static assets only: the app has no Worker. Hashing and code splitting are
+# handled by Vite, so there is nothing for Pages to compile.
+[build]
+command = "npm run build"
+
+# `public/_headers` is copied through to `dist` untouched by Vite and honoured by
+# Pages; nothing to declare here.
+#
+# Deliberately absent: a `public/_redirects` with the usual SPA rule
+# `/* /index.html 200`. Cloudflare rejects that exact rule as an infinite loop
+# (`/*` re-matches `/index.html`) — a hard failure on Workers (code 100324) and
+# an ignored-rule warning on every Pages deploy. Pages already serves
+# `index.html` for unmatched paths whenever the build has no top-level
+# `404.html`, which is the case here, so the rule was only ever dead weight.

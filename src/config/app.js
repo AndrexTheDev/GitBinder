@@ -1,0 +1,147 @@
+/**
+ * Static, non-secret application configuration.
+ * Anything that could differ between deployments lives here rather than
+ * being scattered through components.
+ *
+ * @module config/app
+ */
+
+export const APP_NAME = 'GitBinder';
+
+/**
+ * The brand mark, as a same-origin asset.
+ *
+ * Referenced rather than inlined so the artwork exists once: the navbar, the
+ * book cover and the favicon all point at the same file. Plain SVG, so it
+ * stays sharp at every size and costs no extra request weight beyond the
+ * few hundred bytes of the drawing itself.
+ */
+export const BRAND_MARK = '/brand/mark.svg';
+
+/**
+ * The mark's aspect ratio (width / height).
+ *
+ * It is a book spine, so it is tall and narrow — 1:3.34. Kept as a constant
+ * because three components need to reserve the right box before the image has
+ * loaded; getting it wrong makes the navbar reflow when the SVG arrives.
+ */
+export const BRAND_MARK_RATIO = 64 / 214;
+export const APP_VERSION = '0.1.0';
+export const APP_TAGLINE_KEY = 'meta.tagline';
+
+/** localStorage keys — namespaced so multiple tools can coexist on one origin. */
+export const STORAGE_KEYS = {
+  /** Persisted user settings + repository overrides. */
+  state: 'gitbinder:state',
+  /** Per-device key used to obfuscate the optional Personal Access Token. */
+  vault: 'gitbinder:vault',
+};
+
+/**
+ * Keys written before the GitBooklet → GitBinder rename.
+ *
+ * A rename must never cost a visitor their work: anyone who used the old build
+ * still has their curated book under the old names, and the app would otherwise
+ * boot empty for them. `migrateStorageKeys()` moves these across once, on the
+ * first load after the rename.
+ */
+export const LEGACY_STORAGE_KEYS = {
+  state: 'gitbooklet:state',
+  vault: 'gitbooklet:vault',
+};
+
+/** Schema version of the persisted state envelope. Bump + add a migration. */
+export const STATE_SCHEMA_VERSION = 1;
+
+/**
+ * The ad-blocker gate.
+ *
+ * `enabled: false` switches the whole thing off — the app then boots for
+ * everybody, whatever is hiding the bait elements. Worth knowing before
+ * changing it: detection is heuristic, and privacy tools (Firefox's strict
+ * mode, Brave Shields) hide the same bait elements a filter list does. A
+ * flagged visitor who genuinely runs no ad blocker is locked out until they
+ * act on the notice, which is why the notice explains itself and offers a
+ * re-check rather than a dead end.
+ */
+export const ADBLOCK_GATE = Object.freeze({
+  enabled: true,
+});
+
+export const GITHUB = {
+  apiBase: 'https://api.github.com',
+  /** Repos per page — 100 is the GitHub maximum and minimises round trips. */
+  perPage: 100,
+  /** Hard stop so a pathological account cannot loop forever. */
+  maxPages: 10,
+  webBase: 'https://github.com',
+  /** Scopes the optional token actually needs. Shown in the settings drawer. */
+  requiredScopes: ['repo'],
+  tokenDocsUrl: 'https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens',
+  scopeDocsUrl: 'https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps',
+};
+
+/**
+ * The person who built the tool — deliberately separate from the book's
+ * `authorName` setting, which belongs to whoever is curating their portfolio.
+ * The contact modal credits the developer, not the visitor.
+ */
+export const DEVELOPER = Object.freeze({
+  name: 'AndrexTheDev',
+  email: 'hippie.highho@gmail.com',
+  url: 'https://github.com/AndrexTheDev',
+});
+
+export const LINKS = {
+  /**
+   * Live deployment. Printed in the book's running footer on every page and
+   * linked from the cover colophon — change it here and nowhere else.
+   */
+  deployed: 'https://gitbinder.pages.dev',
+  repository: 'https://github.com/AndrexTheDev/GitBinder',
+  issues: 'https://github.com/AndrexTheDev/GitBinder/issues',
+  license: 'https://github.com/AndrexTheDev/GitBinder/blob/main/LICENSE',
+  author: 'https://github.com/AndrexTheDev',
+};
+
+/**
+ * Project statuses, in the order they appear in the book and in the override
+ * dropdown: shipped work first, dormant work last.
+ *
+ * `tone` maps onto the `.badge--*` classes in styles/components.css.
+ * Labels live under `status.<id>` in the dictionaries; the auto-detection
+ * rules live in `services/status.js`.
+ */
+export const REPO_STATUSES = Object.freeze([
+  { id: 'live', tone: 'forest' },
+  { id: 'development', tone: 'azure' },
+  { id: 'beta', tone: 'brass' },
+  { id: 'paused', tone: 'neutral' },
+]);
+
+export const REPO_STATUS_IDS = Object.freeze(REPO_STATUSES.map((status) => status.id));
+
+/** Chapter + sort ordering: live → development → beta → paused. */
+export const STATUS_RANK = Object.freeze(
+  Object.fromEntries(REPO_STATUSES.map((status, index) => [status.id, index])),
+);
+
+export const DEFAULT_STATUS = 'beta';
+
+export const TONE_BY_STATUS = Object.freeze(
+  Object.fromEntries(REPO_STATUSES.map((status) => [status.id, status.tone])),
+);
+
+/**
+ * Statuses from the very first iteration of the app. Kept so a visitor who
+ * already curated a book does not lose their work when the taxonomy changed.
+ * @see services/status.js
+ */
+export const LEGACY_STATUS_MAP = Object.freeze({
+  showcase: 'live',
+  active: 'development',
+  wip: 'development',
+  experiment: 'beta',
+  legacy: 'paused',
+  archived: 'paused',
+});

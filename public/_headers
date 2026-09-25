@@ -1,0 +1,44 @@
+# Cloudflare Pages — per-path response headers.
+# https://developers.cloudflare.com/pages/configuration/headers/
+#
+# The app has no backend, so everything can be locked down hard. Rules are
+# ordered so the more specific ones come last: for a given header, the last
+# matching rule wins.
+
+# ── Security headers (every path) ──────────────────────────────────────────
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Cloudflare Pages is HTTPS-only, so pinning it costs nothing and closes the
+  # downgrade window on a first visit. No `includeSubDomains`: pages.dev is on
+  # the public suffix list, so it would be ignored there and is not ours to
+  # claim anyway.
+  Strict-Transport-Security: max-age=31536000
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
+  #
+  # Content-Security-Policy. Safe to be this strict because:
+  #   • the production bundle contains no inline <script> — only an external
+  #     module script and an external stylesheet;
+  #   • the one inline <style> (the pre-paint boot splash) and the inline style
+  #     attributes the toast/scroll-lock use need `style-src 'unsafe-inline'`;
+  #   • the only outbound network call in the whole app is api.github.com.
+  # If you ever embed a third-party script, font or analytics snippet, add its
+  # origin here — or switch the header name to
+  # `Content-Security-Policy-Report-Only` first and watch the console.
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://api.github.com; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests
+
+# ── The HTML shell must always be revalidated so a deploy is picked up ──────
+# The root URL is served as index.html, so it needs its own rule: the pattern
+# below only matches paths that literally end in `.html`.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# ── Hashed, immutable build assets: cache for a year ───────────────────────
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -1,0 +1,135 @@
+/* =============================================================================
+   GitBinder — Print stylesheet
+   Foundation for the "Classic Book" output. The PDF composer (next milestone)
+   renders into an isolated print container; these rules guarantee a clean,
+   ink-on-paper result even when a visitor hits Ctrl/Cmd+P manually.
+   ========================================================================== */
+
+@layer base {
+  @media print {
+    @page {
+      size: A4;
+      margin: 22mm 18mm 20mm 18mm;
+    }
+
+    html,
+    body {
+      background: #fff !important;
+      background-image: none !important;
+      color: #000 !important;
+      font-size: 11pt;
+      line-height: 1.55;
+    }
+
+    /* Never print app chrome or transient UI.
+       Modals get the most explicit treatment: an open dialog lives in
+       #overlay-root, so it is already covered, but a drawer or confirm panel
+       left mounted elsewhere would otherwise print *on top of* the book.
+       Interactive controls go too — a printed "Copy address" or "Generate PDF"
+       button is noise on paper, and a form field prints as an empty box. */
+    .skip-link,
+    #navbar-root,
+    #footer-root,
+    #toast-root,
+    #overlay-root,
+    #book-bar-root,
+    .no-print,
+    /*
+     * The screen-only parts of the Book Studio. `button` and `input` above
+     * already hide the controls inside them, but these panels also carry
+     * plain text — the picker's heading and project names, the export menu's
+     * file extensions — which would otherwise print over the first page of
+     * the book if either menu happened to be open.
+     */
+    .book-shell__toolbar,
+    .book-picker,
+    .book-export,
+    .overlay-scrim,
+    .modal,
+    .drawer,
+    [role='dialog'],
+    .tabs,
+    button,
+    .btn,
+    input,
+    select,
+    textarea {
+      display: none !important;
+    }
+
+    #app,
+    main,
+    .print-area {
+      display: block !important;
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      box-shadow: none !important;
+    }
+
+    .card,
+    .panel-inset {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-serif);
+      color: #000 !important;
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    /* Every repository starts a fresh chapter. */
+    .print-chapter {
+      break-before: page;
+      page-break-before: always;
+    }
+
+    a {
+      color: #000 !important;
+      text-decoration: underline;
+    }
+    /* Surface the destination of external links on paper. */
+    a[href^='http']::after {
+      content: ' (' attr(href) ')';
+      font-family: var(--font-mono);
+      font-size: 8pt;
+      color: #444 !important;
+      word-break: break-all;
+    }
+
+    /* ── Classic Book ────────────────────────────────────────────────
+       When the book is composed, the book *is* the document: everything
+       else on the page is chrome. The class is added and removed by
+       `services/print.js` around the `window.print()` call, so cancelling
+       the dialog leaves the app exactly as it was. */
+    body.is-printing-book #app > *:not(main),
+    body.is-printing-book #main > *:not(#book-root),
+    body.is-printing-book #book-bar-root {
+      display: none !important;
+    }
+
+    body.is-printing-book #app,
+    body.is-printing-book #main,
+    body.is-printing-book #book-root {
+      display: block !important;
+      width: auto !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      background: none !important;
+      box-shadow: none !important;
+    }
+
+    img { max-width: 100% !important; }
+
+    ::-webkit-scrollbar { display: none; }
+  }
+}

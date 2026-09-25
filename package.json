@@ -1,0 +1,29 @@
+{
+  "name": "gitbinder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GitBinder — turn your GitHub repositories into a printable Classic Book PDF portfolio. 100% free, 100% client-side.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "test": "node --test \"tests/**/*.test.js\"",
+    "deploy": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=gitbinder --branch=main",
+    "deploy:preview": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=gitbinder"
+  },
+  "dependencies": {
+    "lucide": "^1.48.0",
+    "qrcode-generator": "^2.0.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "jsdom": "^30.1.1",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.1"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
