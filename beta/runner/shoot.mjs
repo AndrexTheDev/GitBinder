@@ -348,6 +348,24 @@ async function universalChecks(page) {
       .length;
     const altless = [...document.querySelectorAll('img')].filter((el) => !el.hasAttribute('alt')).length;
 
+    /** Which top-level layer is inflating scrollWidth? Hide each in turn. */
+    const layers =
+      root.scrollWidth > window.innerWidth
+        ? ['#navbar-root', '#main', '#footer-root', '#book-bar-root', '#overlay-root', '#toast-root', '.skip-link']
+            .map((sel) => {
+              const el = document.querySelector(sel);
+              if (!el) return null;
+              const before = root.scrollWidth;
+              const saved = el.style.display;
+              el.style.display = 'none';
+              const after = root.scrollWidth;
+              el.style.display = saved;
+              return { sel, before, after };
+            })
+            .filter(Boolean)
+            .filter((entry) => entry.after < entry.before)
+        : [];
+
     /** Elements spilling past the right edge — actionable overflow evidence. */
     const wide =
       root.scrollWidth > window.innerWidth
@@ -372,15 +390,20 @@ async function universalChecks(page) {
       nameless,
       altless,
       wide,
+      layers,
     };
   });
 
   if (metrics.scrollWidth > metrics.innerWidth + 1) {
+    const layerNote = metrics.layers.length
+      ? ` — layer(s) whose removal shrinks it: ${metrics.layers.map((l) => `${l.sel} ${l.before}→${l.after}`).join('; ')}`
+      : ' — no single top-level layer is the cause (check fixed/absolute children)';
     findings.push({
       severity: 'error',
       code: 'horizontal-overflow',
       message: `content is ${metrics.scrollWidth}px wide in a ${metrics.innerWidth}px viewport` +
-        (metrics.wide.length ? ` — widest: ${metrics.wide.join('; ')}` : ''),
+        (metrics.wide.length ? ` — widest: ${metrics.wide.join('; ')}` : '') +
+        layerNote,
     });
   }
   for (const leak of metrics.leaks) {
