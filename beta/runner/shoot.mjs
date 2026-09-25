@@ -171,6 +171,36 @@ function locatorFor(page, target) {
   throw new Error(`unsupported target: ${JSON.stringify(target)}`);
 }
 
+/**
+ * A click target that resolves to a bare label (`<span data-i18n>`) is a poor
+ * click surface: the span is `hidden` below certain breakpoints while its
+ * `<button>` parent stays visible. Resolve the nearest interactive ancestor so
+ * a shot behaves like a visitor's pointer, not like a query.
+ *
+ * @returns {Promise<import('playwright').ElementHandle | import('playwright').Locator>}
+ */
+async function clickLocator(page, target) {
+  const base = locatorFor(page, target);
+  const handle = await base.elementHandle({ timeout: args.timeout });
+  if (!handle) return base;
+  const clickable = await handle.evaluateHandle(
+    (el) => el.closest('button, a, [role="button"], [role="tab"]') || el,
+  );
+  const element = clickable.asElement();
+  await handle.dispose();
+  return element ?? base;
+}
+
+/**
+ * Give the app a beat after the last step so the keyed list reconciles and any
+ * rAF-scheduled render lands. Without this, a count assertion can race the
+ * first frame and read a half-mounted list.
+ */
+async function settle(page, shot) {
+  if (shot.fixture) await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForTimeout(450);
+}
+
 /** The app's boot splash must be gone before anything is measured. */
 async function waitForBoot(page) {
   await page.waitForFunction(() => !document.getElementById('boot'), null, { timeout: 15_000 }).catch(() => {});
@@ -236,7 +266,7 @@ function seedFor(capture) {
 
 async function runStep(page, step, capture) {
   if (step.wait) return page.waitForTimeout(step.wait);
-  if (step.click) return locatorFor(page, step.click).click({ timeout: args.timeout });
+  if (step.click) return (await clickLocator(page, step.click)).click({ timeout: args.timeout });
   if (step.fill) return locatorFor(page, step.fill).fill(step.value ?? '');
   if (step.select) return locatorFor(page, step.select).selectOption(step.value);
   if (step.check) return locatorFor(page, step.check).check();
@@ -318,12 +348,30 @@ async function universalChecks(page) {
       .length;
     const altless = [...document.querySelectorAll('img')].filter((el) => !el.hasAttribute('alt')).length;
 
+    /** Elements spilling past the right edge — actionable overflow evidence. */
+    const wide =
+      root.scrollWidth > window.innerWidth
+        ? [...document.querySelectorAll('*')]
+            .map((el) => {
+              const rect = el.getBoundingClientRect();
+              return { el, right: Math.round(rect.right), w: Math.round(rect.width) };
+            })
+            .filter((entry) => entry.right > window.innerWidth + 1)
+            .sort((a, b) => b.right - a.right)
+            .slice(0, 4)
+            .map((entry) => {
+              const cls = (entry.el.getAttribute('class') || '').split(/\s+/).slice(0, 3).join('.');
+              return `<${entry.el.tagName.toLowerCase()}${cls ? `.${cls}` : ''}> right=${entry.right}px`;
+            })
+        : [];
+
     return {
       scrollWidth: root.scrollWidth,
       innerWidth: window.innerWidth,
       leaks,
       nameless,
       altless,
+      wide,
     };
   });
 
@@ -331,7 +379,8 @@ async function universalChecks(page) {
     findings.push({
       severity: 'error',
       code: 'horizontal-overflow',
-      message: `content is ${metrics.scrollWidth}px wide in a ${metrics.innerWidth}px viewport`,
+      message: `content is ${metrics.scrollWidth}px wide in a ${metrics.innerWidth}px viewport` +
+        (metrics.wide.length ? ` — widest: ${metrics.wide.join('; ')}` : ''),
     });
   }
   for (const leak of metrics.leaks) {
@@ -492,9 +541,17 @@ async function runCapture(browser, capture) {
 
   const page = await context.newPage();
   page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
+    if (message.type() !== 'error') return;
+    const text = message.text();
+    // Chromium logs every non-2xx response as a console error
+    // ("Failed to load resource: … 404/403/502 …"). That is network noise, not
+    // an application fault — the app handles those statuses in its own UI.
+    if (/^Failed to load resource/i.test(text)) return;
+    consoleErrors.push(text);
   });
-  page.on('pageerror', (error) => pageErrors.push(String(error?.message ?? error)));
+  page.on('pageerror', (error) =>
+    pageErrors.push(`${error?.message ?? error}\n${(error?.stack ?? '').split('\n').slice(1, 6).join('\n')}`),
+  );
   page.on('requestfailed', (request) => {
     // The fixture aborts api.github.com on purpose for the offline scenario.
     if (request.url().includes('api.github.com')) return;
@@ -508,10 +565,18 @@ async function runCapture(browser, capture) {
   await page.addInitScript(
     ({ envelope, legacy, blockBait, baitCss }) => {
       if (blockBait) {
-        const style = document.createElement('style');
-        style.dataset.betaBait = 'true';
-        style.textContent = baitCss;
-        (document.head ?? document.documentElement).append(style);
+        // On document_start neither <head> nor <html> is guaranteed to exist,
+        // so wait for the head to appear. The baits are only mounted by the app
+        // during its module evaluation (after parse), and detection settles
+        // ~220 ms later — so a style inserted at DOMContentLoaded still wins.
+        const addStyle = () => {
+          const style = document.createElement('style');
+          style.dataset.betaBait = 'true';
+          style.textContent = baitCss;
+          document.head.append(style);
+        };
+        if (document.head) addStyle();
+        else document.addEventListener('DOMContentLoaded', addStyle);
       }
       if (envelope) window.localStorage.setItem('gitbinder:state', JSON.stringify(envelope));
       if (legacy) window.localStorage.setItem('gitbooklet:state', JSON.stringify({ version: 1, data: legacy }));
@@ -535,6 +600,8 @@ async function runCapture(browser, capture) {
         files.push(name);
       }
     }
+
+    if (shot.capture !== 'immediate') await settle(page, shot);
 
     findings.push(...(await universalChecks(page)));
     findings.push(...(await expectChecks(page, shot.expect)));
