@@ -1,0 +1,102 @@
+name: Beta screenshots
+
+# Renders the beta screenshot matrix (`beta/matrix.json`) in a real browser and
+# commits the result back to the branch that triggered it.
+#
+# Why this lives in CI and not on a laptop: the matrix needs Chromium, and the
+# PNGs are the deliverable — they are committed to `beta/shots/` so the run can
+# be reviewed without re-running anything.
+#
+# Loops are prevented twice over: the push trigger ignores `beta/shots/**`, and
+# the commit message carries `[skip ci]`.
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Filter passed to the runner (module id like M09, or part of a shot id)'
+        required: false
+        default: ''
+  push:
+    branches: ['**']
+    paths-ignore:
+      - 'beta/shots/**'
+      - '**.md'
+
+concurrency:
+  group: beta-shots-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  shoot:
+    name: Render the matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      # The fixture self-check runs first: if the fixture no longer matches what
+      # the app expects, every screenshot after it would be a picture of the
+      # wrong thing.
+      - name: Verify the beta fixture against the real app
+        run: npm run beta:selfcheck
+
+      - name: Build the static bundle
+        run: npm run build
+
+      - name: Install Playwright + Chromium
+        run: |
+          npm i --no-save playwright@1.63.0
+          npx playwright@1.63.0 install --with-deps chromium
+
+      - name: Serve dist/
+        run: |
+          npm run preview &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:4173/ > /dev/null && echo "preview up" && exit 0
+            sleep 1
+          done
+          echo "preview never came up" >&2
+          exit 1
+
+      - name: Render the matrix
+        run: |
+          node beta/runner/shoot.mjs \
+            --base http://127.0.0.1:4173 \
+            --out beta/shots \
+            ${{ inputs.only && format('--only {0}', inputs.only) || '' }}
+
+      # Uploaded even when the run fails, so the pictures behind a failure can
+      # be inspected without re-running the job.
+      - name: Upload the matrix
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beta-shots
+          path: beta/shots
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Commit the matrix to the branch
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f beta/shots
+          if git diff --cached --quiet; then
+            echo "no changes to the matrix"
+            exit 0
+          fi
+          git commit -m "Beta screenshot matrix — $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
+          git push origin HEAD
