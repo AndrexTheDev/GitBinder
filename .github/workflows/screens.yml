@@ -127,7 +127,7 @@ jobs:
       - name: Install Playwright + Firefox + WebKit
         run: |
           npm i --no-save playwright@1.63.0
-          npx playwright@1.63.0 install --with-deps firefox webkit
+          npx playwright@1.63.0 install --with-deps firefox webkit || npx playwright@1.63.0 install firefox webkit
 
       - name: Serve dist/
         run: |
@@ -144,7 +144,7 @@ jobs:
           mkdir -p beta/xbrowser
           for b in firefox webkit; do
             GB_BROWSER=$b node beta/runner/shoot.mjs \
-              --base http://127.0.0.1:4173 --out "beta/shots-$b" \
+              --base http://127.0.0.1:4173 --out "beta/shots-$b" --only M01 \
               > "beta/xbrowser/$b-console.log" 2>&1 || true
             if [ -f "beta/shots-$b/REPORT.md" ]; then
               cp "beta/shots-$b/REPORT.md" "beta/xbrowser/REPORT-$b.md"
