@@ -37,7 +37,7 @@ export default {
     never: 'nie',
     enabled: 'Aktiviert',
     disabled: 'Deaktiviert',
-    characters: '{count} Zeichen',
+    characters: { one: '1 Zeichen', other: '{count} Zeichen' },
     showing: '{shown} von {total} angezeigt',
   },
 
@@ -132,9 +132,9 @@ export default {
       openOnGithub: 'Repository',
       homepage: 'Live',
       docs: 'Doku',
-      stars: '{count} Stars',
-      forks: '{count} Forks',
-      issues: '{count} offene Issues',
+      stars: { one: '1 Star', other: '{count} Stars' },
+      forks: { one: '1 Fork', other: '{count} Forks' },
+      issues: { one: '1 offenes Issue', other: '{count} offene Issues' },
       updated: 'Aktualisiert {time}',
       noLicense: 'Keine Lizenz',
       topics: 'Themen',
@@ -191,7 +191,7 @@ export default {
     loading: {
       page: 'Lade Seite {page} …',
       pageOf: 'Lade Seite {page} von {totalPages} …',
-      count: 'Bisher {count} Repositories geladen …',
+      count: { one: 'Bisher 1 Repository geladen …', other: 'Bisher {count} Repositories geladen …' },
     },
     counts: {
       repos: { one: '1 Repository', other: '{count} Repositories' },
@@ -360,7 +360,7 @@ export default {
       validSimple: 'Verbunden als {login}',
       invalid: 'GitHub hat dieses Token abgelehnt.',
       stored: 'Auf diesem Gerät gespeichert',
-      empty: 'Kein Token gespeichert — nur öffentliche Repositories.',
+      empty: 'Kein Token gespeichert',
       securityNote:
         'Das Token wird vor dem Schreiben in den localStorage mit einem Geräteschlüssel verschleiert, ausschließlich an api.github.com gesendet und beim Löschen der lokalen Daten entfernt. Verschleierung ist keine Verschlüsselung: Lass das Feld auf gemeinsamen Rechnern lieber leer.',
       removedOnExport: 'Exporte lassen das Token weg, sofern du es unten nicht ausdrücklich aktivierst.',

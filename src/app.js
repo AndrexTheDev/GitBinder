@@ -249,6 +249,10 @@ export function bootstrap(env = {}) {
   const busDisposers = [
     bus.on(UI_EVENTS.fetchRepos, () => fetchRepos()),
     bus.on(UI_EVENTS.toast, (payload) => toaster.push(payload)),
+    // A toast's text is translated when it is pushed, so it cannot follow a
+    // later language switch. Clear the stack on a locale change rather than
+    // leave stale-language messages on screen (new toasts use the new locale).
+    i18n.onChange(() => toaster.clearAll()),
     // `printBook` and `buildPdf` are handled inside the book studio itself —
     // it owns the print controller, so nothing needs to be forwarded here.
   ];

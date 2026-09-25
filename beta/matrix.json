@@ -1,0 +1,888 @@
+{
+  "$comment": [
+    "GitBinder beta run — the screenshot matrix.",
+    "",
+    "One entry per *scenario*, expanded by the runner over `viewports` x `langs`.",
+    "Every selector below is a hook that exists in src/ today (verified by reading",
+    "the component that renders it): .repo-card[data-slug], .book-picker__toggle,",
+    ".tabs__tab, #settings-token, [data-i18n=\"...\"] .",
+    "",
+    "`expect` turns a picture into an assertion: the runner fails the shot when a",
+    "selector is missing, a count is wrong, or the page overflows horizontally.",
+    "`beta/runner/selfcheck.mjs` cross-checks that every `fixture` named here exists."
+  ],
+
+  "viewports": {
+    "desktop": { "width": 1440, "height": 900 },
+    "tablet": { "width": 820, "height": 1180 },
+    "mobile": { "width": 390, "height": 844 },
+    "small": { "width": 320, "height": 568 },
+    "wide": { "width": 1920, "height": 1080 }
+  },
+
+  "locales": {
+    "en": "en-US",
+    "de": "de-DE"
+  },
+
+  "modules": [
+    { "id": "M00", "name": "Baseline & build", "shots": [] },
+    { "id": "M01", "name": "Layout shell" },
+    { "id": "M02", "name": "i18n (EN/DE)" },
+    { "id": "M03", "name": "GitHub integration" },
+    { "id": "M04", "name": "Repository manager" },
+    { "id": "M05", "name": "Repository card & overrides" },
+    { "id": "M06", "name": "Status auto-detection" },
+    { "id": "M07", "name": "Settings drawer" },
+    { "id": "M08", "name": "Summary & chapter picker" },
+    { "id": "M09", "name": "Book studio & preview" },
+    { "id": "M10", "name": "Print / PDF" },
+    { "id": "M11", "name": "Text exports" },
+    { "id": "M12", "name": "Support & donations" },
+    { "id": "M13", "name": "Legal & info modals" },
+    { "id": "M14", "name": "Ad-blocker gate" },
+    { "id": "M15", "name": "A11y & responsive" },
+    { "id": "M16", "name": "Persistence & migration" }
+  ],
+
+  "shots": [
+    {
+      "id": "m01-shell-empty",
+      "module": "M01",
+      "title": "First visit, nothing fetched yet",
+      "why": "The state every new visitor lands in: hero, empty library, empty summary.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "tablet", "mobile"],
+      "langs": ["en"],
+      "expect": {
+        "selectors": ["#hero-root", "#library-root", "#summary-root", "#navbar-root", "#footer-root"],
+        "text": [{ "sel": "#library-root", "contains": "octodemo", "not": true }]
+      }
+    },
+    {
+      "id": "m01-shell-empty-de",
+      "module": "M01",
+      "title": "First visit — German",
+      "why": "The same empty state with the DE dictionary applied.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "mobile"],
+      "langs": ["de"],
+      "seed": { "lang": "de" },
+      "expect": { "selectors": ["#hero-root"], "htmlLang": "de" }
+    },
+    {
+      "id": "m01-shell-scrolled",
+      "module": "M01",
+      "title": "Sticky navbar after scrolling",
+      "why": "The navbar is position:sticky — it has to stay legible over content.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [{ "scroll": { "y": 700 } }, { "wait": 400 }],
+      "expect": { "selectors": [".repo-card"] }
+    },
+
+    {
+      "id": "m02-i18n-loaded-de",
+      "module": "M02",
+      "title": "Loaded library in German",
+      "why": "Longest German labels in the real layout — the classic overflow case.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "mobile"],
+      "langs": ["de"],
+      "fixture": "ok",
+      "seed": { "username": "octodemo", "lang": "de" },
+      "expect": { "count": { ".repo-card": 12 }, "htmlLang": "de" }
+    },
+    {
+      "id": "m02-i18n-toggle",
+      "module": "M02",
+      "title": "Language toggle mid-session",
+      "why": "Switching locale must re-label everything already rendered, not just new nodes.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "sel": ".segmented__option", "nth": 1 } },
+        { "wait": 500 }
+      ],
+      "expect": { "count": { ".repo-card": 12 }, "htmlLang": "de" }
+    },
+
+    {
+      "id": "m03-fetch-loading",
+      "module": "M03",
+      "title": "Fetch in flight (skeletons)",
+      "why": "2.5 s fixture delay: the loading skeleton is what visitors actually see.",
+      "viewport": "desktop",
+      "fixture": "slow",
+      "seed": { "username": "octodemo" },
+      "capture": "immediate",
+      "expect": { "selectors": ["#library-root"] }
+    },
+    {
+      "id": "m03-fetch-loaded",
+      "module": "M03",
+      "title": "Twelve repositories fetched",
+      "why": "The reference shot for M04–M09: the full, unfiltered library.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "tablet", "mobile"],
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "expect": {
+        "count": { ".repo-card": 12 },
+        "selectors": [".repo-card[data-slug=\"octodemo/gitbinder\"]"]
+      }
+    },
+    {
+      "id": "m03-fetch-paged",
+      "module": "M03",
+      "title": "103 repositories across two pages",
+      "why": "Page 1 must be full before the Link header is followed; nothing may be dropped.",
+      "viewport": "desktop",
+      "fixture": "paged",
+      "seed": { "username": "octodemo" },
+      "expect": { "count": { ".repo-card": 103 } }
+    },
+    {
+      "id": "m03-fetch-empty",
+      "module": "M03",
+      "title": "Account with no repositories",
+      "why": "Empty is not an error — the copy has to say so without alarming anyone.",
+      "viewport": "desktop",
+      "fixture": "empty",
+      "seed": { "username": "octodemo" },
+      "expect": { "count": { ".repo-card": 0 }, "selectors": ["#library-root"] }
+    },
+    {
+      "id": "m03-error-notfound",
+      "module": "M03",
+      "title": "Unknown username (404)",
+      "why": "The most common real failure: a typo in the username.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "mobile"],
+      "fixture": "notFound",
+      "seed": { "username": "no-such-user" },
+      "expect": { "selectors": ["#library-root"], "count": { ".repo-card": 0 } }
+    },
+    {
+      "id": "m03-error-ratelimit",
+      "module": "M03",
+      "title": "Anonymous rate limit hit (403)",
+      "why": "Must name the reset time — otherwise the visitor just retries into the same wall.",
+      "viewport": "desktop",
+      "fixture": "rateLimit",
+      "seed": { "username": "octodemo" },
+      "expect": { "count": { ".repo-card": 0 } }
+    },
+    {
+      "id": "m03-error-unauthorized",
+      "module": "M03",
+      "title": "Bad credentials (401)",
+      "why": "A stored token that was revoked must not look like a network failure.",
+      "viewport": "desktop",
+      "fixture": "unauthorized",
+      "seed": { "username": "octodemo", "token": "ghp_betafixturetoken0000000000000000" },
+      "expect": { "count": { ".repo-card": 0 } }
+    },
+    {
+      "id": "m03-error-offline",
+      "module": "M03",
+      "title": "No network at all",
+      "why": "fetch() rejects — the app has to offer a retry, not hang on skeletons.",
+      "viewport": "desktop",
+      "fixture": "offline",
+      "seed": { "username": "octodemo" },
+      "expect": { "count": { ".repo-card": 0 } }
+    },
+    {
+      "id": "m03-error-server",
+      "module": "M03",
+      "title": "GitHub 502",
+      "why": "Server-side failure maps to its own message and tone.",
+      "viewport": "desktop",
+      "fixture": "server",
+      "seed": { "username": "octodemo" },
+      "expect": { "count": { ".repo-card": 0 } }
+    },
+    {
+      "id": "m03-fetch-private",
+      "module": "M03",
+      "title": "Token present: private work appears",
+      "why": "/user/repos instead of /users/{login}/repos, and the private repo is included.",
+      "viewport": "desktop",
+      "fixture": "token",
+      "seed": { "username": "octodemo", "token": "ghp_betafixturetoken0000000000000000" },
+      "expect": {
+        "count": { ".repo-card": 13 },
+        "selectors": [".repo-card[data-slug=\"octodemo/private-vault\"]"]
+      }
+    },
+
+    {
+      "id": "m04-search",
+      "module": "M04",
+      "title": "Search filters the list",
+      "why": "Debounced session-side filter; must not lose focus or scroll position.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "mobile"],
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "fill": { "sel": "#library-root input[type=\"search\"]" }, "value": "pdf" },
+        { "wait": 500 }
+      ],
+      "expect": { "selectors": [".repo-card[data-slug=\"octodemo/paperback-pdf\"]"] }
+    },
+    {
+      "id": "m04-search-noresult",
+      "module": "M04",
+      "title": "Search with no matches",
+      "why": "The 'nothing matched' state has to offer clearing the filter.",
+      "viewport": "mobile",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "fill": { "sel": "#library-root input[type=\"search\"]" }, "value": "zzzz-no-such-repo" },
+        { "wait": 500 }
+      ],
+      "expect": { "count": { ".repo-card": 0 } }
+    },
+    {
+      "id": "m04-sort-name",
+      "module": "M04",
+      "title": "Sort by name",
+      "why": "Sorting is a persisted setting, so it must survive a re-render.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "select": { "sel": "#library-root select" }, "value": "name" },
+        { "wait": 400 }
+      ],
+      "expect": { "count": { ".repo-card": 12 } }
+    },
+    {
+      "id": "m04-hide-forks",
+      "module": "M04",
+      "title": "Hide forks",
+      "why": "One fork in the fixture; hiding it must change the count by exactly one.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "check": { "sel": "#library-hide-forks" } },
+        { "wait": 400 }
+      ],
+      "expect": { "count": { ".repo-card": 11 } }
+    },
+    {
+      "id": "m04-select-all",
+      "module": "M04",
+      "title": "Select all / none",
+      "why": "Bulk controls feed the chapter count in the summary.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 300 },
+        { "shot": "all" },
+        { "click": { "key": "library.toolbar.selectNone" } },
+        { "wait": 300 }
+      ],
+      "expect": { "count": { ".repo-card": 12 } }
+    },
+
+    {
+      "id": "m05-card-description",
+      "module": "M05",
+      "title": "Editing a chapter description inline",
+      "why": "Keyed reconciliation: typing must not drop focus or reset the card.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        {
+          "fill": { "sel": ".repo-card[data-slug=\"octodemo/gitbinder\"] textarea" },
+          "value": "A printable portfolio that composes itself from your GitHub."
+        },
+        { "wait": 400 }
+      ],
+      "expect": { "selectors": [".repo-card[data-slug=\"octodemo/gitbinder\"]"] }
+    },
+    {
+      "id": "m05-card-status-override",
+      "module": "M05",
+      "title": "Manual status override",
+      "why": "An override has to beat auto-detection and say that it did.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        {
+          "select": { "sel": ".repo-card[data-slug=\"octodemo/quill\"] select" },
+          "value": "live"
+        },
+        { "wait": 400 }
+      ],
+      "expect": { "selectors": [".repo-card[data-slug=\"octodemo/quill\"][data-status=\"live\"]"] }
+    },
+    {
+      "id": "m05-card-notes",
+      "module": "M05",
+      "title": "Per-project notes",
+      "why": "Notes survive a re-fetch; the counter shows they were stored.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        {
+          "fill": { "sel": ".repo-card[data-slug=\"octodemo/folio-ui\"] textarea" },
+          "value": "Shipped to three internal teams; print stylesheet still rough."
+        },
+        { "wait": 400 }
+      ],
+      "expect": { "selectors": [".repo-card[data-slug=\"octodemo/folio-ui\"]"] }
+    },
+    {
+      "id": "m05-card-keyboard",
+      "module": "M05",
+      "title": "Keyboard focus inside a card",
+      "why": "Focus has to be visible on a warm paper background — the usual contrast trap.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "focus": { "sel": ".repo-card[data-slug=\"octodemo/gitbinder\"] input[type=\"checkbox\"]" } },
+        { "press": "Tab" },
+        { "wait": 200 }
+      ],
+      "expect": { "selectors": [".repo-card"] }
+    },
+
+    {
+      "id": "m06-status-matrix",
+      "module": "M06",
+      "title": "Every detection rule in one list",
+      "why": "topic / archived / disabled / homepage / recent / maintained / dormant, all visible at once.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "fullPage": true,
+      "expect": {
+        "selectors": [
+          ".repo-card[data-status=\"live\"]",
+          ".repo-card[data-status=\"development\"]",
+          ".repo-card[data-status=\"beta\"]",
+          ".repo-card[data-status=\"paused\"]"
+        ]
+      }
+    },
+
+    {
+      "id": "m07-settings-top",
+      "module": "M07",
+      "title": "Settings drawer — GitHub & token",
+      "why": "The one place a secret is typed; the field and its warnings are the product promise.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "mobile"],
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 1 } },
+        { "wait": 500 }
+      ],
+      "expect": { "selectors": ["#settings-username", "#settings-token"] }
+    },
+    {
+      "id": "m07-settings-book-meta",
+      "module": "M07",
+      "title": "Settings drawer — book metadata",
+      "why": "Title, author, e-mail, bio: what lands on the cover.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 1 } },
+        { "wait": 400 },
+        { "fill": { "sel": "#settings-book-title" }, "value": "Selected Works 2019–2026" },
+        { "fill": { "sel": "#settings-author-name" }, "value": "Octo Demo" },
+        { "fill": { "sel": "#settings-author-bio" }, "value": "Builds tools for people who still print things." },
+        { "scroll": "#settings-book-title" },
+        { "wait": 400 }
+      ],
+      "expect": { "selectors": ["#settings-book-title", "#settings-author-bio"] }
+    },
+    {
+      "id": "m07-settings-data",
+      "module": "M07",
+      "title": "Settings drawer — data & privacy",
+      "why": "Export / import / reset / clear are destructive; the copy has to be unambiguous.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 1 } },
+        { "wait": 400 },
+        { "scroll": { "key": "settings.data.export" } },
+        { "wait": 400 }
+      ],
+      "expect": { "selectors": ["[data-i18n=\"settings.data.export\"]"] }
+    },
+    {
+      "id": "m07-settings-token-verify-fail",
+      "module": "M07",
+      "title": "Token verification fails",
+      "why": "401 from /user must be reported inline, next to the field.",
+      "viewport": "desktop",
+      "fixture": "unauthorized",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 1 } },
+        { "wait": 400 },
+        { "fill": { "sel": "#settings-token" }, "value": "ghp_betafixturetoken0000000000000000" },
+        { "wait": 300 },
+        { "click": { "nameKey": "settings.token.verify" } },
+        { "wait": 1200 }
+      ],
+      "expect": { "selectors": ["#settings-token"] }
+    },
+
+    {
+      "id": "m08-summary-chapters",
+      "module": "M08",
+      "title": "Summary with chapters selected",
+      "why": "The sticky aside is the only always-visible feedback about book size.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "tablet"],
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 500 },
+        { "scroll": "#summary-root" },
+        { "wait": 300 }
+      ],
+      "expect": { "selectors": ["#summary-root"] }
+    },
+    {
+      "id": "m08-chapter-picker",
+      "module": "M08",
+      "title": "Chapter picker open",
+      "why": "Reaches the same selection from the sticky bar, mid-scroll.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "mobile"],
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "sel": ".book-picker__toggle" } },
+        { "wait": 500 }
+      ],
+      "expect": {
+        "selectors": [".book-picker:not([hidden])", ".book-picker__row[data-slug=\"octodemo/gitbinder\"]"]
+      }
+    },
+
+    {
+      "id": "m09-book-cover",
+      "module": "M09",
+      "title": "Live A4 preview — cover",
+      "why": "The cover is the promise of the whole product.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo", "bookTitle": "Selected Works 2019–2026", "author": "Octo Demo" },
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 400 },
+        { "click": { "key": "book.bar.preview" } },
+        { "wait": 900 },
+        { "scroll": "#book-root" },
+        { "wait": 500 }
+      ],
+      "expect": { "selectors": ["#book-root .book-page", "#book-root .book-cover"] }
+    },
+    {
+      "id": "m09-book-contents",
+      "module": "M09",
+      "title": "Live A4 preview — contents",
+      "why": "Chapter list with folios; ordering follows status rank.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 400 },
+        { "click": { "key": "book.bar.preview" } },
+        { "wait": 900 },
+        { "scroll": { "sel": "#book-root .book-page", "nth": 1 } },
+        { "wait": 500 }
+      ],
+      "expect": { "selectors": ["#book-root .book-page"] }
+    },
+    {
+      "id": "m09-book-catalogue",
+      "module": "M09",
+      "title": "Live A4 preview — catalogue entries",
+      "why": "Where the 200-character descriptions and long URLs get typeset.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 400 },
+        { "click": { "key": "book.bar.preview" } },
+        { "wait": 1200 },
+        { "scroll": { "sel": "#book-root .book-entry", "nth": 0 } },
+        { "wait": 500 }
+      ],
+      "expect": { "selectors": ["#book-root .book-entry"] }
+    },
+    {
+      "id": "m09-book-bar",
+      "module": "M09",
+      "title": "Sticky action bar on mobile",
+      "why": "The bar must not cover content or overflow a 390 px viewport.",
+      "viewport": "mobile",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [{ "scroll": { "y": 1200 } }, { "wait": 400 }],
+      "expect": { "selectors": [".book-bar"] }
+    },
+
+    {
+      "id": "m10-print-emulate",
+      "module": "M10",
+      "title": "Print media: only the book survives",
+      "why": "print.css hides the app chrome — a regression here ruins every PDF.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 400 },
+        { "click": { "key": "book.bar.preview" } },
+        { "wait": 1000 },
+        { "print": true },
+        { "wait": 400 }
+      ],
+      "expect": {
+        "selectors": ["#book-root"],
+        "hiddenInPrint": ["#navbar-root", "#footer-root", "#book-bar-root", ".book-bar"]
+      }
+    },
+    {
+      "id": "m10-print-pdf",
+      "module": "M10",
+      "title": "A4 PDF of the composed book",
+      "why": "The actual deliverable; page count and size are checked in the report.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "pdf": true,
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 400 },
+        { "click": { "key": "book.bar.preview" } },
+        { "wait": 1200 }
+      ],
+      "expect": { "selectors": ["#book-root .book-page"] }
+    },
+
+    {
+      "id": "m11-export-menu",
+      "module": "M11",
+      "title": "Text export menu",
+      "why": "Markdown / plain text / CSV — the menu is the only way to reach them.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 400 },
+        { "click": { "sel": ".book-export" } },
+        { "wait": 400 }
+      ],
+      "expect": { "selectors": [".book-export__menu", ".book-export__item"] }
+    },
+    {
+      "id": "m11-export-toast",
+      "module": "M11",
+      "title": "Export confirmed by toast",
+      "why": "The download itself is silent — the toast is the only feedback.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "key": "library.toolbar.selectAll" } },
+        { "wait": 400 },
+        { "click": { "sel": ".book-export" } },
+        { "wait": 300 },
+        { "click": { "sel": ".book-export__item", "nth": 0 } },
+        { "wait": 600 }
+      ],
+      "expect": { "selectors": ["#toast-root > *"] }
+    },
+
+    {
+      "id": "m12-support-modal",
+      "module": "M12",
+      "title": "Support modal",
+      "why": "Open from both the navbar and the footer — one dialog, two entries.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "mobile"],
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 0 } },
+        { "wait": 600 }
+      ],
+      "expect": { "selectors": [".overlay-scrim"] }
+    },
+    {
+      "id": "m12-support-qr",
+      "module": "M12",
+      "title": "Crypto tab with QR code",
+      "why": "QR generation is client-side; a blank square here is a silent failure.",
+      "viewport": "desktop",
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 0 } },
+        { "wait": 500 },
+        { "click": { "sel": ".tabs__tab", "nth": 1 } },
+        { "wait": 500 }
+      ],
+      "expect": { "selectors": [".crypto__qr", ".crypto__qr svg, .crypto__qr canvas, .crypto__qr img"] }
+    },
+    {
+      "id": "m12-support-copy",
+      "module": "M12",
+      "title": "Copy address feedback",
+      "why": "Clipboard writes need permission; the failure path must be visible.",
+      "viewport": "desktop",
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 0 } },
+        { "wait": 500 },
+        { "click": { "sel": ".tabs__tab", "nth": 1 } },
+        { "wait": 400 },
+        { "click": { "sel": ".crypto__copy" } },
+        { "wait": 600 }
+      ],
+      "expect": { "selectors": [".crypto__copy"] }
+    },
+
+    {
+      "id": "m13-info-help",
+      "module": "M13",
+      "title": "Help modal",
+      "why": "Long-form EN + DE content in a scrollable dialog.",
+      "viewport": "desktop",
+      "steps": [{ "click": { "key": "info.help.footerLink" } }, { "wait": 500 }],
+      "expect": { "selectors": [".overlay-scrim"] }
+    },
+    {
+      "id": "m13-info-disclaimer",
+      "module": "M13",
+      "title": "Disclaimer modal",
+      "viewport": "desktop",
+      "steps": [{ "click": { "key": "info.disclaimer.footerLink" } }, { "wait": 500 }],
+      "expect": { "selectors": [".overlay-scrim"] }
+    },
+    {
+      "id": "m13-info-terms",
+      "module": "M13",
+      "title": "Terms modal",
+      "viewport": "desktop",
+      "steps": [{ "click": { "key": "info.terms.footerLink" } }, { "wait": 500 }],
+      "expect": { "selectors": [".overlay-scrim"] }
+    },
+    {
+      "id": "m13-info-contact",
+      "module": "M13",
+      "title": "Contact modal — German",
+      "why": "DE legal copy is typically longer than EN; checks the dialog at the worst case.",
+      "viewport": "desktop",
+      "langs": ["de"],
+      "seed": { "lang": "de" },
+      "steps": [{ "click": { "key": "info.contact.footerLink" } }, { "wait": 500 }],
+      "expect": { "selectors": [".overlay-scrim"] }
+    },
+    {
+      "id": "m13-info-escape",
+      "module": "M13",
+      "title": "Escape closes the dialog",
+      "why": "After Escape the page must be interactive again, not left inert.",
+      "viewport": "desktop",
+      "steps": [
+        { "click": { "key": "info.help.footerLink" } },
+        { "wait": 500 },
+        { "shot": "open" },
+        { "press": "Escape" },
+        { "wait": 500 }
+      ],
+      "expect": { "count": { ".overlay-scrim": 0 } }
+    },
+
+    {
+      "id": "m14-gate-blocked",
+      "module": "M14",
+      "title": "Ad-blocker gate",
+      "why": "Bait hidden by an injected stylesheet — the app must never mount.",
+      "viewport": "desktop",
+      "viewports": ["desktop", "mobile"],
+      "seed": { "blockBait": true },
+      "expect": {
+        "selectors": [".adblock-notice", "#adblock-title"],
+        "count": { "#navbar-root > *": 0 }
+      }
+    },
+    {
+      "id": "m14-gate-recheck",
+      "module": "M14",
+      "title": "Gate cleared, app boots",
+      "why": "The re-check has to start the real app, not a half-mounted one.",
+      "viewport": "desktop",
+      "seed": { "blockBait": true },
+      "steps": [
+        { "shot": "blocked" },
+        { "unblockBait": true },
+        { "click": { "sel": ".adblock-notice button.btn-accent" } },
+        { "wait": 1500 }
+      ],
+      "expect": { "selectors": ["#navbar-root .btn", "#hero-root"] }
+    },
+
+    {
+      "id": "m15-a11y-skip-link",
+      "module": "M15",
+      "title": "Skip link on first Tab",
+      "why": "The only escape from the navbar for keyboard users.",
+      "viewport": "desktop",
+      "steps": [{ "press": "Tab" }, { "wait": 300 }],
+      "expect": { "selectors": [".skip-link"], "focused": ".skip-link" }
+    },
+    {
+      "id": "m15-a11y-modal-focus",
+      "module": "M15",
+      "title": "Focus trapped in the settings drawer",
+      "why": "After 8 Tabs the focus must still be inside the dialog.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 1 } },
+        { "wait": 400 },
+        { "press": "Tab" },
+        { "press": "Tab" },
+        { "press": "Tab" },
+        { "press": "Tab" },
+        { "press": "Tab" },
+        { "press": "Tab" },
+        { "press": "Tab" },
+        { "press": "Tab" },
+        { "wait": 300 }
+      ],
+      "expect": { "selectors": ["#settings-username"], "focusedInside": "#overlay-root" }
+    },
+    {
+      "id": "m15-responsive-small",
+      "module": "M15",
+      "title": "Narrowest phone (320 px)",
+      "why": "The smallest viewport still in the wild; horizontal scroll is a hard fail.",
+      "viewport": "small",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "fullPage": true,
+      "expect": { "count": { ".repo-card": 12 }, "noScrollX": true }
+    },
+    {
+      "id": "m15-responsive-wide",
+      "module": "M15",
+      "title": "Wide desktop (1920 px)",
+      "why": "Content column must not stretch into unreadable line lengths.",
+      "viewport": "wide",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "expect": { "count": { ".repo-card": 12 } }
+    },
+    {
+      "id": "m15-reduced-motion",
+      "module": "M15",
+      "title": "prefers-reduced-motion",
+      "why": "Animations must be off, and nothing may depend on them finishing.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo", "reducedMotion": "reduce" },
+      "expect": { "count": { ".repo-card": 12 } }
+    },
+
+    {
+      "id": "m16-persistence-reload",
+      "module": "M16",
+      "title": "Overrides survive a reload",
+      "why": "The whole curation flow is worthless if localStorage write-through fails.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        {
+          "select": { "sel": ".repo-card[data-slug=\"octodemo/quill\"] select" },
+          "value": "live"
+        },
+        { "wait": 400 },
+        { "reload": true },
+        { "wait": 1800 }
+      ],
+      "expect": { "selectors": [".repo-card[data-slug=\"octodemo/quill\"][data-status=\"live\"]"] }
+    },
+    {
+      "id": "m16-legacy-migration",
+      "module": "M16",
+      "title": "State migrated from gitbooklet:*",
+      "why": "A rename must not wipe an existing visitor's book.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": {
+        "username": "octodemo",
+        "legacy": {
+          "githubUsername": "octodemo",
+          "customBookTitle": "Migrated Anthology",
+          "repoOverrides": {
+            "octodemo/gitbinder": { "visible": true, "status": "live", "shortDescription": "Kept from the old build." }
+          }
+        }
+      },
+      "expect": {
+        "count": { ".repo-card": 12 },
+        "selectors": [".repo-card[data-slug=\"octodemo/gitbinder\"][data-status=\"live\"]"]
+      }
+    },
+    {
+      "id": "m16-import-settings",
+      "module": "M16",
+      "title": "Import a settings file",
+      "why": "Round-trip of the export; a bad import must warn, not corrupt state.",
+      "viewport": "desktop",
+      "fixture": "ok",
+      "seed": { "username": "octodemo" },
+      "steps": [
+        { "click": { "sel": "#navbar-root button[aria-haspopup=\"dialog\"]", "nth": 1 } },
+        { "wait": 400 },
+        { "scroll": { "key": "settings.data.import" } },
+        {
+          "importFile": {
+            "trigger": { "key": "settings.data.import" },
+            "content": {
+              "version": 1,
+              "data": {
+                "githubUsername": "octodemo",
+                "customBookTitle": "Imported Anthology",
+                "authorName": "Imported Author",
+                "language": "de"
+              }
+            }
+          }
+        },
+        { "wait": 900 }
+      ],
+      "expect": { "selectors": ["#settings-book-title"], "inputValue": { "#settings-book-title": "Imported Anthology" } }
+    }
+  ]
+}

@@ -197,12 +197,18 @@
     text-transform: none;
     color: var(--color-paper-100);
     box-shadow: var(--shadow-panel);
+    /* Hidden with `display: none`, not just `opacity: 0`: an absolutely
+       positioned, max-content tooltip still widens the document's scrollable
+       overflow while invisible, which gave every phone a ~35 px horizontal
+       scroll (F-03.2). It must not exist in layout until actually shown. */
+    display: none;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.14s ease, translate 0.14s ease;
   }
   [data-tooltip]:hover::after,
   [data-tooltip]:focus-visible::after {
+    display: block;
     opacity: 1;
     translate: -50% 2px;
   }
