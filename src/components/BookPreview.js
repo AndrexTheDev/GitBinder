@@ -20,7 +20,7 @@
 import { h, setAttr, setText } from '../core/dom.js';
 import { UI_EVENTS } from '../core/events.js';
 import { createPrintController } from '../services/print.js';
-import { composeBook } from '../book/compose.js';
+import { composeBook, resolveBookTitle } from '../book/compose.js';
 import { EXPORT_FORMATS, buildTextExport } from '../book/export.js';
 import { downloadFile } from '../utils/file.js';
 import { paginateBook } from '../book/paginate.js';
@@ -555,7 +555,10 @@ export function BookPreview(ctx) {
     }
 
     const opened = printController.print({
-      title: settings.state.customBookTitle,
+      // The resolved title, not the raw field: with the field empty the cover
+      // still prints a title, and the file the browser saves has to be named
+      // after the one on the page. `bookFilename()` slugifies it.
+      title: resolveBookTitle(settings.state, t),
       before: () => compose(),
     });
 

@@ -62,6 +62,30 @@ export function buildEntryLinks(repo, t) {
 }
 
 /**
+ * The book's title and author, as every artefact must show them.
+ *
+ * Four places name the book — the cover, the summary card, the text exports and
+ * the PDF's file name — and they have to agree. They did not: an empty title
+ * produced "Untitled anthology" on the cover, "Selected Works" in the export and
+ * a bare `gitbinder` in the PDF's name, because each call site carried its own
+ * copy of this expression and its own fallback. Hence one rule, in one place.
+ *
+ * A title of only spaces counts as no title: it would print a blank line and
+ * slug to nothing.
+ *
+ * @param {{ customBookTitle?: string }} settings
+ * @param {(key: string) => string} t
+ */
+export function resolveBookTitle(settings, t) {
+  return (settings?.customBookTitle || '').trim() || t('summary.bookTitle.fallback');
+}
+
+/** @see resolveBookTitle */
+export function resolveBookAuthor(settings, t) {
+  return (settings?.authorName || '').trim() || t('summary.author.fallback');
+}
+
+/**
  * @param {object} options
  * @param {object[]} options.chapters  output of `selectChapters()` (resolved, visible, ordered)
  * @param {object} options.settings    persisted settings store state
@@ -98,15 +122,15 @@ export function composeBook({
 
   const meta = {
     appName: APP_NAME,
-    title: settings.customBookTitle || t('summary.bookTitle.fallback'),
+    title: resolveBookTitle(settings, t),
     subtitle: t(BOOK_SUBTITLE_KEY),
-    author: settings.authorName || t('summary.author.fallback'),
+    author: resolveBookAuthor(settings, t),
     contact: settings.authorEmail || '',
     bio: paperText(settings.authorBio, 280) || t('book.cover.bioFallback'),
     /** "by" — sits above the author name on the title page. */
     byline: t('book.cover.byline'),
     /** Running footer, left column. */
-    authorLine: t('book.runner.author', { name: settings.authorName || t('summary.author.fallback') }),
+    authorLine: t('book.runner.author', { name: resolveBookAuthor(settings, t) }),
     /** Screen-reader label for a page section. */
     pageLabel: t('book.pageLabel', { page: '{page}' }),
     generatedAtLabel: t('book.cover.generatedOn', { date: date(generatedAt) }),

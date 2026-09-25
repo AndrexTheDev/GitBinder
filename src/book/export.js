@@ -17,6 +17,7 @@
  */
 
 import { APP_NAME } from '../config/app.js';
+import { resolveBookAuthor, resolveBookTitle } from './compose.js';
 import { BOOK_LIMITS } from '../config/book.js';
 import { humanizeRepoName, slugifyTitle } from '../utils/format.js';
 
@@ -69,9 +70,16 @@ function groupByStatus(chapters, t) {
 
 function meta(settings, t) {
   return {
-    title: (settings?.customBookTitle || '').trim() || t('book.cover.fallbackTitle'),
-    author: (settings?.authorName || '').trim() || t('book.cover.fallbackAuthor'),
-    contact: (settings?.authorContact || '').trim(),
+    // The same rule the cover uses — see `resolveBookTitle()`. This function
+    // used to carry its own fallbacks, which meant an export could name the book
+    // something its own cover did not say, and credit an author the cover never
+    // mentioned.
+    title: resolveBookTitle(settings, t),
+    author: resolveBookAuthor(settings, t),
+    // `authorContact` is not a field in the schema — the e-mail lives in
+    // `authorEmail`. Reading the wrong name left the contact out of every
+    // export while the cover printed it.
+    contact: (settings?.authorEmail || '').trim(),
     date: settings?.generatedAt ? new Date(settings.generatedAt) : new Date(),
   };
 }

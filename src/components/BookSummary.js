@@ -11,6 +11,7 @@
 import { h, setText } from '../core/dom.js';
 import { UI_EVENTS } from '../core/events.js';
 import { REPO_STATUSES } from '../config/app.js';
+import { resolveBookAuthor, resolveBookTitle } from '../book/compose.js';
 import { selectChapters, selectStats, selectViews } from '../state/selectors.js';
 import { formatCompact } from '../utils/format.js';
 import { icon } from './ui/Icon.js';
@@ -179,11 +180,11 @@ export function BookSummary(ctx) {
     const chapters = selectChapters(views);
     const stats = selectStats(views);
 
-    setText(coverTitle, state.customBookTitle || t('summary.bookTitle.fallback'));
+    setText(coverTitle, resolveBookTitle(state, t));
 
     coverAuthor.replaceChildren(
       icon('user', { size: 13, class: 'shrink-0 text-ink-400' }),
-      h('span', { class: 'truncate', text: state.authorName || t('summary.author.fallback') }),
+      h('span', { class: 'truncate', text: resolveBookAuthor(state, t) }),
     );
 
     coverEmail.replaceChildren(

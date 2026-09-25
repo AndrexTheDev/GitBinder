@@ -297,8 +297,6 @@ export default {
       bioFallback:
         'A curated selection of public repositories — built, shipped and maintained in the open.',
       generatedOn: 'Generated on {date}',
-      fallbackTitle: 'Selected Works',
-      fallbackAuthor: 'AndrexTheDev',
       stats: '{projects} projects · {languages} languages · {stars} stars',
     },
     toc: {

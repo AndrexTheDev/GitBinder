@@ -19,6 +19,8 @@ import {
   toPlainText,
 } from '../src/book/export.js';
 import { slugifyTitle as slugify } from '../src/utils/format.js';
+import { resolveBookAuthor, resolveBookTitle } from '../src/book/compose.js';
+import { bookFilename } from '../src/services/print.js';
 
 /**
  * Minimal translator. Most keys resolve to a readable stand-in, but a few
@@ -69,7 +71,10 @@ function chapter(overrides = {}) {
 const SETTINGS = {
   customBookTitle: 'My Portfolio',
   authorName: 'AndrexTheDev',
-  authorContact: 'hippie.high@ho.com',
+  // The field the schema actually has. The fixture said `authorContact` — a
+  // name no store ever sets — which is exactly why nobody noticed the export
+  // was reading the wrong one and dropping the address from every file.
+  authorEmail: 'hippie.high@ho.com',
   generatedAt: NOW.toISOString(),
 };
 
@@ -91,9 +96,33 @@ test('markdown carries the title, TOC and one section per chapter', () => {
   assert.match(md, /^# My Portfolio/);
   assert.match(md, /Project & Codebase Anthology/);
   assert.match(md, /AndrexTheDev/);
+  assert.match(md, /hippie\.high@ho\.com/, 'the contact address is missing from the export');
   assert.match(md, /## Table of contents/);
   assert.match(md, /## 1\. Alpha/);
   assert.match(md, /https:\/\/github\.com\/octo\/alpha/);
+});
+
+test('a blank title reads the same on the cover, in the file and in the PDF name', () => {
+  // The book has four voices — the cover, the summary card, the text exports and
+  // the PDF's suggested file name — and they have to agree on what the book is
+  // called. They did not: an empty title printed "Untitled anthology" on the
+  // cover, "Selected Works" in the export and saved the PDF as plain
+  // `gitbinder`, because each call site had its own copy of the rule and its own
+  // fallback. They now share one, and this is what sharing it buys.
+  const settings = { customBookTitle: '   ', authorName: '', authorEmail: '' };
+  const title = resolveBookTitle(settings, t);
+  const author = resolveBookAuthor(settings, t);
+
+  assert.ok(title.trim(), 'a book with no title still needs a name');
+  assert.ok(author.trim(), 'a book with no author still needs a credit');
+
+  const md = buildTextExport('markdown', { settings, chapters: [chapter()], t, locale: 'en' });
+  assert.match(md.content, new RegExp(`^# ${title}$`, 'm'), 'the export titles the book differently than the cover');
+  assert.ok(md.content.includes(author), 'the export credits a different author than the cover');
+  assert.equal(md.filename, `${slugify(title)}.md`);
+
+  // And the browser seeds "Save as PDF" with the same name.
+  assert.equal(bookFilename(title), `gitbinder-${slugify(title)}`);
 });
 
 test('markdown prints notes as a blockquote, line breaks preserved', () => {

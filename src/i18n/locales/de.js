@@ -293,8 +293,6 @@ export default {
       bioFallback:
         'Eine kuratierte Auswahl öffentlicher Repositories — offen gebaut, ausgeliefert und gepflegt.',
       generatedOn: 'Erstellt am {date}',
-      fallbackTitle: 'Ausgewählte Arbeiten',
-      fallbackAuthor: 'AndrexTheDev',
       stats: '{projects} Projekte · {languages} Sprachen · {stars} Sterne',
     },
     toc: {
