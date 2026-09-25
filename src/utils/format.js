@@ -14,11 +14,6 @@ export function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
-/** Escape a value used inside a CSS `url()` or an SVG attribute. */
-export function escapeAttribute(value) {
-  return String(value ?? '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
 /**
  * Collapse whitespace and clamp a string to `max` characters, adding an ellipsis.
  * Useful for the "short description" column of the book index.
@@ -41,24 +36,39 @@ export function formatCompact(value, locale = 'en') {
   return formatNumber(value, locale, { notation: 'compact', maximumFractionDigits: 1 });
 }
 
+/**
+ * Coerce a date-ish value, or `null` when there is no date in it.
+ *
+ * `null` is how this codebase spells "no value" — `normalizeRepo()` builds
+ * `updatedAt: raw?.updated_at ?? null` — and `new Date(null)` is the epoch, so
+ * without this check a repository whose date arrived missing would claim to
+ * have been updated on 1 January 1970, and `formatRelativeTime()` would say
+ * "57 years ago". `0` stays a real timestamp; only the empty values are empty.
+ */
+function toDate(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 /** Format an ISO date / Date / timestamp as a medium-length local date. */
 export function formatDate(value, locale = 'en') {
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
+  const date = toDate(value);
+  if (!date) return '—';
   return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date);
 }
 
 /** Format an ISO date with time, for "last synchronised" stamps. */
 export function formatDateTime(value, locale = 'en') {
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
+  const date = toDate(value);
+  if (!date) return '—';
   return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 
 /** "3 days ago" / "vor 3 Tagen" using Intl.RelativeTimeFormat. */
 export function formatRelativeTime(value, locale = 'en', now = Date.now()) {
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
+  const date = toDate(value);
+  if (!date) return '—';
 
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
   const diffMs = date.getTime() - now;
