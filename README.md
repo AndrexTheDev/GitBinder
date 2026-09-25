@@ -19,9 +19,9 @@ ad-blocker gate** are in.
 
 The project has since been audited module by module for release: every module under
 `src/` was read against its tests, and the findings were fixed rather than noted. The
-release gate is `npm test` — 384 tests, including `tests/deploy.test.js`, which fails on
-any drift between the Pages project name, the deployed origin, the sitemap, the
-canonical URL and the Node pin.
+release gate is `npm test` — 687 tests across 34 suites, including `tests/deploy.test.js`,
+which fails on any drift between the Pages project name, the deployed origin, the sitemap,
+the canonical URL and the Node pin.
 
 | Area | State |
 | --- | --- |
@@ -578,38 +578,89 @@ which drives the real components against a stubbed GitHub API.
 npm test
 ```
 
-316 tests across twelve suites:
+687 tests across 34 suites. They run on Node's own test runner — no framework, no
+configuration — and the whole app boots inside them, so a break anywhere from the
+GitHub parser to the print stylesheet fails the same command:
+
+**The state layer**
 
 - `tests/store.test.js` — reactivity paths, batching, persistence, encode/decode,
   import/export, migrations, corrupt-payload survival.
-- `tests/i18n.test.js` — dictionary parity, plurals, interpolation, escaping,
-  locale detection, DOM binding applier.
+- `tests/schema.test.js` — defaults, hostile input, vault sealing, the codec, and the
+  per-repository override rules.
+- `tests/context.test.js` — the real `createAppContext()`: the token sealed at rest and
+  readable again on the next visit, a payload under the pre-rename storage key moved
+  rather than ignored, an older schema version migrated, a bare object without an
+  envelope accepted, corrupt storage survived, and the language the visitor chose coming
+  back — plus `migrateState()` itself.
+- `tests/selectors.test.js` — the merge and ordering rules behind the book: an override
+  wins over detection and says so, a note is only ever read from the override, a fork
+  stays out until it is ticked, and the chapter order is stable under reversed input.
+- `tests/storage.test.js`, `tests/migration.test.js` — the adapters, the memory fallback,
+  and the storage-key hand-off that has to survive a failed write.
+
+**Language**
+
+- `tests/i18n.test.js` — dictionary parity, identical placeholders, plurals,
+  interpolation, escaping, locale detection, the DOM binding applier, and the scan that
+  checks every key the code asks for — including the ones held in a constant.
+- `tests/languages.test.js` — the registry, the two dictionaries and the detector have to
+  agree in both directions, and the control on the page offers exactly those languages.
+- `tests/rerender.test.js` — walks the whole interface while recording every
+  `textContent` write, and fails if a binding ever assigns over an element that has
+  children. That failure shipped once; it is not going to ship twice.
+
+**GitHub, and what leaves the browser**
+
+- `tests/github.test.js` — endpoint selection, `Link`-header pagination, the truncation
+  cap, abort handling, every error kind, the metadata allow-list, and `verifyToken()`.
 - `tests/status.test.js` — the full detection matrix, including the 30-day and 365-day
   boundaries and every priority tie-break, plus legacy status migration.
-- `tests/github.test.js` — endpoint selection, `Link`-header pagination, the truncation
-  cap, abort handling, every error kind, and the metadata allow-list.
-- `tests/schema.test.js` — defaults, hostile input, vault sealing, codec, selectors.
-- `tests/utils.test.js` — object/format helpers, repo normalisation, URL safety, debounce.
-- `tests/paginate.test.js` — the book geometry: entry heights, the 1–2-per-page rule,
-  group ordering, TOC widow control, and the invariant that every page number in the
-  contents points at the sheet that really holds the chapter.
-- `tests/book.test.js` — cover/contents/catalogue rendering, the print controller
-  (file name, chrome hiding, dialog refusal, guard release), and the book studio
-  mounted in the real app under jsdom.
-- `tests/app.smoke.test.js` — **jsdom**: boots the real app, opens the drawer, types,
-  fetches 101 repositories across two pages, edits statuses and descriptions, toggles
-  the fork filter and sorting, switches language, exports/imports, ticks projects in
-  the chapter picker, and opens the text export menu.
-- `tests/export.test.js` — Markdown/plain-text/CSV output, RFC 4180 escaping and the
-  Excel BOM, umlaut transliteration, and the i18n keys the exporters depend on.
-- `tests/migration.test.js` — the storage-key hand-off from the pre-rename names,
-  including the failure mode where a failed write must leave the old copy alone.
-- `tests/adblock.test.js` — detection on a clean page and under injected CSS filters,
-  the "no layout engine" trap, and that no bait elements are left behind.
-- `tests/print-overlay.test.js` — screen-only panels are excluded from print, and the
-  print path closes them before the dialog opens.
-- `tests/brand.test.js` — the mark exists at the referenced path, is self-contained
+- `tests/security.test.js` — the invariants that must not rot: the token only ever in an
+  `Authorization: Bearer` header, no third-party request, `target="_blank"` always
+  carrying `rel="noopener noreferrer"`.
+- `tests/adblock.test.js` — detection on a clean page and under injected CSS filters, the
+  "no layout engine" trap, and that no bait elements are left behind.
+
+**The book**
+
+- `tests/paginate.test.js` and `tests/geometry.test.js` — entry heights, the 1–2-per-page
+  rule, TOC widow control, and the invariant that every page number in the contents
+  points at the sheet that really holds the chapter.
+- `tests/book.test.js` — cover/contents/catalogue rendering, the print controller (file
+  name, chrome hiding, dialog refusal, guard release), and the book studio mounted in the
+  real app under jsdom.
+- `tests/export.test.js` — Markdown/plain-text/CSV output, RFC 4180 escaping, the Excel
+  BOM, umlaut transliteration.
+- `tests/notes.test.js` — the note lifecycle, including the rule that a re-fetch may not
+  touch what the visitor typed.
+- `tests/print.test.js`, `tests/print-overlay.test.js` — the print contract, walked
+  through the real CSSOM: what is hidden on paper, what is forced.
+- `tests/qrcode.test.js` — finder patterns, the quiet zone, determinism, and byte-mode
+  case fidelity.
+
+**The interface**
+
+- `tests/app.smoke.test.js` — boots the real app and drives it the way a visitor would:
+  fetch 101 repositories across two pages, edit statuses and descriptions, toggle the
+  fork filter, switch language, export and import, tick projects in the chapter picker,
+  open the text-export menu.
+- `tests/dom.test.js`, `tests/list.test.js`, `tests/events.test.js` — the micro DOM layer,
+  the keyed-list reconciler that keeps a typing visitor's caret, and the event bus.
+- `tests/a11y.test.js` — accessible names and roles on the booted application.
+- `tests/icons.test.js` — every icon name the code asks for is registered (a typo renders
+  a blank square and one console line, nothing more), and all of them draw.
+- `tests/formatting.test.js`, `tests/utils.test.js`, `tests/timing.test.js`,
+  `tests/file.test.js` — the `Intl`-backed formatters, the object helpers, the debounce
+  and throttle, and every route out of the app that produces a file download.
+
+**Release**
+
+- `tests/deploy.test.js` — the Pages project name, the deployed origin, the sitemap, the
+  canonical URL and the Node pin, all cross-checked.
+- `tests/brand.test.js` — the mark exists where the code says it does, is self-contained
   SVG, and stays small.
+- `tests/support.test.js` — the wallet addresses are shape-checked and not placeholders.
 
 The suite includes a regression test for repository names containing a dot
 (`octo/special.name`), which would be split into nested keys by a naive dot-path write.
