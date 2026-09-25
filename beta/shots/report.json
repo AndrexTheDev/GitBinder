@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-25T15:04:19.321Z",
+  "generatedAt": "2026-09-25T15:56:28.104Z",
   "base": "http://127.0.0.1:4173",
   "total": 70,
   "passed": 70,
@@ -99,7 +99,7 @@
       "files": [
         "m01-shell-empty@desktop@en.png"
       ],
-      "ms": 975,
+      "ms": 1001,
       "findings": [],
       "status": "pass"
     },
@@ -114,7 +114,7 @@
       "files": [
         "m01-shell-empty@tablet@en.png"
       ],
-      "ms": 885,
+      "ms": 919,
       "findings": [],
       "status": "pass"
     },
@@ -129,7 +129,7 @@
       "files": [
         "m01-shell-empty@mobile@en.png"
       ],
-      "ms": 868,
+      "ms": 880,
       "findings": [],
       "status": "pass"
     },
@@ -144,7 +144,7 @@
       "files": [
         "m01-shell-empty-de@desktop@de.png"
       ],
-      "ms": 925,
+      "ms": 948,
       "findings": [],
       "status": "pass"
     },
@@ -159,7 +159,7 @@
       "files": [
         "m01-shell-empty-de@mobile@de.png"
       ],
-      "ms": 840,
+      "ms": 866,
       "findings": [],
       "status": "pass"
     },
@@ -174,7 +174,7 @@
       "files": [
         "m01-shell-scrolled@desktop@en.png"
       ],
-      "ms": 1400,
+      "ms": 1425,
       "findings": [],
       "status": "pass"
     },
@@ -189,7 +189,7 @@
       "files": [
         "m02-i18n-loaded-de@desktop@de.png"
       ],
-      "ms": 1429,
+      "ms": 1460,
       "findings": [],
       "status": "pass"
     },
@@ -204,7 +204,7 @@
       "files": [
         "m02-i18n-loaded-de@mobile@de.png"
       ],
-      "ms": 1374,
+      "ms": 1416,
       "findings": [],
       "status": "pass"
     },
@@ -219,7 +219,7 @@
       "files": [
         "m02-i18n-toggle@desktop@en.png"
       ],
-      "ms": 1528,
+      "ms": 1638,
       "findings": [],
       "status": "pass"
     },
@@ -234,7 +234,7 @@
       "files": [
         "m03-fetch-loading@desktop@en.png"
       ],
-      "ms": 188,
+      "ms": 221,
       "findings": [],
       "status": "pass"
     },
@@ -249,7 +249,7 @@
       "files": [
         "m03-fetch-loaded@desktop@en.png"
       ],
-      "ms": 1426,
+      "ms": 1455,
       "findings": [],
       "status": "pass"
     },
@@ -264,7 +264,7 @@
       "files": [
         "m03-fetch-loaded@tablet@en.png"
       ],
-      "ms": 1405,
+      "ms": 1441,
       "findings": [],
       "status": "pass"
     },
@@ -279,7 +279,7 @@
       "files": [
         "m03-fetch-loaded@mobile@en.png"
       ],
-      "ms": 1367,
+      "ms": 1393,
       "findings": [],
       "status": "pass"
     },
@@ -294,7 +294,7 @@
       "files": [
         "m03-fetch-paged@desktop@en.png"
       ],
-      "ms": 1441,
+      "ms": 1499,
       "findings": [],
       "status": "pass"
     },
@@ -309,7 +309,7 @@
       "files": [
         "m03-fetch-empty@desktop@en.png"
       ],
-      "ms": 1410,
+      "ms": 1496,
       "findings": [],
       "status": "pass"
     },
@@ -324,7 +324,7 @@
       "files": [
         "m03-error-notfound@desktop@en.png"
       ],
-      "ms": 1469,
+      "ms": 1514,
       "findings": [],
       "status": "pass"
     },
@@ -339,7 +339,7 @@
       "files": [
         "m03-error-notfound@mobile@en.png"
       ],
-      "ms": 1413,
+      "ms": 1439,
       "findings": [],
       "status": "pass"
     },
@@ -354,7 +354,7 @@
       "files": [
         "m03-error-ratelimit@desktop@en.png"
       ],
-      "ms": 1468,
+      "ms": 1528,
       "findings": [],
       "status": "pass"
     },
@@ -369,7 +369,7 @@
       "files": [
         "m03-error-unauthorized@desktop@en.png"
       ],
-      "ms": 1566,
+      "ms": 1501,
       "findings": [],
       "status": "pass"
     },
@@ -384,7 +384,7 @@
       "files": [
         "m03-error-offline@desktop@en.png"
       ],
-      "ms": 1399,
+      "ms": 1432,
       "findings": [],
       "status": "pass"
     },
@@ -399,7 +399,7 @@
       "files": [
         "m03-error-server@desktop@en.png"
       ],
-      "ms": 1455,
+      "ms": 1502,
       "findings": [],
       "status": "pass"
     },
@@ -414,7 +414,7 @@
       "files": [
         "m03-fetch-private@desktop@en.png"
       ],
-      "ms": 1445,
+      "ms": 1616,
       "findings": [],
       "status": "pass"
     },
@@ -429,7 +429,7 @@
       "files": [
         "m04-search@desktop@en.png"
       ],
-      "ms": 1452,
+      "ms": 1519,
       "findings": [],
       "status": "pass"
     },
@@ -444,7 +444,7 @@
       "files": [
         "m04-search@mobile@en.png"
       ],
-      "ms": 1382,
+      "ms": 1417,
       "findings": [],
       "status": "pass"
     },
@@ -459,7 +459,7 @@
       "files": [
         "m04-search-noresult@mobile@en.png"
       ],
-      "ms": 1384,
+      "ms": 1419,
       "findings": [],
       "status": "pass"
     },
@@ -474,7 +474,7 @@
       "files": [
         "m04-sort-name@desktop@en.png"
       ],
-      "ms": 1405,
+      "ms": 1430,
       "findings": [],
       "status": "pass"
     },
@@ -489,7 +489,7 @@
       "files": [
         "m04-hide-forks@desktop@en.png"
       ],
-      "ms": 1418,
+      "ms": 1467,
       "findings": [],
       "status": "pass"
     },
@@ -505,7 +505,7 @@
         "m04-select-all--all@desktop@en.png",
         "m04-select-all@desktop@en.png"
       ],
-      "ms": 1793,
+      "ms": 1899,
       "findings": [],
       "status": "pass"
     },
@@ -520,7 +520,7 @@
       "files": [
         "m05-card-description@desktop@en.png"
       ],
-      "ms": 1403,
+      "ms": 1450,
       "findings": [],
       "status": "pass"
     },
@@ -535,7 +535,7 @@
       "files": [
         "m05-card-status-override@desktop@en.png"
       ],
-      "ms": 1431,
+      "ms": 1467,
       "findings": [],
       "status": "pass"
     },
@@ -550,7 +550,7 @@
       "files": [
         "m05-card-notes@desktop@en.png"
       ],
-      "ms": 1399,
+      "ms": 1418,
       "findings": [],
       "status": "pass"
     },
@@ -565,7 +565,7 @@
       "files": [
         "m05-card-keyboard@desktop@en.png"
       ],
-      "ms": 1408,
+      "ms": 1446,
       "findings": [],
       "status": "pass"
     },
@@ -580,7 +580,7 @@
       "files": [
         "m06-status-matrix@desktop@en.png"
       ],
-      "ms": 1691,
+      "ms": 1789,
       "findings": [],
       "status": "pass"
     },
@@ -595,7 +595,7 @@
       "files": [
         "m07-settings-top@desktop@en.png"
       ],
-      "ms": 1598,
+      "ms": 1670,
       "findings": [],
       "status": "pass"
     },
@@ -610,7 +610,7 @@
       "files": [
         "m07-settings-top@mobile@en.png"
       ],
-      "ms": 1429,
+      "ms": 1476,
       "findings": [],
       "status": "pass"
     },
@@ -625,7 +625,7 @@
       "files": [
         "m07-settings-book-meta@desktop@en.png"
       ],
-      "ms": 1975,
+      "ms": 2121,
       "findings": [],
       "status": "pass"
     },
@@ -640,7 +640,7 @@
       "files": [
         "m07-settings-data@desktop@en.png"
       ],
-      "ms": 1846,
+      "ms": 1906,
       "findings": [],
       "status": "pass"
     },
@@ -655,7 +655,7 @@
       "files": [
         "m07-settings-token-verify-fail@desktop@en.png"
       ],
-      "ms": 2985,
+      "ms": 3058,
       "findings": [],
       "status": "pass"
     },
@@ -670,7 +670,7 @@
       "files": [
         "m08-summary-chapters@desktop@en.png"
       ],
-      "ms": 1776,
+      "ms": 1870,
       "findings": [],
       "status": "pass"
     },
@@ -685,7 +685,7 @@
       "files": [
         "m08-summary-chapters@tablet@en.png"
       ],
-      "ms": 1757,
+      "ms": 1834,
       "findings": [],
       "status": "pass"
     },
@@ -700,7 +700,7 @@
       "files": [
         "m08-chapter-picker@desktop@en.png"
       ],
-      "ms": 1509,
+      "ms": 1566,
       "findings": [],
       "status": "pass"
     },
@@ -715,7 +715,7 @@
       "files": [
         "m08-chapter-picker@mobile@en.png"
       ],
-      "ms": 1421,
+      "ms": 1461,
       "findings": [],
       "status": "pass"
     },
@@ -730,7 +730,7 @@
       "files": [
         "m09-book-cover@desktop@en.png"
       ],
-      "ms": 3299,
+      "ms": 3362,
       "findings": [],
       "status": "pass"
     },
@@ -745,7 +745,7 @@
       "files": [
         "m09-book-contents@desktop@en.png"
       ],
-      "ms": 3323,
+      "ms": 3406,
       "findings": [],
       "status": "pass"
     },
@@ -760,7 +760,7 @@
       "files": [
         "m09-book-catalogue@desktop@en.png"
       ],
-      "ms": 3251,
+      "ms": 3353,
       "findings": [],
       "status": "pass"
     },
@@ -775,7 +775,7 @@
       "files": [
         "m09-book-bar@mobile@en.png"
       ],
-      "ms": 1359,
+      "ms": 1377,
       "findings": [],
       "status": "pass"
     },
@@ -790,7 +790,7 @@
       "files": [
         "m10-print-emulate@desktop@en.png"
       ],
-      "ms": 2792,
+      "ms": 2879,
       "findings": [],
       "status": "pass"
     },
@@ -805,7 +805,7 @@
       "files": [
         "m10-print-pdf@desktop@en.pdf"
       ],
-      "ms": 2981,
+      "ms": 3176,
       "findings": [],
       "status": "pass"
     },
@@ -820,7 +820,7 @@
       "files": [
         "m11-export-menu@desktop@en.png"
       ],
-      "ms": 1829,
+      "ms": 1927,
       "findings": [],
       "status": "pass"
     },
@@ -835,7 +835,7 @@
       "files": [
         "m11-export-toast@desktop@en.png"
       ],
-      "ms": 2366,
+      "ms": 2433,
       "findings": [],
       "status": "pass"
     },
@@ -850,7 +850,7 @@
       "files": [
         "m12-support-modal@desktop@en.png"
       ],
-      "ms": 1624,
+      "ms": 1626,
       "findings": [],
       "status": "pass"
     },
@@ -865,7 +865,7 @@
       "files": [
         "m12-support-modal@mobile@en.png"
       ],
-      "ms": 1512,
+      "ms": 1553,
       "findings": [],
       "status": "pass"
     },
@@ -880,7 +880,7 @@
       "files": [
         "m12-support-qr@desktop@en.png"
       ],
-      "ms": 2046,
+      "ms": 2104,
       "findings": [],
       "status": "pass"
     },
@@ -895,7 +895,7 @@
       "files": [
         "m12-support-copy@desktop@en.png"
       ],
-      "ms": 2583,
+      "ms": 2651,
       "findings": [],
       "status": "pass"
     },
@@ -910,7 +910,7 @@
       "files": [
         "m13-info-help@desktop@en.png"
       ],
-      "ms": 1503,
+      "ms": 1512,
       "findings": [],
       "status": "pass"
     },
@@ -925,7 +925,7 @@
       "files": [
         "m13-info-disclaimer@desktop@en.png"
       ],
-      "ms": 1444,
+      "ms": 1503,
       "findings": [],
       "status": "pass"
     },
@@ -940,7 +940,7 @@
       "files": [
         "m13-info-terms@desktop@en.png"
       ],
-      "ms": 1435,
+      "ms": 1519,
       "findings": [],
       "status": "pass"
     },
@@ -955,7 +955,7 @@
       "files": [
         "m13-info-contact@desktop@de.png"
       ],
-      "ms": 1465,
+      "ms": 1496,
       "findings": [],
       "status": "pass"
     },
@@ -971,7 +971,7 @@
         "m13-info-escape--open@desktop@en.png",
         "m13-info-escape@desktop@en.png"
       ],
-      "ms": 2003,
+      "ms": 2045,
       "findings": [],
       "status": "pass"
     },
@@ -986,7 +986,7 @@
       "files": [
         "m14-gate-blocked@desktop@en.png"
       ],
-      "ms": 816,
+      "ms": 834,
       "findings": [],
       "status": "pass"
     },
@@ -1001,7 +1001,7 @@
       "files": [
         "m14-gate-blocked@mobile@en.png"
       ],
-      "ms": 785,
+      "ms": 811,
       "findings": [],
       "status": "pass"
     },
@@ -1017,7 +1017,7 @@
         "m14-gate-recheck--blocked@desktop@en.png",
         "m14-gate-recheck@desktop@en.png"
       ],
-      "ms": 2475,
+      "ms": 2504,
       "findings": [],
       "status": "pass"
     },
@@ -1032,7 +1032,7 @@
       "files": [
         "m15-a11y-skip-link@desktop@en.png"
       ],
-      "ms": 1218,
+      "ms": 1248,
       "findings": [],
       "status": "pass"
     },
@@ -1047,7 +1047,7 @@
       "files": [
         "m15-a11y-modal-focus@desktop@en.png"
       ],
-      "ms": 1853,
+      "ms": 1856,
       "findings": [],
       "status": "pass"
     },
@@ -1062,7 +1062,7 @@
       "files": [
         "m15-responsive-small@small@en.png"
       ],
-      "ms": 1525,
+      "ms": 1617,
       "findings": [],
       "status": "pass"
     },
@@ -1077,7 +1077,7 @@
       "files": [
         "m15-responsive-wide@wide@en.png"
       ],
-      "ms": 1441,
+      "ms": 1492,
       "findings": [],
       "status": "pass"
     },
@@ -1092,7 +1092,7 @@
       "files": [
         "m15-reduced-motion@desktop@en.png"
       ],
-      "ms": 1414,
+      "ms": 1456,
       "findings": [],
       "status": "pass"
     },
@@ -1107,7 +1107,7 @@
       "files": [
         "m16-persistence-reload@desktop@en.png"
       ],
-      "ms": 3481,
+      "ms": 3557,
       "findings": [],
       "status": "pass"
     },
@@ -1122,7 +1122,7 @@
       "files": [
         "m16-legacy-migration@desktop@en.png"
       ],
-      "ms": 1419,
+      "ms": 1461,
       "findings": [],
       "status": "pass"
     },
@@ -1137,7 +1137,7 @@
       "files": [
         "m16-import-settings@desktop@en.png"
       ],
-      "ms": 2487,
+      "ms": 2593,
       "findings": [],
       "status": "pass"
     }
