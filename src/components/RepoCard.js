@@ -23,6 +23,7 @@ import {
   truncate,
 } from '../utils/format.js';
 import { debounce } from '../utils/timing.js';
+import { safeUrl } from '../utils/format.js';
 import { icon } from './ui/Icon.js';
 
 /**
@@ -387,16 +388,21 @@ export function RepoCard({ repo, t, locale, onPatch }) {
       ),
     ];
 
-    if (next.homepage) {
+    // The homepage is the one link badge whose target the *repository owner*
+    // controls, so it goes through the same allow-list the book uses — a
+    // `javascript:` (or data:/vbscript:) homepage must never become a live href
+    // here, and a scheme-less address is normalised exactly as on the cover.
+    const homepageHref = safeUrl(next.homepage);
+    if (homepageHref) {
       links.push(
         h(
           'a',
           {
             class: 'link-badge link-badge--accent',
-            href: next.homepage,
+            href: homepageHref,
             target: '_blank',
             rel: 'noopener noreferrer',
-            title: next.homepage,
+            title: homepageHref,
           },
           icon('external', { size: 12 }),
           h('span', { text: t('library.row.homepage'), 'data-i18n': 'library.row.homepage' }),

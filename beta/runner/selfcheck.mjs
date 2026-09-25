@@ -258,3 +258,106 @@ describe('fixture × real app', () => {
     }
   });
 });
+
+/**
+ * Phase 2, step 1 — HTML injection.
+ *
+ * GitBinder renders arbitrary GitHub payloads (name, description, topics,
+ * homepage). The audit found the app builds every node through `h()` with
+ * `text:` (textContent) and routes links through `safeUrl()`; this block turns
+ * that audit into a regression guarantee by driving a *hostile* repository
+ * through the real card and the real book composer and asserting nothing
+ * executes and nothing injects.
+ */
+describe('adversarial GitHub payloads render inert', () => {
+  const PAYLOAD =
+    '<scr' + 'ipt>window.__pwn=1</scr' + 'ipt><img src=x onerror="window.__pwn=1">';
+
+  function hostileRepo() {
+    const now = Date.now();
+    const iso = (d) => new Date(now - d * 86_400_000).toISOString();
+    return {
+      id: 999001,
+      full_name: 'octodemo/hostile',
+      name: `hostile${PAYLOAD}`,
+      owner: { login: 'octodemo' },
+      html_url: 'https://github.com/octodemo/hostile',
+      description: `${PAYLOAD} "quotes" & ampersands <b onmouseover="window.__pwn=1">bold</b>`,
+      language: 'JavaScript',
+      fork: false,
+      private: false,
+      archived: false,
+      disabled: false,
+      default_branch: 'main',
+      homepage: 'javascript:window.__pwn=1', // must never become a live href
+      created_at: iso(400),
+      updated_at: iso(5),
+      pushed_at: iso(5),
+      stargazers_count: 1,
+      forks_count: 0,
+      open_issues_count: 0,
+      size: 10,
+      license: null,
+      topics: [PAYLOAD, 'status-live'],
+    };
+  }
+
+  async function mountHostile() {
+    const env = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const storage = createMemoryStorage();
+    const fetch = async () => ({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: async () => [hostileRepo()],
+    });
+    const app = bootstrap({ host: env.document, storage, fetch });
+    app.ctx.settings.set('githubUsername', 'octodemo');
+    await app.fetchRepos({ silent: true });
+    app.components.library.flush();
+    return { app, document: env.document, cleanup: () => (app.destroy(), env.cleanup()) };
+  }
+
+  const assertInert = (document, scope, label) => {
+    const root = scope ?? document;
+    assert.equal(root.querySelector('script'), null, `${label}: injected <script>`);
+    assert.equal(root.querySelector('img[onerror]'), null, `${label}: injected <img onerror>`);
+    assert.equal(root.querySelector('[onmouseover]'), null, `${label}: injected handler attr`);
+    assert.equal(root.querySelector('a[href^="javascript:"]'), null, `${label}: javascript: href`);
+    assert.equal(typeof document.defaultView.__pwn, 'undefined', `${label}: payload executed`);
+  };
+
+  test('the library card renders the payload as inert text', async () => {
+    const { document, cleanup } = await mountHostile();
+    try {
+      const card = document.querySelector('.repo-card[data-slug="octodemo/hostile"]');
+      assert.ok(card, 'hostile card rendered');
+      assertInert(document, card, 'card');
+      // The raw markup survives only as *text*, proving textContent semantics.
+      assert.ok(card.textContent.includes('<img src=x onerror='), 'payload present as text');
+      // The javascript: homepage must not become a link badge.
+      assert.ok(!card.innerHTML.includes('javascript:'), 'no javascript: in card markup');
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('the composed book renders the payload inert too', async () => {
+    const { app, document, cleanup } = await mountHostile();
+    try {
+      app.ctx.settings.set(['repoOverrides', 'octodemo/hostile'], {
+        visible: true,
+        status: null,
+        shortDescription: null,
+        updatedAt: null,
+      });
+      app.ctx.settings.set('book', { preview: true });
+      app.components.bookPreview.compose();
+      const book = document.querySelector('#book-root');
+      assert.ok(book, 'book rendered');
+      assertInert(document, book, 'book');
+    } finally {
+      cleanup();
+    }
+  });
+});
