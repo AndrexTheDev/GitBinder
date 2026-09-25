@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-25T10:31:31.494Z",
+  "generatedAt": "2026-09-25T13:01:01.131Z",
   "base": "http://127.0.0.1:4173",
   "total": 70,
   "passed": 58,
@@ -99,7 +99,7 @@
       "files": [
         "m01-shell-empty@desktop@en.png"
       ],
-      "ms": 1002,
+      "ms": 1001,
       "findings": [],
       "status": "pass"
     },
@@ -114,7 +114,7 @@
       "files": [
         "m01-shell-empty@tablet@en.png"
       ],
-      "ms": 919,
+      "ms": 936,
       "findings": [],
       "status": "pass"
     },
@@ -129,12 +129,12 @@
       "files": [
         "m01-shell-empty@mobile@en.png"
       ],
-      "ms": 897,
+      "ms": 912,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-primary> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -150,7 +150,7 @@
       "files": [
         "m01-shell-empty-de@desktop@de.png"
       ],
-      "ms": 930,
+      "ms": 949,
       "findings": [],
       "status": "pass"
     },
@@ -165,12 +165,12 @@
       "files": [
         "m01-shell-empty-de@mobile@de.png"
       ],
-      "ms": 885,
+      "ms": 884,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 424px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 424→390"
+          "message": "content is 424px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=104 w=270 r=374; <button.btn.btn-primary> l=272 w=102 r=374; <span.sm:hidden> l=311 w=48 r=359; <svg.> l=287 w=16 r=303; <path.> l=289 w=12 r=301 — layer(s) whose removal shrinks it: #navbar-root 424→390"
         }
       ],
       "status": "fail"
@@ -186,7 +186,7 @@
       "files": [
         "m01-shell-scrolled@desktop@en.png"
       ],
-      "ms": 1422,
+      "ms": 1436,
       "findings": [],
       "status": "pass"
     },
@@ -201,7 +201,7 @@
       "files": [
         "m02-i18n-loaded-de@desktop@de.png"
       ],
-      "ms": 1482,
+      "ms": 1481,
       "findings": [],
       "status": "pass"
     },
@@ -216,12 +216,12 @@
       "files": [
         "m02-i18n-loaded-de@mobile@de.png"
       ],
-      "ms": 1418,
+      "ms": 1436,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 424px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 424→390"
+          "message": "content is 424px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=104 w=270 r=374; <button.btn.btn-accent> l=272 w=102 r=374; <span.sm:hidden> l=311 w=48 r=359; <svg.> l=287 w=16 r=303; <path.> l=289 w=12 r=301 — layer(s) whose removal shrinks it: #navbar-root 424→390"
         }
       ],
       "status": "fail"
@@ -237,7 +237,7 @@
       "files": [
         "m02-i18n-toggle@desktop@en.png"
       ],
-      "ms": 1633,
+      "ms": 1637,
       "findings": [],
       "status": "pass"
     },
@@ -252,7 +252,7 @@
       "files": [
         "m03-fetch-loading@desktop@en.png"
       ],
-      "ms": 221,
+      "ms": 271,
       "findings": [],
       "status": "pass"
     },
@@ -267,7 +267,7 @@
       "files": [
         "m03-fetch-loaded@desktop@en.png"
       ],
-      "ms": 1472,
+      "ms": 1506,
       "findings": [],
       "status": "pass"
     },
@@ -282,7 +282,7 @@
       "files": [
         "m03-fetch-loaded@tablet@en.png"
       ],
-      "ms": 1443,
+      "ms": 1478,
       "findings": [],
       "status": "pass"
     },
@@ -297,12 +297,12 @@
       "files": [
         "m03-fetch-loaded@mobile@en.png"
       ],
-      "ms": 1426,
+      "ms": 1460,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-accent> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -318,7 +318,7 @@
       "files": [
         "m03-fetch-paged@desktop@en.png"
       ],
-      "ms": 1514,
+      "ms": 1525,
       "findings": [],
       "status": "pass"
     },
@@ -333,7 +333,7 @@
       "files": [
         "m03-fetch-empty@desktop@en.png"
       ],
-      "ms": 1464,
+      "ms": 1466,
       "findings": [],
       "status": "pass"
     },
@@ -348,7 +348,7 @@
       "files": [
         "m03-error-notfound@desktop@en.png"
       ],
-      "ms": 1497,
+      "ms": 1496,
       "findings": [],
       "status": "pass"
     },
@@ -363,12 +363,12 @@
       "files": [
         "m03-error-notfound@mobile@en.png"
       ],
-      "ms": 1438,
+      "ms": 1455,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-primary> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -384,7 +384,7 @@
       "files": [
         "m03-error-ratelimit@desktop@en.png"
       ],
-      "ms": 1493,
+      "ms": 1509,
       "findings": [],
       "status": "pass"
     },
@@ -399,7 +399,7 @@
       "files": [
         "m03-error-unauthorized@desktop@en.png"
       ],
-      "ms": 1500,
+      "ms": 1501,
       "findings": [],
       "status": "pass"
     },
@@ -414,7 +414,7 @@
       "files": [
         "m03-error-offline@desktop@en.png"
       ],
-      "ms": 1456,
+      "ms": 1448,
       "findings": [],
       "status": "pass"
     },
@@ -429,7 +429,7 @@
       "files": [
         "m03-error-server@desktop@en.png"
       ],
-      "ms": 1513,
+      "ms": 1499,
       "findings": [],
       "status": "pass"
     },
@@ -444,7 +444,7 @@
       "files": [
         "m03-fetch-private@desktop@en.png"
       ],
-      "ms": 1465,
+      "ms": 1468,
       "findings": [],
       "status": "pass"
     },
@@ -459,7 +459,7 @@
       "files": [
         "m04-search@desktop@en.png"
       ],
-      "ms": 1539,
+      "ms": 1570,
       "findings": [],
       "status": "pass"
     },
@@ -474,12 +474,12 @@
       "files": [
         "m04-search@mobile@en.png"
       ],
-      "ms": 1466,
+      "ms": 1468,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-accent> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -500,7 +500,7 @@
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-accent> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -516,7 +516,7 @@
       "files": [
         "m04-sort-name@desktop@en.png"
       ],
-      "ms": 1445,
+      "ms": 1447,
       "findings": [],
       "status": "pass"
     },
@@ -531,7 +531,7 @@
       "files": [
         "m04-hide-forks@desktop@en.png"
       ],
-      "ms": 1450,
+      "ms": 1500,
       "findings": [],
       "status": "pass"
     },
@@ -547,7 +547,7 @@
         "m04-select-all--all@desktop@en.png",
         "m04-select-all@desktop@en.png"
       ],
-      "ms": 1869,
+      "ms": 1949,
       "findings": [],
       "status": "pass"
     },
@@ -562,7 +562,7 @@
       "files": [
         "m05-card-description@desktop@en.png"
       ],
-      "ms": 1448,
+      "ms": 1470,
       "findings": [],
       "status": "pass"
     },
@@ -577,7 +577,7 @@
       "files": [
         "m05-card-status-override@desktop@en.png"
       ],
-      "ms": 1482,
+      "ms": 1462,
       "findings": [],
       "status": "pass"
     },
@@ -592,7 +592,7 @@
       "files": [
         "m05-card-notes@desktop@en.png"
       ],
-      "ms": 1449,
+      "ms": 1472,
       "findings": [],
       "status": "pass"
     },
@@ -607,7 +607,7 @@
       "files": [
         "m05-card-keyboard@desktop@en.png"
       ],
-      "ms": 1476,
+      "ms": 1479,
       "findings": [],
       "status": "pass"
     },
@@ -622,7 +622,7 @@
       "files": [
         "m06-status-matrix@desktop@en.png"
       ],
-      "ms": 1790,
+      "ms": 1787,
       "findings": [],
       "status": "pass"
     },
@@ -637,7 +637,7 @@
       "files": [
         "m07-settings-top@desktop@en.png"
       ],
-      "ms": 1702,
+      "ms": 1650,
       "findings": [],
       "status": "pass"
     },
@@ -652,12 +652,12 @@
       "files": [
         "m07-settings-top@mobile@en.png"
       ],
-      "ms": 1595,
+      "ms": 1599,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — widest: <div.drawer.animate-slide-in-right> w=390 right=414; <header.flex.items-start.justify-between.gap-3.border-b> w=389 right=414; <div.scroll-thin.flex-1.overflow-y-auto.px-5.py-4> w=389 right=414; <footer.items-center.justify-end.gap-2.border-t.border-paper-300> w=389 right=414; <section.space-y-4> w=349 right=394; <div.mb-3.flex.items-start.gap-2.5> w=349 right=394 — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — widest: <div.drawer.animate-slide-in-right> w=390 right=414; <header.flex.items-start.justify-between.gap-3.border-b> w=389 right=414; <div.scroll-thin.flex-1.overflow-y-auto.px-5.py-4> w=389 right=414; <footer.items-center.justify-end.gap-2.border-t.border-paper-300> w=389 right=414; <section.space-y-4> w=349 right=394; <div.mb-3.flex.items-start.gap-2.5> w=349 right=394 — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-accent> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -673,7 +673,7 @@
       "files": [
         "m07-settings-book-meta@desktop@en.png"
       ],
-      "ms": 2041,
+      "ms": 2083,
       "findings": [],
       "status": "pass"
     },
@@ -688,7 +688,7 @@
       "files": [
         "m07-settings-data@desktop@en.png"
       ],
-      "ms": 1987,
+      "ms": 1959,
       "findings": [],
       "status": "pass"
     },
@@ -703,7 +703,7 @@
       "files": [
         "m07-settings-token-verify-fail@desktop@en.png"
       ],
-      "ms": 3077,
+      "ms": 3066,
       "findings": [],
       "status": "pass"
     },
@@ -718,7 +718,7 @@
       "files": [
         "m08-summary-chapters@desktop@en.png"
       ],
-      "ms": 1915,
+      "ms": 1912,
       "findings": [],
       "status": "pass"
     },
@@ -733,7 +733,7 @@
       "files": [
         "m08-summary-chapters@tablet@en.png"
       ],
-      "ms": 1850,
+      "ms": 1849,
       "findings": [],
       "status": "pass"
     },
@@ -748,7 +748,7 @@
       "files": [
         "m08-chapter-picker@desktop@en.png"
       ],
-      "ms": 1576,
+      "ms": 1613,
       "findings": [],
       "status": "pass"
     },
@@ -763,12 +763,12 @@
       "files": [
         "m08-chapter-picker@mobile@en.png"
       ],
-      "ms": 1532,
+      "ms": 1567,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-accent> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -784,7 +784,7 @@
       "files": [
         "m09-book-cover@desktop@en.png"
       ],
-      "ms": 3374,
+      "ms": 3439,
       "findings": [],
       "status": "pass"
     },
@@ -799,7 +799,7 @@
       "files": [
         "m09-book-contents@desktop@en.png"
       ],
-      "ms": 3421,
+      "ms": 3423,
       "findings": [],
       "status": "pass"
     },
@@ -814,7 +814,7 @@
       "files": [
         "m09-book-catalogue@desktop@en.png"
       ],
-      "ms": 3387,
+      "ms": 3388,
       "findings": [],
       "status": "pass"
     },
@@ -829,12 +829,12 @@
       "files": [
         "m09-book-bar@mobile@en.png"
       ],
-      "ms": 1449,
+      "ms": 1430,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-accent> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -850,7 +850,7 @@
       "files": [
         "m10-print-emulate@desktop@en.png"
       ],
-      "ms": 2890,
+      "ms": 2875,
       "findings": [],
       "status": "pass"
     },
@@ -865,7 +865,7 @@
       "files": [
         "m10-print-pdf@desktop@en.pdf"
       ],
-      "ms": 3228,
+      "ms": 3227,
       "findings": [],
       "status": "pass"
     },
@@ -880,7 +880,7 @@
       "files": [
         "m11-export-menu@desktop@en.png"
       ],
-      "ms": 1946,
+      "ms": 1944,
       "findings": [],
       "status": "pass"
     },
@@ -895,7 +895,7 @@
       "files": [
         "m11-export-toast@desktop@en.png"
       ],
-      "ms": 2463,
+      "ms": 2466,
       "findings": [],
       "status": "pass"
     },
@@ -910,7 +910,7 @@
       "files": [
         "m12-support-modal@desktop@en.png"
       ],
-      "ms": 1691,
+      "ms": 1644,
       "findings": [],
       "status": "pass"
     },
@@ -925,12 +925,12 @@
       "files": [
         "m12-support-modal@mobile@en.png"
       ],
-      "ms": 1610,
+      "ms": 1624,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
+          "message": "content is 425px wide in a 390px viewport — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=390 r=390; <span.gilt-rule.block> l=0 w=390 r=390; <div.mx-auto.flex.h-16.w-full> l=0 w=390 r=390; <div.flex.items-center.gap-1.5.sm:gap-2> l=108 w=266 r=374; <button.btn.btn-primary> l=277 w=97 r=374; <span.sm:hidden> l=316 w=43 r=359; <svg.> l=292 w=16 r=308; <path.> l=294 w=12 r=306 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -946,7 +946,7 @@
       "files": [
         "m12-support-qr@desktop@en.png"
       ],
-      "ms": 2130,
+      "ms": 2073,
       "findings": [],
       "status": "pass"
     },
@@ -961,7 +961,7 @@
       "files": [
         "m12-support-copy@desktop@en.png"
       ],
-      "ms": 2649,
+      "ms": 2646,
       "findings": [],
       "status": "pass"
     },
@@ -976,7 +976,7 @@
       "files": [
         "m13-info-help@desktop@en.png"
       ],
-      "ms": 1502,
+      "ms": 1509,
       "findings": [],
       "status": "pass"
     },
@@ -991,7 +991,7 @@
       "files": [
         "m13-info-disclaimer@desktop@en.png"
       ],
-      "ms": 1531,
+      "ms": 1523,
       "findings": [],
       "status": "pass"
     },
@@ -1006,7 +1006,7 @@
       "files": [
         "m13-info-terms@desktop@en.png"
       ],
-      "ms": 1539,
+      "ms": 1532,
       "findings": [],
       "status": "pass"
     },
@@ -1021,7 +1021,7 @@
       "files": [
         "m13-info-contact@desktop@de.png"
       ],
-      "ms": 1515,
+      "ms": 1534,
       "findings": [],
       "status": "pass"
     },
@@ -1037,7 +1037,7 @@
         "m13-info-escape--open@desktop@en.png",
         "m13-info-escape@desktop@en.png"
       ],
-      "ms": 2125,
+      "ms": 2072,
       "findings": [],
       "status": "pass"
     },
@@ -1052,7 +1052,7 @@
       "files": [
         "m14-gate-blocked@desktop@en.png"
       ],
-      "ms": 841,
+      "ms": 846,
       "findings": [],
       "status": "pass"
     },
@@ -1067,7 +1067,7 @@
       "files": [
         "m14-gate-blocked@mobile@en.png"
       ],
-      "ms": 808,
+      "ms": 816,
       "findings": [],
       "status": "pass"
     },
@@ -1083,7 +1083,7 @@
         "m14-gate-recheck--blocked@desktop@en.png",
         "m14-gate-recheck@desktop@en.png"
       ],
-      "ms": 2519,
+      "ms": 2506,
       "findings": [],
       "status": "pass"
     },
@@ -1098,7 +1098,7 @@
       "files": [
         "m15-a11y-skip-link@desktop@en.png"
       ],
-      "ms": 1248,
+      "ms": 1247,
       "findings": [],
       "status": "pass"
     },
@@ -1113,7 +1113,7 @@
       "files": [
         "m15-a11y-modal-focus@desktop@en.png"
       ],
-      "ms": 1847,
+      "ms": 1856,
       "findings": [],
       "status": "pass"
     },
@@ -1128,12 +1128,12 @@
       "files": [
         "m15-responsive-small@small@en.png"
       ],
-      "ms": 1651,
+      "ms": 1656,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 355px wide in a 320px viewport — widest: <div.flex.shrink-0.items-center.gap-2> w=358 right=378; <button.btn.btn-outline.book-bar__action> w=38 right=332; <button.btn.btn-accent.book-bar__action> w=38 right=378; <svg.> w=16 right=367; <path.> w=13 right=366; <path.> w=8 right=363 — layer(s) whose removal shrinks it: #navbar-root 355→320"
+          "message": "content is 355px wide in a 320px viewport — widest: <div.flex.shrink-0.items-center.gap-2> w=358 right=378; <button.btn.btn-outline.book-bar__action> w=38 right=332; <button.btn.btn-accent.book-bar__action> w=38 right=378; <svg.> w=16 right=367; <path.> w=13 right=366; <path.> w=8 right=363 — navbar: <nav.border-b.border-paper-300/80.bg-paper-50/85.backdrop-blur-md> l=0 w=320 r=320; <span.gilt-rule.block> l=0 w=320 r=320; <div.mx-auto.flex.h-16.w-full> l=0 w=320 r=320; <div.flex.items-center.gap-1.5.sm:gap-2> l=38 w=266 r=304; <button.btn.btn-accent> l=207 w=97 r=304; <span.sm:hidden> l=246 w=43 r=289; <svg.> l=222 w=16 r=238; <path.> l=224 w=12 r=236 — layer(s) whose removal shrinks it: #navbar-root 355→320"
         },
         {
           "severity": "error",
@@ -1154,7 +1154,7 @@
       "files": [
         "m15-responsive-wide@wide@en.png"
       ],
-      "ms": 1499,
+      "ms": 1505,
       "findings": [],
       "status": "pass"
     },
@@ -1169,7 +1169,7 @@
       "files": [
         "m15-reduced-motion@desktop@en.png"
       ],
-      "ms": 1471,
+      "ms": 1470,
       "findings": [],
       "status": "pass"
     },
@@ -1184,7 +1184,7 @@
       "files": [
         "m16-persistence-reload@desktop@en.png"
       ],
-      "ms": 3574,
+      "ms": 3558,
       "findings": [],
       "status": "pass"
     },
@@ -1199,7 +1199,7 @@
       "files": [
         "m16-legacy-migration@desktop@en.png"
       ],
-      "ms": 1478,
+      "ms": 1474,
       "findings": [],
       "status": "pass"
     },
@@ -1214,7 +1214,7 @@
       "files": [
         "m16-import-settings@desktop@en.png"
       ],
-      "ms": 2583,
+      "ms": 2633,
       "findings": [],
       "status": "pass"
     }
