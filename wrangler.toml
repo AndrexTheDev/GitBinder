@@ -16,5 +16,12 @@ compatibility_date = "2025-01-01"
 [build]
 command = "npm run build"
 
-# `public/_headers` and `public/_redirects` are copied through to `dist`
-# untouched by Vite and honoured by Pages; nothing to declare here.
+# `public/_headers` is copied through to `dist` untouched by Vite and honoured by
+# Pages; nothing to declare here.
+#
+# Deliberately absent: a `public/_redirects` with the usual SPA rule
+# `/* /index.html 200`. Cloudflare rejects that exact rule as an infinite loop
+# (`/*` re-matches `/index.html`) — a hard failure on Workers (code 100324) and
+# an ignored-rule warning on every Pages deploy. Pages already serves
+# `index.html` for unmatched paths whenever the build has no top-level
+# `404.html`, which is the case here, so the rule was only ever dead weight.

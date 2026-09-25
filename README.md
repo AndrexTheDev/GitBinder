@@ -70,20 +70,35 @@ npm run deploy    # build + `wrangler pages deploy dist`
 | Framework preset | `None` (or `Vite`) |
 | Build command | `npm run build` |
 | Build output directory | `dist` |
-| Node version | `20.19+` or `22.12+` (Vite 8 requirement) |
+| Node version | leave on the default — `.nvmrc` pins `22.22.3` |
 
 **Option B — Wrangler CLI.**
 
 ```bash
-npm run deploy          # builds, then `wrangler pages deploy dist --project-name=gitbinder`
+npm run deploy          # builds, then `wrangler pages deploy dist --project-name=gitbinder --branch=main`
+npm run deploy:preview  # same, but on the current branch → a preview URL
 ```
 
 `wrangler.toml` pins the project name (it is what produces the `*.pages.dev`
-host) and the output directory, so the CLI path needs no flags by hand.
+host) and the output directory. The `--branch=main` in `npm run deploy` is not
+optional: without it, Wrangler deploys to whatever branch is checked out, which
+gives you a preview URL while the production host keeps serving the old build —
+a "successful" deploy that changes nothing.
 
-`public/_headers` and `public/_redirects` ship with the build: they lock down the
-security headers, cache hashed assets for a year and fall back to `index.html` for
-unknown routes.
+`public/_headers` ships with the build and locks down the security headers and
+the cache policy.
+
+**Do not add a `public/_redirects`.** The textbook SPA rule — `/* /index.html 200`
+— is rejected by Cloudflare as an infinite loop, because `/*` re-matches
+`/index.html` and Cloudflare's own `.html`-stripping redirect throws the result
+back into the rule. On Workers the upload fails outright (API code `100324`); on
+Pages the rule is discarded with an "Infinite loop detected … has been ignored"
+warning on every deploy. It is also unnecessary here: per Cloudflare's docs, *"if
+your project does not include a top-level `404.html` file, Pages assumes that you
+are deploying a single-page application"* and serves `index.html` for unmatched
+paths by itself. This repo ships no `404.html` and no `_redirects`, and unknown
+paths return the shell — verified against `wrangler pages dev`, byte for byte.
+`tests/deploy.test.js` fails if either file is added back.
 
 **Content-Security-Policy.** The bundle has no inline scripts and only one inline
 `<style>` (the pre-paint boot splash), so `_headers` can — and does — ship a strict
@@ -102,7 +117,7 @@ repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
 ```
 index.html                  Static shell — every mount point lives here
 vite.config.js              Vite 8 + Tailwind v4 (CSS-first config)
-public/                     favicon, brand/mark.svg, _headers, _redirects, robots.txt, sitemap.xml
+public/                     favicon, og.png, brand/mark.svg, _headers, robots.txt, sitemap.xml
 src/
 ├── main.js                 Entry point (error boundary + boot splash teardown)
 ├── app.js                  Bootstrap: mounts components, owns the fetch pipeline
@@ -606,6 +621,18 @@ The suite includes a regression test for repository names containing a dot
    `public/robots.txt` to your Pages domain.
 4. Match the Pages project name (`gitbinder` here) in `wrangler.toml`,
    `package.json` → `scripts.deploy`, and `.github/workflows/deploy.yml`.
+   `tests/deploy.test.js` cross-checks the project name against `LINKS.deployed`,
+   so a rename cannot leave the book crediting a host that does not exist.
+
+Watch out for three things that fail silently rather than loudly:
+
+- **A deploy without `--branch=main` is a preview, not a release.** The live
+  host keeps serving the previous build and nothing in the output says so.
+- **`NODE_VERSION` in the dashboard can be ignored.** Once a `wrangler.toml`
+  exists, Cloudflare treats the file as the source of truth for the project and
+  the environment variable may not win. `.nvmrc` is the reliable pin.
+- **A `_redirects` file breaks the deploy** rather than fixing routing; see the
+  note above.
 
 ---
 

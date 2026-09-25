@@ -189,14 +189,33 @@ test('the CSP is compatible with what index.html actually contains', () => {
   assert.match(read('public', '_headers'), /style-src 'self' 'unsafe-inline'/);
 });
 
-test('_redirects provides the SPA fallback', () => {
-  const redirects = read('public', '_redirects');
-  assert.match(redirects, /^\s*\/\*\s+\/index\.html\s+200\s*$/m);
+test('there is no _redirects file', () => {
+  // This file used to hold the textbook SPA rule, `/* /index.html 200`.
+  // Cloudflare rejects exactly that rule as an infinite loop — the `/*`
+  // pattern re-matches `/index.html`, and Cloudflare's own `.html`-stripping
+  // redirects the result back into the rule. On Workers the upload fails
+  // outright (API code 100324); on Pages the rule is discarded and logged as
+  // "Infinite loop detected in this rule and has been ignored" on every
+  // deploy. Either way it never does what it looks like it does.
+  //
+  // It is also unnecessary, which is the part that is easy to miss: per
+  // Cloudflare's docs, "if your project does not include a top-level 404.html
+  // file, Pages assumes that you are deploying a single-page application",
+  // and serves index.html for unmatched paths by itself. Verified against
+  // `wrangler pages dev` — with the rule dropped, `/some/unknown/path` still
+  // returns index.html byte for byte.
+  assert.equal(has('public', '_redirects'), false, 'a _redirects file would break the deploy');
+  assert.equal(has('dist', '_redirects'), false, 'a _redirects file reached the build output');
+});
 
-  // Cloudflare matches static assets before applying rules, so this only
-  // catches paths that do not exist — shared links with a query string still
-  // resolve to the real shell.
-  assert.equal(/\b301\b|\b302\b/.test(redirects), false, 'a permanent redirect would be cached');
+test('no 404.html is shipped, which is what enables the automatic SPA fallback', () => {
+  // Adding a top-level 404.html would switch Pages to "this site is not an
+  // SPA" mode and serve it for unknown paths. That is a legitimate choice for
+  // a site with real pages, but this app has no path routing at all — every
+  // view lives behind a query string — so it would only make typos look like
+  // a broken site instead of the app.
+  assert.equal(has('public', '404.html'), false);
+  assert.equal(has('dist', '404.html'), false);
 });
 
 test('robots.txt invites crawlers and points at the sitemap', () => {
@@ -233,7 +252,6 @@ test('the built site is entirely self-contained', { skip: !has('dist') ? 'no dis
 test('the built site ships the deploy files and the brand assets', { skip: !has('dist') ? 'no dist/ — run npm run build' : false }, () => {
   for (const file of [
     '_headers',
-    '_redirects',
     'robots.txt',
     'sitemap.xml',
     'favicon.svg',
