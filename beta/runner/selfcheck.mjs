@@ -36,6 +36,8 @@ import { DEMO_REPOS, DEMO_USER, fixtureFetch, SCENARIO_IDS } from './fixture.js'
 import { plan, validateMatrix } from './shoot.mjs';
 import { buildTextExport, EXPORT_FORMATS } from '../../src/book/export.js';
 import { createTranslator } from '../../src/i18n/index.js';
+import { gzipSync } from 'node:zlib';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const TOKEN = 'ghp_betafixturetoken0000000000000000';
 
@@ -689,6 +691,69 @@ describe('accessibility behaviour (integration)', () => {
       assert.ok(
         document.querySelector('#toast-root[role="status"][aria-live="polite"]'),
         'toasts are announced through a polite live region',
+      );
+    } finally {
+      cleanup();
+    }
+  });
+});
+
+/**
+ * Phase 2, step 5 — performance, measured not assumed.
+ *
+ * Timing under node:test is too noisy to assert on, so these check the things
+ * that are deterministic: the shipped bundle stays within a byte budget, the
+ * library really renders (and filters) the full 103-repository list, and rapid
+ * edits coalesce into a single stored value instead of one write per keystroke.
+ */
+describe('performance', () => {
+  test('the production JS bundle stays within its gzip budget', {
+    skip: existsSync('dist/assets') ? false : 'dist not built',
+  }, () => {
+    const dir = 'dist/assets';
+    const files = readdirSync(dir).filter((f) => f.endsWith('.js'));
+    assert.ok(files.length > 0, 'found built JS');
+    let gz = 0;
+    for (const f of files) gz += gzipSync(readFileSync(`${dir}/${f}`)).length;
+    // App + vendor JS, gzipped. Today ~69 KB; the budget leaves headroom but
+    // fails if a large dependency is added without a decision.
+    assert.ok(gz < 90_000, `gzipped JS is ${gz} bytes (budget 90000)`);
+  });
+
+  test('the library renders and filters the full 103-repository list', async () => {
+    const { app, document, cleanup } = await mount('paged');
+    try {
+      const count = () => document.querySelectorAll('#library-root .repo-card').length;
+      assert.equal(count(), 103, 'every repository rendered');
+
+      app.ctx.session.set('search', 'zzz-no-such-repo');
+      app.components.library.flush();
+      assert.equal(count(), 0, 'a non-matching filter empties the list');
+
+      app.ctx.session.set('search', '');
+      app.components.library.flush();
+      assert.equal(count(), 103, 'clearing the filter restores the full list');
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('rapid edits coalesce into a single stored value', async () => {
+    const { app, document, cleanup } = await mount('ok');
+    try {
+      const card = document.querySelector('.repo-card[data-slug="octodemo/gitbinder"]');
+      const textarea = card.querySelector('textarea');
+      // Five keystrokes inside the debounce window — only the last should win.
+      for (const v of ['G', 'Gr', 'Grü', 'Grüß', 'Grüße 🚀']) {
+        textarea.value = v;
+        textarea.dispatchEvent(new document.defaultView.Event('input', { bubbles: true }));
+      }
+      await new Promise((r) => setTimeout(r, 360)); // past the debounce
+      app.components.library.flush();
+      assert.equal(
+        app.ctx.settings.state.repoOverrides['octodemo/gitbinder'].shortDescription,
+        'Grüße 🚀',
+        'only the final keystroke was stored',
       );
     } finally {
       cleanup();

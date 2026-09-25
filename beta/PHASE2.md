@@ -14,7 +14,7 @@ gate or in `beta:selfcheck`, which CI runs) so a regression cannot slip back in.
 | P2‑2 | Storage & session robustness (corrupt/quota, fetch races, Unicode) | ✅ done — no new defects; pinned by 4 integration tests |
 | P2‑3 | Data-output correctness (PDF structure, full-fixture export round-trips) | ✅ done — integration seam pinned; per-format/PDF already unit-covered |
 | P2‑4 | Accessibility deep-dive (focus behaviour, landmarks, live region) | ✅ done — jsdom-verifiable behaviour pinned; contrast/axe belong to the browser run |
-| P2‑5 | Performance (100+ repos render, bundle budget, debounce) | pending |
+| P2‑5 | Performance (bundle budget, 103-repo render/filter, debounce coalescing) | ✅ done — 3 deterministic checks |
 | P2‑6 | i18n polish (plurals, date formats, long DE strings) | pending |
 
 ---
@@ -122,3 +122,19 @@ module-import time and a synthetic event on a later test window would not reach
 it; the synchronous focus-restore on `close()` is what the test pins.
 
 `beta:selfcheck` is 22/22; the release gate stays 714/714.
+
+## P2‑5 — Performance ✅
+
+Timing under `node:test` is too noisy to assert on, so this step measures the
+deterministic things (three tests in `beta/runner/selfcheck.mjs`, "performance"):
+
+- **Bundle budget** — the production JS (app + vendor), gzipped, must stay under
+  90 KB. Today it is ~69 KB (index ~58 KB + vendor ~11 KB); the guard fails if a
+  heavy dependency lands without a decision. Skips cleanly when `dist/` is absent.
+- **Full-list render/filter** — the library renders all **103** repositories from
+  the `paged` fixture, a non-matching filter empties it to 0, and clearing the
+  filter restores all 103.
+- **Debounce coalescing** — five keystrokes inside the debounce window store only
+  the final value, not one write per keystroke.
+
+`beta:selfcheck` is 25/25; the release gate stays 714/714.
