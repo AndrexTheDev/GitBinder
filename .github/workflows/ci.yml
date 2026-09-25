@@ -25,7 +25,12 @@ jobs:
       - name: Build the static bundle
         run: npm run build
 
+      # Kept as a plain artifact for inspection. `upload-pages-artifact` is
+      # for GitHub Pages, which this project does not use — Cloudflare Pages
+      # builds `dist/` itself, so the job above is the real gate.
       - name: Upload the bundle
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
+          name: dist
           path: dist
+          retention-days: 7
