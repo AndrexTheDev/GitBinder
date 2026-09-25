@@ -37,7 +37,7 @@ export default {
     never: 'nie',
     enabled: 'Aktiviert',
     disabled: 'Deaktiviert',
-    characters: '{count} Zeichen',
+    characters: { one: '1 Zeichen', other: '{count} Zeichen' },
     showing: '{shown} von {total} angezeigt',
   },
 
@@ -132,9 +132,9 @@ export default {
       openOnGithub: 'Repository',
       homepage: 'Live',
       docs: 'Doku',
-      stars: '{count} Stars',
-      forks: '{count} Forks',
-      issues: '{count} offene Issues',
+      stars: { one: '1 Star', other: '{count} Stars' },
+      forks: { one: '1 Fork', other: '{count} Forks' },
+      issues: { one: '1 offenes Issue', other: '{count} offene Issues' },
       updated: 'Aktualisiert {time}',
       noLicense: 'Keine Lizenz',
       topics: 'Themen',
@@ -191,7 +191,7 @@ export default {
     loading: {
       page: 'Lade Seite {page} …',
       pageOf: 'Lade Seite {page} von {totalPages} …',
-      count: 'Bisher {count} Repositories geladen …',
+      count: { one: 'Bisher 1 Repository geladen …', other: 'Bisher {count} Repositories geladen …' },
     },
     counts: {
       repos: { one: '1 Repository', other: '{count} Repositories' },

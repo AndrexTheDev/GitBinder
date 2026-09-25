@@ -760,3 +760,36 @@ describe('performance', () => {
     }
   });
 });
+
+/**
+ * Phase 2, step 6 — i18n pluralisation.
+ *
+ * Several count-bearing strings were hardcoded plural ("{count} stars"), so a
+ * repository with one star read "1 stars" and a single fetch read "Loaded 1
+ * repositories". These assert the singular and plural forms in both locales.
+ */
+describe('i18n pluralisation', () => {
+  const en = createTranslator({ locale: 'en' }).t;
+  const de = createTranslator({ locale: 'de' }).t;
+
+  test('English count strings take the singular at one', () => {
+    assert.equal(en('library.row.stars', { count: 1 }), '1 star');
+    assert.equal(en('library.row.forks', { count: 1 }), '1 fork');
+    assert.equal(en('library.row.issues', { count: 1 }), '1 open issue');
+    assert.equal(en('common.characters', { count: 1 }), '1 character');
+    assert.equal(en('library.loading.count', { count: 1 }), 'Loaded 1 repository so far…');
+  });
+
+  test('English count strings stay plural above one', () => {
+    assert.equal(en('library.row.stars', { count: 16 }), '16 stars');
+    assert.equal(en('library.row.issues', { count: 3 }), '3 open issues');
+    assert.equal(en('common.characters', { count: 12 }), '12 characters');
+  });
+
+  test('German count strings take the singular at one', () => {
+    assert.equal(de('library.row.stars', { count: 1 }), '1 Star');
+    assert.equal(de('library.row.forks', { count: 1 }), '1 Fork');
+    assert.equal(de('library.row.issues', { count: 1 }), '1 offenes Issue');
+    assert.equal(de('library.loading.count', { count: 1 }), 'Bisher 1 Repository geladen …');
+  });
+});

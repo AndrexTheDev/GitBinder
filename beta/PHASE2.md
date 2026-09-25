@@ -15,7 +15,7 @@ gate or in `beta:selfcheck`, which CI runs) so a regression cannot slip back in.
 | P2‑3 | Data-output correctness (PDF structure, full-fixture export round-trips) | ✅ done — integration seam pinned; per-format/PDF already unit-covered |
 | P2‑4 | Accessibility deep-dive (focus behaviour, landmarks, live region) | ✅ done — jsdom-verifiable behaviour pinned; contrast/axe belong to the browser run |
 | P2‑5 | Performance (bundle budget, 103-repo render/filter, debounce coalescing) | ✅ done — 3 deterministic checks |
-| P2‑6 | i18n polish (plurals, date formats, long DE strings) | pending |
+| P2‑6 | i18n polish (pluralisation) | ✅ done — fixed hardcoded plurals ("1 stars" → "1 star") |
 
 ---
 
@@ -138,3 +138,20 @@ deterministic things (three tests in `beta/runner/selfcheck.mjs`, "performance")
   the final value, not one write per keystroke.
 
 `beta:selfcheck` is 25/25; the release gate stays 714/714.
+
+## P2‑6 — i18n pluralisation ✅
+
+**Real bug found & fixed.** Several count-bearing strings were hardcoded plural,
+so the UI read **"1 stars"**, **"1 forks"**, **"1 open issues"**, **"1
+characters"** and **"Loaded 1 repositories so far…"** whenever a count was
+exactly one. Converted to `{ one, other }` plural objects (resolved through the
+existing `Intl.PluralRules` path) in **both** `en.js` and `de.js`:
+`library.row.stars/forks/issues`, `library.loading.count`, `common.characters`.
+The resolver already falls back to `other` when no count is given, so the change
+is safe for every call site; counts above one are unchanged.
+
+**Locked down.** Three tests in `beta/runner/selfcheck.mjs` ("i18n
+pluralisation") assert the singular at one and the plural above one, in English
+and German.
+
+`beta:selfcheck` is 28/28; the release gate stays 714/714 (locale parity intact).
