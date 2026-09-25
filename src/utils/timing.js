@@ -44,21 +44,35 @@ export function debounce(fn, wait = 200) {
   return debounced;
 }
 
-/** Leading-edge throttle for scroll/resize handlers. */
+/**
+ * Leading-edge throttle for scroll/resize handlers.
+ *
+ * The trailing call carries the *newest* arguments, the way `debounce()` here
+ * and `throttle()` in lodash do. It used to keep whichever call opened the
+ * window, so a handler that takes a position as an argument reported where the
+ * visitor was when the window started rather than where they are — wrong in
+ * exactly the situation a throttle is for.
+ */
 export function throttle(fn, wait = 100) {
   let last = 0;
   let timer = null;
+  /** @type {any[]|null} */
+  let lastArgs = null;
   return (...args) => {
+    lastArgs = args;
     const now = Date.now();
     const remaining = wait - (now - last);
     if (remaining <= 0) {
       last = now;
+      lastArgs = null;
       fn(...args);
     } else if (timer === null) {
       timer = setTimeout(() => {
         timer = null;
         last = Date.now();
-        fn(...args);
+        const callArgs = lastArgs ?? args;
+        lastArgs = null;
+        fn(...callArgs);
       }, remaining);
     }
   };
@@ -72,15 +86,25 @@ export function delay(ms) {
 /**
  * Run `task` on the next animation frame, coalescing repeated calls.
  * Useful for "sync the DOM after state settled" work.
+ *
+ * The newest arguments win, like `debounce()` and `throttle()` above. The first
+ * draft kept the args of whichever call opened the frame, which is the one thing
+ * a caller cannot predict — and this module has three helpers, so they should
+ * behave the same way at the edges.
  */
 export function nextFrame(task) {
   let queued = false;
+  /** @type {any[]|null} */
+  let lastArgs = null;
   return (...args) => {
+    lastArgs = args;
     if (queued) return;
     queued = true;
     requestAnimationFrame(() => {
       queued = false;
-      task(...args);
+      const callArgs = lastArgs ?? [];
+      lastArgs = null;
+      task(...callArgs);
     });
   };
 }

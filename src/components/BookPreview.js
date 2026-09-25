@@ -638,7 +638,6 @@ export function BookPreview(ctx) {
       setPreview(true);
       toaster.push({ tone: 'success', message: t('book.bar.built', { pages: book?.totalPages ?? 0 }) });
     }),
-    bus.on(UI_EVENTS.toggleBookPreview, (payload) => setPreview(payload?.open ?? !isOpen())),
   ];
 
   measure();
