@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-25T10:17:56.446Z",
+  "generatedAt": "2026-09-25T10:22:17.800Z",
   "base": "http://127.0.0.1:4173",
   "total": 70,
   "passed": 58,
@@ -99,7 +99,7 @@
       "files": [
         "m01-shell-empty@desktop@en.png"
       ],
-      "ms": 992,
+      "ms": 999,
       "findings": [],
       "status": "pass"
     },
@@ -129,12 +129,12 @@
       "files": [
         "m01-shell-empty@mobile@en.png"
       ],
-      "ms": 878,
+      "ms": 899,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -150,7 +150,7 @@
       "files": [
         "m01-shell-empty-de@desktop@de.png"
       ],
-      "ms": 947,
+      "ms": 945,
       "findings": [],
       "status": "pass"
     },
@@ -165,12 +165,12 @@
       "files": [
         "m01-shell-empty-de@mobile@de.png"
       ],
-      "ms": 869,
+      "ms": 885,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 424px wide in a 390px viewport"
+          "message": "content is 424px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 424→390"
         }
       ],
       "status": "fail"
@@ -186,7 +186,7 @@
       "files": [
         "m01-shell-scrolled@desktop@en.png"
       ],
-      "ms": 1421,
+      "ms": 1428,
       "findings": [],
       "status": "pass"
     },
@@ -201,7 +201,7 @@
       "files": [
         "m02-i18n-loaded-de@desktop@de.png"
       ],
-      "ms": 1465,
+      "ms": 1462,
       "findings": [],
       "status": "pass"
     },
@@ -216,12 +216,12 @@
       "files": [
         "m02-i18n-loaded-de@mobile@de.png"
       ],
-      "ms": 1399,
+      "ms": 1417,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 424px wide in a 390px viewport"
+          "message": "content is 424px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 424→390"
         }
       ],
       "status": "fail"
@@ -237,7 +237,7 @@
       "files": [
         "m02-i18n-toggle@desktop@en.png"
       ],
-      "ms": 1650,
+      "ms": 1632,
       "findings": [],
       "status": "pass"
     },
@@ -252,7 +252,7 @@
       "files": [
         "m03-fetch-loading@desktop@en.png"
       ],
-      "ms": 220,
+      "ms": 218,
       "findings": [],
       "status": "pass"
     },
@@ -267,7 +267,7 @@
       "files": [
         "m03-fetch-loaded@desktop@en.png"
       ],
-      "ms": 1459,
+      "ms": 1457,
       "findings": [],
       "status": "pass"
     },
@@ -282,7 +282,7 @@
       "files": [
         "m03-fetch-loaded@tablet@en.png"
       ],
-      "ms": 1443,
+      "ms": 1431,
       "findings": [],
       "status": "pass"
     },
@@ -297,12 +297,12 @@
       "files": [
         "m03-fetch-loaded@mobile@en.png"
       ],
-      "ms": 1393,
+      "ms": 1408,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -318,7 +318,7 @@
       "files": [
         "m03-fetch-paged@desktop@en.png"
       ],
-      "ms": 1501,
+      "ms": 1531,
       "findings": [],
       "status": "pass"
     },
@@ -333,7 +333,7 @@
       "files": [
         "m03-fetch-empty@desktop@en.png"
       ],
-      "ms": 1477,
+      "ms": 1460,
       "findings": [],
       "status": "pass"
     },
@@ -348,7 +348,7 @@
       "files": [
         "m03-error-notfound@desktop@en.png"
       ],
-      "ms": 1500,
+      "ms": 1501,
       "findings": [],
       "status": "pass"
     },
@@ -368,7 +368,7 @@
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -384,7 +384,7 @@
       "files": [
         "m03-error-ratelimit@desktop@en.png"
       ],
-      "ms": 1542,
+      "ms": 1525,
       "findings": [],
       "status": "pass"
     },
@@ -399,7 +399,7 @@
       "files": [
         "m03-error-unauthorized@desktop@en.png"
       ],
-      "ms": 1500,
+      "ms": 1501,
       "findings": [],
       "status": "pass"
     },
@@ -414,7 +414,7 @@
       "files": [
         "m03-error-offline@desktop@en.png"
       ],
-      "ms": 1432,
+      "ms": 1450,
       "findings": [],
       "status": "pass"
     },
@@ -429,7 +429,7 @@
       "files": [
         "m03-error-server@desktop@en.png"
       ],
-      "ms": 1485,
+      "ms": 1498,
       "findings": [],
       "status": "pass"
     },
@@ -444,7 +444,7 @@
       "files": [
         "m03-fetch-private@desktop@en.png"
       ],
-      "ms": 1451,
+      "ms": 1450,
       "findings": [],
       "status": "pass"
     },
@@ -459,7 +459,7 @@
       "files": [
         "m04-search@desktop@en.png"
       ],
-      "ms": 1501,
+      "ms": 1545,
       "findings": [],
       "status": "pass"
     },
@@ -474,12 +474,12 @@
       "files": [
         "m04-search@mobile@en.png"
       ],
-      "ms": 1417,
+      "ms": 1493,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -495,12 +495,12 @@
       "files": [
         "m04-search-noresult@mobile@en.png"
       ],
-      "ms": 1416,
+      "ms": 1432,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -516,7 +516,7 @@
       "files": [
         "m04-sort-name@desktop@en.png"
       ],
-      "ms": 1447,
+      "ms": 1434,
       "findings": [],
       "status": "pass"
     },
@@ -531,7 +531,7 @@
       "files": [
         "m04-hide-forks@desktop@en.png"
       ],
-      "ms": 1433,
+      "ms": 1463,
       "findings": [],
       "status": "pass"
     },
@@ -547,7 +547,7 @@
         "m04-select-all--all@desktop@en.png",
         "m04-select-all@desktop@en.png"
       ],
-      "ms": 1851,
+      "ms": 1849,
       "findings": [],
       "status": "pass"
     },
@@ -562,7 +562,7 @@
       "files": [
         "m05-card-description@desktop@en.png"
       ],
-      "ms": 1449,
+      "ms": 1433,
       "findings": [],
       "status": "pass"
     },
@@ -577,7 +577,7 @@
       "files": [
         "m05-card-status-override@desktop@en.png"
       ],
-      "ms": 1433,
+      "ms": 1449,
       "findings": [],
       "status": "pass"
     },
@@ -592,7 +592,7 @@
       "files": [
         "m05-card-notes@desktop@en.png"
       ],
-      "ms": 1467,
+      "ms": 1451,
       "findings": [],
       "status": "pass"
     },
@@ -607,7 +607,7 @@
       "files": [
         "m05-card-keyboard@desktop@en.png"
       ],
-      "ms": 1451,
+      "ms": 1463,
       "findings": [],
       "status": "pass"
     },
@@ -622,7 +622,7 @@
       "files": [
         "m06-status-matrix@desktop@en.png"
       ],
-      "ms": 1776,
+      "ms": 1770,
       "findings": [],
       "status": "pass"
     },
@@ -637,7 +637,7 @@
       "files": [
         "m07-settings-top@desktop@en.png"
       ],
-      "ms": 1624,
+      "ms": 1634,
       "findings": [],
       "status": "pass"
     },
@@ -652,12 +652,12 @@
       "files": [
         "m07-settings-top@mobile@en.png"
       ],
-      "ms": 1496,
+      "ms": 1589,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport — widest: <span.badge.badge--neutral> w=346 right=505"
+          "message": "content is 425px wide in a 390px viewport — widest: <div.drawer.animate-slide-in-right> w=390 right=414; <header.flex.items-start.justify-between.gap-3.border-b> w=389 right=414; <div.scroll-thin.flex-1.overflow-y-auto.px-5.py-4> w=389 right=414; <footer.items-center.justify-end.gap-2.border-t.border-paper-300> w=389 right=414; <section.space-y-4> w=349 right=394; <div.mb-3.flex.items-start.gap-2.5> w=349 right=394 — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -673,7 +673,7 @@
       "files": [
         "m07-settings-book-meta@desktop@en.png"
       ],
-      "ms": 2038,
+      "ms": 2058,
       "findings": [],
       "status": "pass"
     },
@@ -688,7 +688,7 @@
       "files": [
         "m07-settings-data@desktop@en.png"
       ],
-      "ms": 1928,
+      "ms": 1981,
       "findings": [],
       "status": "pass"
     },
@@ -703,7 +703,7 @@
       "files": [
         "m07-settings-token-verify-fail@desktop@en.png"
       ],
-      "ms": 3059,
+      "ms": 3058,
       "findings": [],
       "status": "pass"
     },
@@ -718,7 +718,7 @@
       "files": [
         "m08-summary-chapters@desktop@en.png"
       ],
-      "ms": 1871,
+      "ms": 1903,
       "findings": [],
       "status": "pass"
     },
@@ -733,7 +733,7 @@
       "files": [
         "m08-summary-chapters@tablet@en.png"
       ],
-      "ms": 1816,
+      "ms": 1834,
       "findings": [],
       "status": "pass"
     },
@@ -748,7 +748,7 @@
       "files": [
         "m08-chapter-picker@desktop@en.png"
       ],
-      "ms": 1580,
+      "ms": 1582,
       "findings": [],
       "status": "pass"
     },
@@ -763,12 +763,12 @@
       "files": [
         "m08-chapter-picker@mobile@en.png"
       ],
-      "ms": 1462,
+      "ms": 1513,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -784,7 +784,7 @@
       "files": [
         "m09-book-cover@desktop@en.png"
       ],
-      "ms": 3377,
+      "ms": 3413,
       "findings": [],
       "status": "pass"
     },
@@ -799,7 +799,7 @@
       "files": [
         "m09-book-contents@desktop@en.png"
       ],
-      "ms": 3410,
+      "ms": 3419,
       "findings": [],
       "status": "pass"
     },
@@ -814,7 +814,7 @@
       "files": [
         "m09-book-catalogue@desktop@en.png"
       ],
-      "ms": 3371,
+      "ms": 3352,
       "findings": [],
       "status": "pass"
     },
@@ -829,12 +829,12 @@
       "files": [
         "m09-book-bar@mobile@en.png"
       ],
-      "ms": 1374,
+      "ms": 1430,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -850,7 +850,7 @@
       "files": [
         "m10-print-emulate@desktop@en.png"
       ],
-      "ms": 2860,
+      "ms": 2876,
       "findings": [],
       "status": "pass"
     },
@@ -865,7 +865,7 @@
       "files": [
         "m10-print-pdf@desktop@en.pdf"
       ],
-      "ms": 3214,
+      "ms": 3197,
       "findings": [],
       "status": "pass"
     },
@@ -880,7 +880,7 @@
       "files": [
         "m11-export-menu@desktop@en.png"
       ],
-      "ms": 1927,
+      "ms": 1924,
       "findings": [],
       "status": "pass"
     },
@@ -895,7 +895,7 @@
       "files": [
         "m11-export-toast@desktop@en.png"
       ],
-      "ms": 2448,
+      "ms": 2432,
       "findings": [],
       "status": "pass"
     },
@@ -910,7 +910,7 @@
       "files": [
         "m12-support-modal@desktop@en.png"
       ],
-      "ms": 1668,
+      "ms": 1670,
       "findings": [],
       "status": "pass"
     },
@@ -925,12 +925,12 @@
       "files": [
         "m12-support-modal@mobile@en.png"
       ],
-      "ms": 1543,
+      "ms": 1602,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 425px wide in a 390px viewport"
+          "message": "content is 425px wide in a 390px viewport — layer(s) whose removal shrinks it: #navbar-root 425→390"
         }
       ],
       "status": "fail"
@@ -946,7 +946,7 @@
       "files": [
         "m12-support-qr@desktop@en.png"
       ],
-      "ms": 2089,
+      "ms": 2096,
       "findings": [],
       "status": "pass"
     },
@@ -961,7 +961,7 @@
       "files": [
         "m12-support-copy@desktop@en.png"
       ],
-      "ms": 2634,
+      "ms": 2635,
       "findings": [],
       "status": "pass"
     },
@@ -976,7 +976,7 @@
       "files": [
         "m13-info-help@desktop@en.png"
       ],
-      "ms": 1537,
+      "ms": 1511,
       "findings": [],
       "status": "pass"
     },
@@ -991,7 +991,7 @@
       "files": [
         "m13-info-disclaimer@desktop@en.png"
       ],
-      "ms": 1479,
+      "ms": 1503,
       "findings": [],
       "status": "pass"
     },
@@ -1006,7 +1006,7 @@
       "files": [
         "m13-info-terms@desktop@en.png"
       ],
-      "ms": 1520,
+      "ms": 1502,
       "findings": [],
       "status": "pass"
     },
@@ -1021,7 +1021,7 @@
       "files": [
         "m13-info-contact@desktop@de.png"
       ],
-      "ms": 1495,
+      "ms": 1512,
       "findings": [],
       "status": "pass"
     },
@@ -1037,7 +1037,7 @@
         "m13-info-escape--open@desktop@en.png",
         "m13-info-escape@desktop@en.png"
       ],
-      "ms": 2047,
+      "ms": 2046,
       "findings": [],
       "status": "pass"
     },
@@ -1052,7 +1052,7 @@
       "files": [
         "m14-gate-blocked@desktop@en.png"
       ],
-      "ms": 837,
+      "ms": 841,
       "findings": [],
       "status": "pass"
     },
@@ -1067,7 +1067,7 @@
       "files": [
         "m14-gate-blocked@mobile@en.png"
       ],
-      "ms": 817,
+      "ms": 804,
       "findings": [],
       "status": "pass"
     },
@@ -1083,7 +1083,7 @@
         "m14-gate-recheck--blocked@desktop@en.png",
         "m14-gate-recheck@desktop@en.png"
       ],
-      "ms": 2510,
+      "ms": 2504,
       "findings": [],
       "status": "pass"
     },
@@ -1098,7 +1098,7 @@
       "files": [
         "m15-a11y-skip-link@desktop@en.png"
       ],
-      "ms": 1247,
+      "ms": 1250,
       "findings": [],
       "status": "pass"
     },
@@ -1113,7 +1113,7 @@
       "files": [
         "m15-a11y-modal-focus@desktop@en.png"
       ],
-      "ms": 1837,
+      "ms": 1880,
       "findings": [],
       "status": "pass"
     },
@@ -1128,12 +1128,12 @@
       "files": [
         "m15-responsive-small@small@en.png"
       ],
-      "ms": 1622,
+      "ms": 1633,
       "findings": [
         {
           "severity": "error",
           "code": "horizontal-overflow",
-          "message": "content is 355px wide in a 320px viewport — widest: <div.flex.shrink-0.items-center.gap-2> w=358 right=378; <button.btn.btn-outline.book-bar__action> w=38 right=332; <button.btn.btn-accent.book-bar__action> w=38 right=378; <svg.> w=16 right=367; <path.> w=13 right=366; <path.> w=8 right=363"
+          "message": "content is 355px wide in a 320px viewport — widest: <div.flex.shrink-0.items-center.gap-2> w=358 right=378; <button.btn.btn-outline.book-bar__action> w=38 right=332; <button.btn.btn-accent.book-bar__action> w=38 right=378; <svg.> w=16 right=367; <path.> w=13 right=366; <path.> w=8 right=363 — layer(s) whose removal shrinks it: #navbar-root 355→320"
         },
         {
           "severity": "error",
@@ -1154,7 +1154,7 @@
       "files": [
         "m15-responsive-wide@wide@en.png"
       ],
-      "ms": 1490,
+      "ms": 1505,
       "findings": [],
       "status": "pass"
     },
@@ -1169,7 +1169,7 @@
       "files": [
         "m15-reduced-motion@desktop@en.png"
       ],
-      "ms": 1454,
+      "ms": 1453,
       "findings": [],
       "status": "pass"
     },
@@ -1184,7 +1184,7 @@
       "files": [
         "m16-persistence-reload@desktop@en.png"
       ],
-      "ms": 3510,
+      "ms": 3577,
       "findings": [],
       "status": "pass"
     },
@@ -1199,7 +1199,7 @@
       "files": [
         "m16-legacy-migration@desktop@en.png"
       ],
-      "ms": 1474,
+      "ms": 1454,
       "findings": [],
       "status": "pass"
     },
@@ -1214,7 +1214,7 @@
       "files": [
         "m16-import-settings@desktop@en.png"
       ],
-      "ms": 2568,
+      "ms": 2553,
       "findings": [],
       "status": "pass"
     }
