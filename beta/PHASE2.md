@@ -12,7 +12,7 @@ gate or in `beta:selfcheck`, which CI runs) so a regression cannot slip back in.
 | --- | --- | --- |
 | P2‑1 | Security / output escaping (XSS, `javascript:` hrefs) | ✅ done — found & fixed one real vuln |
 | P2‑2 | Storage & session robustness (corrupt/quota, fetch races, Unicode) | ✅ done — no new defects; pinned by 4 integration tests |
-| P2‑3 | Data-output correctness (PDF structure, full-fixture export round-trips) | pending |
+| P2‑3 | Data-output correctness (PDF structure, full-fixture export round-trips) | ✅ done — integration seam pinned; per-format/PDF already unit-covered |
 | P2‑4 | Accessibility deep-dive (axe-core in CI, contrast, focus order) | pending |
 | P2‑5 | Performance (100+ repos render, bundle budget, debounce) | pending |
 | P2‑6 | i18n polish (plurals, date formats, long DE strings) | pending |
@@ -71,3 +71,26 @@ into an integration guarantee — four tests in `beta/runner/selfcheck.mjs`
   intact, nothing injected.
 
 `beta:selfcheck` is 18/18; the release gate stays 714/714.
+
+## P2‑3 — Data outputs ✅
+
+**Audit.** Export correctness (RFC-4180 escaping, BOM, CRLF, round-trip parse)
+is already pinned by `tests/export.test.js`; book/PDF structure (one section per
+page, running heads, folios, TOC page targets, hostile-URL safety, text-not-HTML
+typesetting) by 30 tests in `tests/book.test.js`. Crucially, `BookPreview`
+feeds the *same* `currentChapters()` to both `compose()` and `exportAs()`, so an
+export can never diverge from the book on screen. Re-testing those on synthetic
+inputs would only duplicate coverage.
+
+**What was missing — the integration seam at full size.** Two tests in
+`beta/runner/selfcheck.mjs` ("data outputs over the full fixture") drive the real
+selection→compose pipeline with all 12 repositories:
+
+- the composed book renders **one `.book-entry` and one `.book-toc__entry` per
+  selected repo**, every slug present in both, folios ascending and unique, a
+  cover page present, and every TOC page target within range;
+- all three export formats (`.md`/`.txt`/`.csv`) come back non-empty with the
+  right filename/extension/mime, the CSV parses to **header + 12 records**, and
+  the Markdown carries **12 numbered chapter sections**.
+
+`beta:selfcheck` is 20/20; the release gate stays 714/714.

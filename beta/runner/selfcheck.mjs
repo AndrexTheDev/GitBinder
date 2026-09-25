@@ -34,6 +34,8 @@ import { detectStatus } from '../../src/services/status.js';
 import { REPO_STATUS_IDS } from '../../src/config/app.js';
 import { DEMO_REPOS, DEMO_USER, fixtureFetch, SCENARIO_IDS } from './fixture.js';
 import { plan, validateMatrix } from './shoot.mjs';
+import { buildTextExport, EXPORT_FORMATS } from '../../src/book/export.js';
+import { createTranslator } from '../../src/i18n/index.js';
 
 const TOKEN = 'ghp_betafixturetoken0000000000000000';
 
@@ -528,6 +530,116 @@ describe('storage & session robustness', () => {
     } finally {
       app.destroy();
       env.cleanup();
+    }
+  });
+});
+
+/**
+ * Phase 2, step 3 — data outputs over the full fixture.
+ *
+ * Per-format export correctness (RFC-4180 escaping, BOM, CRLF) and book/PDF
+ * structure (running heads, folios, TOC page targets, hostile-URL safety) are
+ * already covered exhaustively by `tests/export.test.js` and `tests/book.test.js`
+ * on small synthetic inputs. This block covers the *integration seam* those
+ * cannot: the real selection→compose pipeline and all three export formats at
+ * the full 12-repository size, so a chapter can never silently drop out of the
+ * book or an export as the dataset grows.
+ */
+describe('data outputs over the full fixture', () => {
+  const { t } = createTranslator({ locale: 'en' });
+
+  /** Count RFC-4180 records (a quoted field may contain CRLF). */
+  function csvRecordCount(csv) {
+    const body = csv.replace(/^\uFEFF/, '');
+    let count = 0;
+    let inQuotes = false;
+    for (let i = 0; i < body.length; i += 1) {
+      const c = body[i];
+      if (c === '"') {
+        if (inQuotes && body[i + 1] === '"') i += 1;
+        else inQuotes = !inQuotes;
+      } else if (c === '\r' && body[i + 1] === '\n' && !inQuotes) {
+        count += 1;
+        i += 1;
+      }
+    }
+    return count; // trailing CRLF after the last record
+  }
+
+  async function mountAllVisible() {
+    const m = await mount('ok');
+    m.app.ctx.settings.batch(() => {
+      for (const r of m.app.ctx.session.state.repos) {
+        m.app.ctx.settings.state.repoOverrides[r.slug].visible = true;
+      }
+    });
+    return m;
+  }
+
+  test('the composed book covers every selected repository', async () => {
+    const { app, document, cleanup } = await mountAllVisible();
+    try {
+      app.ctx.settings.set('book', { preview: true });
+      app.components.bookPreview.compose();
+      const book = document.querySelector('#book-root');
+      assert.ok(book, 'book rendered');
+
+      const total = app.ctx.session.state.repos.length; // 12
+      const entries = [...book.querySelectorAll('.book-entry')];
+      const tocRows = [...book.querySelectorAll('.book-toc__entry')];
+      assert.equal(entries.length, total, 'one book entry per selected repo');
+      assert.equal(tocRows.length, total, 'one TOC row per selected repo');
+
+      const entrySlugs = new Set(entries.map((e) => e.dataset.slug));
+      const tocSlugs = new Set(tocRows.map((e) => e.dataset.slug));
+      for (const r of app.ctx.session.state.repos) {
+        assert.ok(entrySlugs.has(r.slug), `book entry missing ${r.slug}`);
+        assert.ok(tocSlugs.has(r.slug), `TOC row missing ${r.slug}`);
+      }
+
+      // Folios ascend and are unique; the cover carries none.
+      const folios = [...book.querySelectorAll('.book-run__center')].map((n) => Number(n.textContent));
+      assert.ok(folios.length > 0, 'folios present');
+      assert.deepEqual(folios, [...folios].sort((a, b) => a - b), 'folios ascend');
+      assert.equal(new Set(folios).size, folios.length, 'folios unique');
+      assert.ok(book.querySelector('.book-page--cover'), 'cover present');
+
+      // Every TOC page target points at a page that exists.
+      const maxPage = Math.max(...folios);
+      for (const row of tocRows) {
+        const p = Number(row.querySelector('.book-toc__page').textContent);
+        assert.ok(p >= 1 && p <= maxPage + 1, `TOC page ${p} out of range (max ${maxPage})`);
+      }
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('all three export formats list every selected chapter', async () => {
+    const { app, cleanup } = await mountAllVisible();
+    try {
+      const chapters = app.ctx.session.state.repos; // the same normalised repos the book uses
+      const total = chapters.length; // 12
+      const settings = app.ctx.settings.state;
+
+      for (const format of EXPORT_FORMATS) {
+        const res = buildTextExport(format.id, { settings, chapters, t, locale: 'en' });
+        assert.ok(res.content.length > 0, `${format.id}: empty export`);
+        assert.ok(res.filename.endsWith(`.${format.extension}`), `${format.id}: filename ${res.filename}`);
+        assert.equal(res.mime, format.mime, `${format.id}: mime`);
+      }
+
+      const csv = buildTextExport('csv', { settings, chapters, t, locale: 'en' }).content;
+      assert.equal(csvRecordCount(csv), total + 1, 'csv: header + one record per chapter');
+
+      const md = buildTextExport('markdown', { settings, chapters, t, locale: 'en' }).content;
+      const chapterHeads = (md.match(/^## \d+\. /gm) || []).length;
+      assert.equal(chapterHeads, total, 'markdown: one numbered section per chapter');
+
+      const txt = buildTextExport('text', { settings, chapters, t, locale: 'en' }).content;
+      assert.ok(txt.length > 0 && /01/.test(txt), 'text: numbered chapters present');
+    } finally {
+      cleanup();
     }
   });
 });
