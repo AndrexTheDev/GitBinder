@@ -8,7 +8,7 @@ prioritised by what a bug would cost a visitor.
 | Step | Theme | Status |
 | --- | --- | --- |
 | V3‑1 | Data-loss protection (export→import round-trip, legacy migration) | ✅ done — no data-loss; pinned by 2 integration tests |
-| V3‑2 | Cross-tab session sync (storage events across two live apps) | pending |
+| V3‑2 | Cross-tab session sync (storage events across two live apps) | ✅ done — a hide in tab A re-renders tab B |
 | V3‑3 | Selection combinatorics (search × sort × hide-forks × status, full fixture) | pending |
 | V3‑4 | Print/PDF page fidelity (catalogue packing over large sets) | pending |
 | V3‑5 | Cross-browser (Firefox/WebKit in CI) | pending |
@@ -39,3 +39,22 @@ so the test asserts the real key.
 No data-loss defect found — the round-trip and migration are correct. The value
 is the durable guarantee: `beta:selfcheck` is 32/32; the release gate stays
 714/714.
+
+## V3‑2 — Cross-tab sync ✅
+
+Two real `bootstrap()`s share one storage. Tab A hides a repository and calls
+`persistNow()`; the resulting `storage` event, delivered to Tab B's window exactly
+as the browser would, re-hydrates Tab B's store **and** re-renders its library.
+
+One correction while writing it: the repository manager lists *every* repository
+with an "include in book" checkbox, so hiding a repo removes it from the **book**
+but not from the manager list. The test therefore asserts the card's checkbox
+flips to unchecked (and the store updates), not that a card disappears.
+
+Also learned: `tests/helpers/dom.js` installs each environment's `window`/
+`document` as globals, so two live environments must be unwound in reverse order
+after letting debounced work settle — the test does this to avoid tearing down
+globals a still-live app needs.
+
+No sync defect found — the cross-tab path is correct. `beta:selfcheck` 33/33;
+the release gate stays 714/714.

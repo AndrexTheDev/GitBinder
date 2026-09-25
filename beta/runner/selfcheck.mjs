@@ -890,3 +890,60 @@ describe('data-loss protection (integration)', () => {
     }
   });
 });
+
+/**
+ * Phase 3, step 2 — cross-tab sync.
+ *
+ * Two real bootstraps share one storage. Tab A hides a repository and persists;
+ * the resulting `storage` event, delivered to Tab B's window, must re-hydrate
+ * Tab B's store *and* re-render its library — not just its state.
+ */
+describe('cross-tab sync (integration)', () => {
+  test('a hide in one tab re-renders another tab', async () => {
+    const storage = createMemoryStorage();
+    const envA = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const appA = bootstrap({ host: envA.document, storage, fetch: fixtureFetch('ok').impl });
+    const envB = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const appB = bootstrap({ host: envB.document, storage, fetch: fixtureFetch('ok').impl });
+    try {
+      appB.ctx.settings.set('githubUsername', DEMO_USER);
+      await appB.fetchRepos({ silent: true });
+      appB.components.library.flush();
+      assert.equal(envB.document.querySelectorAll('#library-root .repo-card').length, 12, 'tab B starts full');
+
+      // Tab A curates and persists to the shared storage.
+      appA.ctx.settings.set('githubUsername', DEMO_USER);
+      await appA.fetchRepos({ silent: true });
+      appA.ctx.settings.set(['repoOverrides', 'octodemo/gitbinder'], {
+        visible: false,
+        status: null,
+        shortDescription: null,
+        updatedAt: null,
+      });
+      appA.ctx.settings.persistNow();
+
+      // Deliver the change to tab B exactly like the browser would.
+      const key = appB.ctx.settings.meta.storageKey;
+      envB.window.dispatchEvent(
+        new envB.window.StorageEvent('storage', { key, newValue: storage.getItem(key) }),
+      );
+      await new Promise((r) => setTimeout(r, 120)); // let the cross-tab subscriber's debounced paint fire
+      appB.components.library.flush();
+
+      assert.equal(appB.ctx.settings.state.repoOverrides['octodemo/gitbinder'].visible, false, 'tab B state updated');
+      // The manager keeps every repo listed; visibility is the "include in book"
+      // checkbox, so the cross-tab change shows up there (and in the book count).
+      const box = envB.document.querySelector('.repo-card[data-slug="octodemo/gitbinder"] input[type="checkbox"]');
+      assert.ok(box, 'the gitbinder card is still listed');
+      assert.equal(box.checked, false, 'tab B re-rendered the card as excluded from the book');
+    } finally {
+      // Let debounced/async work flush while globals still point at a live DOM,
+      // then unwind environments in reverse so each destroy sees valid globals.
+      await new Promise((r) => setTimeout(r, 50));
+      appB.destroy();
+      envB.cleanup();
+      appA.destroy();
+      envA.cleanup();
+    }
+  });
+});
