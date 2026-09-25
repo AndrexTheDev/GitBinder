@@ -478,16 +478,30 @@ re-check rather than a dead end. Set `ADBLOCK_GATE.enabled = false` in
 
 ## Brand mark
 
-The mark lives in `public/brand/mark.svg` and is referenced — never inlined —
-from the navbar, the footer and the book cover, so the artwork exists once.
-`public/favicon.svg` is a deliberately simplified variant of the same drawing:
-a faithful illustration collapses into noise at 16 px, because the combed page
-edges, the stitching and the raised bands are all sub-pixel at favicon size.
-The detailed mark keeps them; the favicon drops them and keeps only what
-survives — silhouette, branch, navy-on-cream contrast.
+The mark is a bound book spine — page edges combed through the head, raised
+bands, dashed rules, `CODE & STORY`, a braided vine, and the imprint block at
+the foot. It lives in `public/brand/mark.svg` and is referenced — never
+inlined — from the navbar, the footer and the book cover, so the artwork exists
+once.
+
+Because the mark is a tall 1:3.34 column rather than a square badge, the three
+placements size it by height and take their width from `BRAND_MARK_RATIO`:
+44 px in the navbar (which makes it 13 px wide, reading as a deliberate
+vertical rule beside the wordmark), 28 px in the footer, and 34 mm on the A4
+cover. `tests/brand.test.js` asserts that the constant still matches the file
+it describes — a mismatch is a layout shift waiting to happen.
+
+`public/favicon.svg` is a **separate, simplified drawing**, not a scaled copy.
+At 16 px one SVG unit is about 0.07 px, so the comb, the stitching and both
+imprint lines collapse into the navy. The favicon keeps only what survives:
+silhouette, the two bands, a cream bar standing in for the lettering, and the
+stem with its nodes.
 
 Both files are plain SVG with no external references, so they stay sharp at any
-size, cost no request beyond the drawing itself, and satisfy the CSP.
+size, cost no request beyond the drawing itself, and satisfy the CSP. Text
+inside the mark is pinned with `textLength`, so the lockup keeps its layout
+instead of reflowing with whatever serif the system happens to offer — a
+sandbox with no fonts installed at all is how that one got noticed.
 
 ## Internationalisation
 
