@@ -1018,3 +1018,46 @@ describe('selection combinatorics (integration)', () => {
     }
   });
 });
+
+/**
+ * Phase 3, step 4 — print/PDF page fidelity over the full set.
+ *
+ * `tests/book.test.js` pins catalogue packing on small synthetic sets; this
+ * checks the invariant at the full 12-chapter size: every catalogue page holds
+ * one or two entries, a full-page entry is alone, and folios stay ascending and
+ * unique so the PDF cannot gain a blank or duplicated sheet.
+ */
+describe('print page fidelity (integration)', () => {
+  test('catalogue pages hold one or two entries, full-page entries alone', async () => {
+    const m = await mount('ok');
+    try {
+      m.app.ctx.settings.batch(() => {
+        for (const r of m.app.ctx.session.state.repos) {
+          m.app.ctx.settings.state.repoOverrides[r.slug].visible = true;
+        }
+      });
+      m.app.ctx.settings.set('book', { preview: true });
+      m.app.components.bookPreview.compose();
+      const book = m.document.querySelector('#book-root');
+
+      const pages = [...book.querySelectorAll('.book-page')];
+      let entryPages = 0;
+      for (const page of pages) {
+        const entries = page.querySelectorAll('.book-entry');
+        if (entries.length === 0) continue; // cover / TOC
+        entryPages += 1;
+        assert.ok(entries.length <= 2, `a catalogue page holds ${entries.length} entries (> 2)`);
+        if (page.querySelector('.book-entry--full')) {
+          assert.equal(entries.length, 1, 'a full-page entry must be alone on its sheet');
+        }
+      }
+      assert.ok(entryPages > 0, 'catalogue pages were rendered');
+
+      const folios = [...book.querySelectorAll('.book-run__center')].map((n) => Number(n.textContent));
+      assert.deepEqual(folios, [...folios].sort((a, b) => a - b), 'folios ascend');
+      assert.equal(new Set(folios).size, folios.length, 'folios are unique (no duplicated sheet)');
+    } finally {
+      m.cleanup();
+    }
+  });
+});

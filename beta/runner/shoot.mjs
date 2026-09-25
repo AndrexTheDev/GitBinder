@@ -794,9 +794,9 @@ async function main() {
     return;
   }
 
-  let chromium;
+  let pw;
   try {
-    ({ chromium } = await import('playwright'));
+    pw = await import('playwright');
   } catch {
     console.error(
       'playwright is not installed here.\n' +
@@ -806,13 +806,20 @@ async function main() {
     );
     process.exit(3);
   }
+  const browserName = process.env.GB_BROWSER || 'chromium';
+  const launcher = pw[browserName];
+  if (!launcher) {
+    console.error(`unknown GB_BROWSER "${browserName}" (use chromium | firefox | webkit)`);
+    process.exit(3);
+  }
 
   rmSync(args.out, { recursive: true, force: true });
   mkdirSync(args.out, { recursive: true });
 
-  const browser = await chromium.launch({
+  const browser = await launcher.launch({
     headless: !args.headed,
-    args: ['--force-color-profile=srgb', '--font-render-hinting=none'],
+    // The srgb/hinting flags are Chromium-only; other engines ignore or reject them.
+    ...(browserName === 'chromium' ? { args: ['--force-color-profile=srgb', '--font-render-hinting=none'] } : {}),
   });
 
   const results = [];

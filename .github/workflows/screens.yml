@@ -100,3 +100,59 @@ jobs:
           fi
           git commit -m "Beta screenshot matrix — $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
           git push origin HEAD
+
+  # Cross-browser confidence: render the same matrix on Firefox and WebKit.
+  # Informational (continue-on-error) and does NOT commit — Chromium remains the
+  # reference whose shots are committed; this job surfaces engine deltas as an
+  # artifact so a benign rendering difference never blocks the branch.
+  crossbrowser:
+    name: Cross-browser (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build the static bundle
+        run: npm run build
+
+      - name: Install Playwright + ${{ matrix.browser }}
+        run: |
+          npm i --no-save playwright@1.63.0
+          npx playwright@1.63.0 install --with-deps ${{ matrix.browser }}
+
+      - name: Serve dist/
+        run: |
+          npm run preview &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:4173/ > /dev/null && echo "preview up" && exit 0
+            sleep 1
+          done
+          echo "preview never came up" >&2
+          exit 1
+
+      - name: Render the matrix on ${{ matrix.browser }}
+        run: |
+          GB_BROWSER=${{ matrix.browser }} node beta/runner/shoot.mjs \
+            --base http://127.0.0.1:4173 \
+            --out "beta/shots-${{ matrix.browser }}"
+
+      - name: Upload the cross-browser matrix
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beta-shots-${{ matrix.browser }}
+          path: beta/shots-${{ matrix.browser }}
+          retention-days: 14
+          if-no-files-found: warn

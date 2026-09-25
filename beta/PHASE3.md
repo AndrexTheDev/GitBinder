@@ -10,7 +10,7 @@ prioritised by what a bug would cost a visitor.
 | V3‑1 | Data-loss protection (export→import round-trip, legacy migration) | ✅ done — no data-loss; pinned by 2 integration tests |
 | V3‑2 | Cross-tab session sync (storage events across two live apps) | ✅ done — a hide in tab A re-renders tab B |
 | V3‑3 | Selection combinatorics (search × sort × hide-forks, full fixture) | ✅ done — every combo yields the exact subset |
-| V3‑4 | Print/PDF page fidelity (catalogue packing over large sets) | pending |
+| V3‑4 | Print/PDF page fidelity (catalogue packing over large sets) | ✅ done — packing invariant holds at full size |
 | V3‑5 | Cross-browser (Firefox/WebKit in CI) | pending |
 
 ---
@@ -70,3 +70,13 @@ no-match search yields the empty state with zero cards.
 
 No defect found — the selection pipeline composes correctly. `beta:selfcheck`
 35/35; the release gate stays 714/714.
+
+## V3‑4 — Print/PDF page fidelity ✅
+
+`tests/book.test.js` pins catalogue packing on small synthetic inputs. This
+checks the invariant at the full 12-chapter size: every catalogue sheet holds
+**one or two** entries, a `--full` entry is **alone** on its sheet, and folios
+stay ascending and unique (no blank or duplicated sheet). Holds for the full
+set — the packing algorithm does not degrade as the book grows.
+
+`beta:selfcheck` 36/36; the release gate stays 714/714.
