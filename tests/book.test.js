@@ -306,6 +306,66 @@ describe('renderBook', () => {
     assert.deepEqual(hrefs, ['https://github.com/octo/alpha']);
   });
 
+  test('repository text is typeset as text, whatever it contains', async () => {
+    // The homepage test above covers the URL vector. This one covers the other
+    // half: a repository's name, description, topics and licence all arrive
+    // from the GitHub API, so a book generated from someone else's account
+    // contains strings its owner chose. They are rendered as text nodes, which
+    // is why markup in them has to come out as visible characters rather than
+    // as elements.
+    const { composeBook, renderBook } = await load();
+    const EVIL = '<script>window.__pwned=1</script><img src=x onerror="window.__pwned=2">';
+
+    const book = composeBook({
+      chapters: [
+        chapter({
+          name: EVIL,
+          shortDescription: EVIL,
+          description: EVIL,
+          language: '<b>TypeScript</b>',
+          topics: [EVIL],
+          license: { spdx_id: 'MIT', name: EVIL },
+        }),
+      ],
+      settings: { ...SETTINGS, bookTitle: EVIL, authorName: EVIL, authorBio: EVIL },
+      i18n,
+      t,
+      now: NOW,
+    });
+    const el = renderBook(book, { t });
+
+    // 1. Nothing executable was created.
+    for (const tag of ['script', 'iframe', 'object', 'embed', 'svg', 'form', 'style']) {
+      assert.equal(el.querySelectorAll(tag).length, 0, `an injected <${tag}> appeared`);
+    }
+
+    // 2. No event-handler attribute, on any node, anywhere.
+    for (const node of el.querySelectorAll('*')) {
+      for (const attribute of node.attributes) {
+        assert.equal(
+          /^on/i.test(attribute.name),
+          false,
+          `an injected ${attribute.name} handler survived on <${node.tagName.toLowerCase()}>`,
+        );
+      }
+    }
+
+    // 3. `<img>` is allowed only for the cover mark, which the app owns.
+    for (const image of el.querySelectorAll('img')) {
+      assert.equal(image.getAttribute('src'), '/brand/mark.svg');
+    }
+
+    // 4. Every link is still a real, safe address.
+    for (const link of el.querySelectorAll('[href]')) {
+      assert.match(link.getAttribute('href'), /^(https?:|mailto:)/);
+    }
+
+    // 5. And the markup is visible as characters, so nothing was silently
+    //    swallowed on the way to the page.
+    assert.ok(el.textContent.includes('<script>'), 'the markup vanished instead of being escaped');
+    assert.equal(window.__pwned, undefined, 'injected code ran');
+  });
+
   test('the catalogue holds one or two projects per page', async () => {
     const { el } = await build(14);
     for (const page of el.querySelectorAll('.book-page--catalog')) {
