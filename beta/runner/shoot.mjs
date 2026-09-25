@@ -366,6 +366,20 @@ async function universalChecks(page) {
             .filter((entry) => entry.after < entry.before)
         : [];
 
+    /** When the navbar is the culprit, list its widest descendants, no filter. */
+    const navkids =
+      layers.some((l) => l.sel === '#navbar-root')
+        ? [...document.querySelectorAll('#navbar-root *')]
+            .map((el) => {
+              const rect = el.getBoundingClientRect();
+              return { el, w: Math.round(rect.width), right: Math.round(rect.right), left: Math.round(rect.left) };
+            })
+            .filter((e) => e.w > 0)
+            .sort((a, b) => b.right - a.right)
+            .slice(0, 8)
+            .map((e) => `<${e.el.tagName.toLowerCase()}.${(e.el.getAttribute('class') || '').split(/\s+/).slice(0, 4).join('.')}> l=${e.left} w=${e.w} r=${e.right}`)
+        : [];
+
     /** Elements spilling past the right edge — actionable overflow evidence. */
     const wide =
       root.scrollWidth > window.innerWidth
@@ -391,6 +405,7 @@ async function universalChecks(page) {
       altless,
       wide,
       layers,
+      navkids,
     };
   });
 
@@ -403,6 +418,7 @@ async function universalChecks(page) {
       code: 'horizontal-overflow',
       message: `content is ${metrics.scrollWidth}px wide in a ${metrics.innerWidth}px viewport` +
         (metrics.wide.length ? ` — widest: ${metrics.wide.join('; ')}` : '') +
+        (metrics.navkids.length ? ` — navbar: ${metrics.navkids.join('; ')}` : '') +
         layerNote,
     });
   }
