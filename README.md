@@ -17,6 +17,12 @@ The shell, i18n, state layer, GitHub integration, repository manager, the Classi
 PDF composer, the donations and legal surfaces, **text exports, per-project notes and the
 ad-blocker gate** are in.
 
+The project has since been audited module by module for release: every module under
+`src/` was read against its tests, and the findings were fixed rather than noted. The
+release gate is `npm test` — 384 tests, including `tests/deploy.test.js`, which fails on
+any drift between the Pages project name, the deployed origin, the sitemap, the
+canonical URL and the Node pin.
+
 | Area | State |
 | --- | --- |
 | Vite + Tailwind v4 + Lucide static build | ✅ |
@@ -40,6 +46,7 @@ ad-blocker gate** are in.
 | **Per-project notes that survive a re-fetch** | ✅ |
 | **Ad-blocker gate with a friendly, re-checkable notice** | ✅ |
 | GitBinder brand mark (navbar, footer, book cover, favicon) | ✅ |
+| **Release audit, module by module, with the deploy gate in `npm test`** | ✅ |
 
 ---
 
@@ -53,7 +60,7 @@ npm run dev       # http://localhost:5173  (binds 0.0.0.0 for container/preview 
 Other scripts:
 
 ```bash
-npm test          # 101 unit + smoke tests (node:test, no browser needed)
+npm test          # the whole suite (node:test, no browser needed)
 npm run build     # static bundle → dist/
 npm run preview   # serve dist/ locally
 npm run deploy    # build + `wrangler pages deploy dist`
@@ -624,7 +631,7 @@ The suite includes a regression test for repository names containing a dot
    `tests/deploy.test.js` cross-checks the project name against `LINKS.deployed`,
    so a rename cannot leave the book crediting a host that does not exist.
 
-Watch out for three things that fail silently rather than loudly:
+Watch out for four things that fail silently rather than loudly:
 
 - **A deploy without `--branch=main` is a preview, not a release.** The live
   host keeps serving the previous build and nothing in the output says so.
@@ -633,6 +640,11 @@ Watch out for three things that fail silently rather than loudly:
   the environment variable may not win. `.nvmrc` is the reliable pin.
 - **A `_redirects` file breaks the deploy** rather than fixing routing; see the
   note above.
+- **`NODE_ENV=production` in the dashboard breaks the build.** Cloudflare runs
+  `npm ci` first, and that variable makes npm skip devDependencies — which is
+  where Vite lives, so the build stops with `vite: not found` before it reaches
+  any of this code. `.npmrc` pins `include=dev` so the deploy works with or
+  without it (`tests/deploy.test.js` fails if that file goes away).
 
 ---
 

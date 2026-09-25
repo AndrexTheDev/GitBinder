@@ -70,6 +70,21 @@ test('the pinned Node version satisfies every engine requirement', () => {
  * Build output
  * -------------------------------------------------------------------------- */
 
+test('the install keeps devDependencies even under NODE_ENV=production', () => {
+  // The build runs `npm ci` first, and Vite — the thing that does the building
+  // — is a devDependency. A `NODE_ENV=production` in the Pages dashboard makes
+  // npm omit those, and the build then fails with "vite: not found" before it
+  // ever reads this repository's code. `.npmrc` pins `include=dev` so the
+  // deploy does not depend on a variable somebody might set later.
+  assert.ok(has('.npmrc'), 'the .npmrc that protects the install is missing');
+  const npmrc = read('.npmrc');
+  assert.match(npmrc, /^include\s*=\s*dev$/m, 'include=dev is not set in .npmrc');
+
+  // Vite really is a devDependency, which is what makes this worth guarding.
+  const pkg = JSON.parse(read('package.json'));
+  assert.ok(pkg.devDependencies?.vite, 'vite is no longer a devDependency — this test can be retired');
+});
+
 test('the build writes to dist/ and nothing else', () => {
   const pkg = JSON.parse(read('package.json'));
   assert.equal(pkg.scripts.build, 'vite build');
