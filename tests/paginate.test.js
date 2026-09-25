@@ -17,6 +17,7 @@ import assert from 'node:assert/strict';
 
 import {
   countEntryLinks,
+  countNoteLines,
   estimateEntryHeight,
   groupByStatus,
   isFullPageEntry,
@@ -338,5 +339,74 @@ describe('paginateBook', () => {
     const a = JSON.stringify(paginateBook(chapters).pages.map((page) => page.entries.map((entry) => entry.slug)));
     const b = JSON.stringify(paginateBook(chapters).pages.map((page) => page.entries.map((entry) => entry.slug)));
     assert.equal(a, b);
+  });
+});
+
+/* -------------------------------------------------------------------------- *
+ * Notes
+ * -------------------------------------------------------------------------- */
+
+describe('countNoteLines — the space a notes block really needs', () => {
+  // This is the function that decides whether the last entry on a sheet spills
+  // over the bottom edge. It was exported and documented but never exercised,
+  // which is the wrong way round for the one number that turns typed text into
+  // reserved millimetres.
+  const W = BOOK_WEIGHTS;
+
+  test('an empty note still reserves the ruled lines to write on', () => {
+    // Notes print as ruled lines for a pen or a PDF editor, so "no text" is
+    // not "no height". Getting this wrong drops the ruled block off the page.
+    for (const empty of [null, undefined, '', '   ', '\n\n', '\t']) {
+      assert.equal(countNoteLines(empty, W), BOOK_LIMITS.noteLines, `wrong reserve for ${JSON.stringify(empty)}`);
+    }
+  });
+
+  test('explicit newlines count, because three short lines are three lines', () => {
+    assert.equal(countNoteLines('one', W), 1);
+    assert.equal(countNoteLines('one\ntwo\nthree', W), 3);
+    assert.equal(countNoteLines('one\n\ntwo', W), 3, 'a blank line in the middle still occupies a line');
+  });
+
+  test('a stray newline at either end is not charged for', () => {
+    // The textarea is free-form, so a leading or trailing newline is a slip of
+    // the keyboard rather than a deliberate blank line. It must not cost a
+    // ruled line of page height — otherwise the reserve depends on invisible
+    // whitespace. Trimming also keeps the empty case honest: '\n\n' is still
+    // "no notes", so it still prints the ruled block.
+    assert.equal(countNoteLines('\n\none\ntwo', W), 2, 'leading blank lines are trimmed');
+    assert.equal(countNoteLines('one\ntwo\n\n', W), 2, 'trailing blank lines are trimmed');
+    assert.equal(countNoteLines('\n\nonly\n\n', W), 1);
+  });
+
+  test('a long line wraps at the characters the ruler holds', () => {
+    const per = W.notesCharsPerLine;
+    assert.equal(countNoteLines('x'.repeat(per), W), 1, 'exactly full is still one line');
+    assert.equal(countNoteLines('x'.repeat(per + 1), W), 2);
+    assert.equal(countNoteLines('x'.repeat(per * 2), W), 2);
+    assert.equal(countNoteLines('x'.repeat(per * 2 + 1), W), 3);
+  });
+
+  test('wrapping and newlines add up', () => {
+    const per = W.notesCharsPerLine;
+    assert.equal(countNoteLines('x'.repeat(per) + '\ny', W), 2);
+    assert.equal(countNoteLines('x'.repeat(per + 1) + '\ny', W), 3);
+  });
+
+  test('the longest note the app accepts still fits a page', () => {
+    // The textarea allows BOOK_LIMITS.notesChars. Whatever it holds has to be
+    // expressible as lines that the paginator can reserve — a note taller than
+    // a whole content box could never be laid out at all.
+    const longest = 'x'.repeat(BOOK_LIMITS.notesChars);
+    const lines = countNoteLines(longest, W);
+    const mm = lines * W.entryNoteLineMm + W.entryNotesPadMm + W.entryNotesLabelMm;
+
+    assert.ok(lines > BOOK_LIMITS.noteLines, 'a full-length note should need more than the ruled baseline');
+    assert.ok(mm < CONTENT_H, `a full-length note needs ${mm} mm, more than a page`);
+  });
+
+  test('never returns less than one line for text that exists', () => {
+    for (const text of ['a', '.', ' ', 'x\ny']) {
+      assert.ok(countNoteLines(text, W) >= 1);
+    }
   });
 });
