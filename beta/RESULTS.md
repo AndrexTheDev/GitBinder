@@ -109,6 +109,10 @@ artefacts (F-04).
 | M15 A11y / responsive | 5 | 1 | F-03 at 320 px; skip-link + focus trap green |
 | M16 Persistence | 3 | 0 | ✅ reload, migration, import |
 
+**Final matrix (after F-03.2 tooltip fix): 70/70 captures pass, 0 failed,
+0 warnings — every row above is 0 failed.** `beta/shots/REPORT.md` is the
+authoritative, regenerated record.
+
 ### Findings (continued)
 
 **F-03 · Horizontal overflow on narrow viewports — the repo card's right column**
@@ -143,13 +147,15 @@ on phones.
    wrap (`min-w-0 flex-wrap justify-end`). Verified: the card/header offenders
    disappeared from the matrix.
 
-2. *Navbar — open, precisely localised.* The runner's layer diagnosis shows that
-   on every ≤ 390 px capture, hiding `#navbar-root` alone drops `scrollWidth`
-   from ~425 px to exactly 390 px — the navbar is the remaining constant
-   overflow. An icon-only-Fetch attempt *regressed* it (425→451) and was
-   reverted; the navbar needs an interactive pass to compress its
-   wordmark+EN/DE+actions row without removing affordances. Kept as an open,
-   reproducible finding rather than guessed at blind.
+2. *Navbar — fixed.* The layer diagnosis localised it to `#navbar-root`, and a
+   descendant dump then showed **no navbar child wider than the viewport** —
+   the culprit was the navbar buttons' `data-tooltip` pseudo-elements:
+   `position:absolute; width:max-content` and hidden only via `opacity:0`, so an
+   invisible "Fetch repositories" tooltip still widened the document's
+   scrollable overflow by ~35 px on every phone. Fix in `styles/components.css`:
+   hidden tooltips are now `display:none` until `:hover`/`:focus-visible`.
+   Verified by a full re-render: **70/70 captures pass, 0 failed, 0 warnings** —
+   every module (M01–M16) is green at all viewports and both locales.
 
 **F-04 · The ad-block gate did NOT crash — the first pilot's M14 failure was the
 runner** — severity: n/a (correction), module: M14, status: resolved (harness).
