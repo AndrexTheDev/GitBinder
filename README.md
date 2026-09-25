@@ -19,7 +19,7 @@ ad-blocker gate** are in.
 
 The project has since been audited module by module for release: every module under
 `src/` was read against its tests, and the findings were fixed rather than noted. The
-release gate is `npm test` — 687 tests across 34 suites, including `tests/deploy.test.js`,
+release gate is `npm test` — 714 tests across 35 suites, including `tests/deploy.test.js`,
 which fails on any drift between the Pages project name, the deployed origin, the sitemap,
 the canonical URL and the Node pin.
 
@@ -578,7 +578,7 @@ which drives the real components against a stubbed GitHub API.
 npm test
 ```
 
-687 tests across 34 suites. They run on Node's own test runner — no framework, no
+714 tests across 35 suites. They run on Node's own test runner — no framework, no
 configuration — and the whole app boots inside them, so a break anywhere from the
 GitHub parser to the print stylesheet fails the same command:
 
@@ -650,6 +650,9 @@ GitHub parser to the print stylesheet fails the same command:
 - `tests/a11y.test.js` — accessible names and roles on the booted application.
 - `tests/icons.test.js` — every icon name the code asks for is registered (a typo renders
   a blank square and one console line, nothing more), and all of them draw.
+- `tests/fields.test.js` — the form primitives: a visible label really is associated with
+  its control, ids are minted rather than written, a focused field is not overwritten by
+  a re-render, and an error marks the input it belongs to.
 - `tests/formatting.test.js`, `tests/utils.test.js`, `tests/timing.test.js`,
   `tests/file.test.js` — the `Intl`-backed formatters, the object helpers, the debounce
   and throttle, and every route out of the app that produces a file download.
