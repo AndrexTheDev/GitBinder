@@ -364,7 +364,7 @@ export default {
       validSimple: 'Connected as {login}',
       invalid: 'GitHub rejected this token.',
       stored: 'Stored on this device',
-      empty: 'No token stored — public repositories only.',
+      empty: 'No token stored',
       securityNote:
         'The token is obfuscated with a device key before it is written to localStorage, never sent anywhere except api.github.com, and removed when you clear local data. Obfuscation is not encryption: on a shared computer, prefer leaving the field empty.',
       removedOnExport: 'Exports omit the token unless you explicitly enable it below.',

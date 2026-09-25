@@ -155,3 +155,19 @@ pluralisation") assert the singular at one and the plural above one, in English
 and German.
 
 `beta:selfcheck` is 28/28; the release gate stays 714/714 (locale parity intact).
+
+## Cosmetic follow-ups ✅
+
+The two notes left open from the visual review are now fixed:
+
+- **Token badge clipped the drawer's right edge** — the empty-state badge showed
+  the full sentence "No token stored — public repositories only." in a narrow
+  chip. Shortened to "No token stored" / "Kein Token gespeichert" (the
+  public-only nuance already lives in the field's placeholder and hint). A test
+  guards the length so it cannot grow back into an overflow.
+- **Pre-existing toasts kept their language after a locale switch** — a toast's
+  text is translated when pushed, so it cannot follow a later switch. The app now
+  clears the toast stack on a locale change (`i18n.onChange`) instead of leaving
+  stale-language messages; new toasts use the new locale. Pinned by a test.
+
+`beta:selfcheck` is 30/30; the release gate stays 714/714.

@@ -360,7 +360,7 @@ export default {
       validSimple: 'Verbunden als {login}',
       invalid: 'GitHub hat dieses Token abgelehnt.',
       stored: 'Auf diesem Gerät gespeichert',
-      empty: 'Kein Token gespeichert — nur öffentliche Repositories.',
+      empty: 'Kein Token gespeichert',
       securityNote:
         'Das Token wird vor dem Schreiben in den localStorage mit einem Geräteschlüssel verschleiert, ausschließlich an api.github.com gesendet und beim Löschen der lokalen Daten entfernt. Verschleierung ist keine Verschlüsselung: Lass das Feld auf gemeinsamen Rechnern lieber leer.',
       removedOnExport: 'Exporte lassen das Token weg, sofern du es unten nicht ausdrücklich aktivierst.',

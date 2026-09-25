@@ -793,3 +793,27 @@ describe('i18n pluralisation', () => {
     assert.equal(de('library.loading.count', { count: 1 }), 'Bisher 1 Repository geladen …');
   });
 });
+
+/** Phase 2, cosmetic follow-ups. */
+describe('cosmetic follow-ups', () => {
+  test('switching language clears stale toasts instead of leaving them untranslated', async () => {
+    const { app, cleanup } = await mount('ok');
+    try {
+      app.toaster.push({ message: 'Saved', tone: 'success' });
+      assert.ok(app.toaster.count >= 1, 'a toast is showing');
+      app.ctx.i18n.setLocale('de');
+      assert.equal(app.toaster.count, 0, 'stale toasts cleared on language switch');
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('the empty-token badge is short enough to fit the drawer', async () => {
+    const en = createTranslator({ locale: 'en' }).t;
+    const de = createTranslator({ locale: 'de' }).t;
+    // The badge sits in a narrow row; the old value was a full sentence that
+    // overflowed the drawer's right edge. Keep it a short status chip.
+    assert.ok(en('settings.token.empty').length <= 24, `EN badge too long: "${en('settings.token.empty')}"`);
+    assert.ok(de('settings.token.empty').length <= 28, `DE badge too long: "${de('settings.token.empty')}"`);
+  });
+});
