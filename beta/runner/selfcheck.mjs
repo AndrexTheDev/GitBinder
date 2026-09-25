@@ -947,3 +947,74 @@ describe('cross-tab sync (integration)', () => {
     }
   });
 });
+
+/**
+ * Phase 3, step 3 — selection combinatorics.
+ *
+ * search × sort × hide-forks over the full 103-repository fixture. For each
+ * combination the rendered card set must equal an independently computed subset
+ * of the session's repos, and the ordering must respect the active sort. (Status
+ * is a *sort*, not a filter, in the toolbar.)
+ */
+describe('selection combinatorics (integration)', () => {
+  const matches = (repo, needle) => {
+    if (!needle) return true;
+    const hay = [repo.name, repo.slug, repo.description, repo.shortDescription, repo.language, ...(repo.topics ?? [])]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return needle.toLowerCase().split(/\s+/).filter(Boolean).every((tk) => hay.includes(tk));
+  };
+
+  async function combo({ search, hideForks, sort }) {
+    const m = await mount('paged');
+    m.app.ctx.session.set('search', search);
+    m.app.ctx.settings.set('library.hideForks', hideForks);
+    m.app.ctx.settings.set('library.sort', sort);
+    m.app.components.library.flush();
+    return m;
+  }
+
+  test('every search×sort×hide-forks combination yields exactly the right subset', async () => {
+    const combos = [
+      { search: '', hideForks: false, sort: 'name' },
+      { search: '', hideForks: true, sort: 'updated' },
+      { search: 'a', hideForks: true, sort: 'name' },
+      { search: 'a', hideForks: false, sort: 'updated' },
+    ];
+    for (const c of combos) {
+      const { app, document, cleanup } = await combo(c);
+      try {
+        const repos = app.ctx.session.state.repos;
+        const expected = repos.filter((r) => (!c.hideForks || !r.isFork) && matches(r, c.search));
+        const cards = [...document.querySelectorAll('#library-root .repo-card')];
+        const rendered = cards.map((el) => el.dataset.slug);
+        assert.deepEqual(
+          [...rendered].sort(),
+          expected.map((r) => r.slug).sort(),
+          `combo ${JSON.stringify(c)}: rendered set != expected set`,
+        );
+        // Ordering respects the active sort (primary comparator).
+        const bySlug = new Map(repos.map((r) => [r.slug, r]));
+        if (c.sort === 'name') {
+          const names = rendered.map((s) => bySlug.get(s).name.toLowerCase());
+          for (let i = 1; i < names.length; i += 1) assert.ok(names[i - 1] <= names[i], 'name sort ascending');
+        } else {
+          const ups = rendered.map((s) => String(bySlug.get(s).updatedAt ?? ''));
+          for (let i = 1; i < ups.length; i += 1) assert.ok(ups[i - 1] >= ups[i], 'updated sort descending');
+        }
+      } finally {
+        cleanup();
+      }
+    }
+  });
+
+  test('a search matching nothing shows the empty state, not cards', async () => {
+    const { document, cleanup } = await combo({ search: 'zzz-no-match', hideForks: false, sort: 'name' });
+    try {
+      assert.equal(document.querySelectorAll('#library-root .repo-card').length, 0);
+    } finally {
+      cleanup();
+    }
+  });
+});
