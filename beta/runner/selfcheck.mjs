@@ -817,3 +817,76 @@ describe('cosmetic follow-ups', () => {
     assert.ok(de('settings.token.empty').length <= 28, `DE badge too long: "${de('settings.token.empty')}"`);
   });
 });
+
+/**
+ * Phase 3, step 1 — data-loss protection (the app's own backup path).
+ *
+ * A bug here costs a visitor their curated book, so the export→import
+ * round-trip and the legacy-schema migration are exercised end to end through
+ * the real bootstrap, not just on synthetic stores.
+ */
+describe('data-loss protection (integration)', () => {
+  test('export then import round-trips the curated book, without leaking the token', async () => {
+    const source = await mount('ok');
+    try {
+      source.app.ctx.settings.set(['repoOverrides', 'octodemo/gitbinder'], {
+        visible: true,
+        status: 'live',
+        shortDescription: 'Curated summary',
+        updatedAt: null,
+        notes: 'Keep this line',
+      });
+      source.app.ctx.settings.set('customBookTitle', 'My Backup');
+      source.app.ctx.settings.set('personalAccessToken', 'ghp_secretdonotleak00000000000000');
+
+      const payload = source.app.ctx.settings.exportJSON();
+      const serialized = JSON.stringify(payload);
+      assert.ok(!serialized.includes('ghp_secretdonotleak'), 'the export must not contain the token');
+
+      // A fresh browser profile imports the backup.
+      const env = createDomEnvironment({ languages: ['en-US', 'en'] });
+      const storage = createMemoryStorage();
+      const app2 = bootstrap({ host: env.document, storage, fetch: fixtureFetch('ok').impl });
+      try {
+        const result = app2.ctx.settings.importJSON(payload, { merge: false });
+        assert.equal(result.ok, true, 'import accepted the export');
+        await new Promise((r) => setTimeout(r, 50));
+        const back = app2.ctx.settings.state.repoOverrides['octodemo/gitbinder'];
+        assert.equal(back.shortDescription, 'Curated summary', 'description survived the round-trip');
+        assert.equal(back.notes, 'Keep this line', 'notes survived the round-trip');
+        assert.equal(back.status, 'live', 'status survived the round-trip');
+        assert.equal(app2.ctx.settings.state.customBookTitle, 'My Backup', 'book title survived');
+      } finally {
+        app2.destroy();
+        env.cleanup();
+      }
+    } finally {
+      source.cleanup();
+    }
+  });
+
+  test('a version-0 (bare) persisted state is migrated, not discarded', async () => {
+    const storage = createMemoryStorage();
+    storage.setItem(
+      'gitbinder:state',
+      JSON.stringify({
+        githubUsername: DEMO_USER,
+        repoOverrides: {
+          'octodemo/gitbinder': { visible: true, status: 'live', shortDescription: 'Old book', updatedAt: null },
+        },
+      }),
+    );
+    const env = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const app = bootstrap({ host: env.document, storage, fetch: fixtureFetch('ok').impl });
+    try {
+      const override = app.ctx.settings.state.repoOverrides['octodemo/gitbinder'];
+      assert.ok(override, 'the legacy override survived boot');
+      assert.equal(override.shortDescription, 'Old book', 'the legacy description is preserved');
+      assert.equal(app.ctx.settings.state.githubUsername, DEMO_USER, 'username preserved');
+      await new Promise((r) => setTimeout(r, 50));
+    } finally {
+      app.destroy();
+      env.cleanup();
+    }
+  });
+});
