@@ -643,3 +643,55 @@ describe('data outputs over the full fixture', () => {
     }
   });
 });
+
+/**
+ * Phase 2, step 4 — accessibility, the parts jsdom can actually verify.
+ *
+ * Contrast and full axe rules need a real rendering engine, so they belong in
+ * the browser run, not here. What jsdom *can* prove is the behaviour screen
+ * readers depend on and that no static check catches: that an overlay really
+ * moves focus in and hands it back, and that the shell carries the landmarks
+ * and live region the announcements ride on.
+ */
+describe('accessibility behaviour (integration)', () => {
+  test('the settings drawer takes focus on open and returns it on close', async () => {
+    const { app, document, cleanup } = await mount('ok');
+    try {
+      const trigger = document.querySelector('a.skip-link');
+      assert.ok(trigger, 'a skip link exists to act as the opener');
+      trigger.focus();
+      assert.equal(document.activeElement, trigger, 'opener focused before opening');
+
+      app.components.settingsDrawer.open();
+      await new Promise((r) => setTimeout(r, 150));
+      const dialog = document.querySelector('[role="dialog"][aria-modal="true"]');
+      assert.ok(dialog, 'a modal dialog opened');
+      assert.ok(dialog.contains(document.activeElement), 'focus moved into the dialog');
+
+      // Close through the component (the overlay's Escape handler is bound to the
+      // window that existed at module-import time, so a synthetic Escape on this
+      // test's window would not reach it — that path is covered in the browser
+      // matrix). close() restores focus synchronously.
+      app.components.settingsDrawer.close();
+      assert.equal(document.querySelector('[role="dialog"][aria-modal="true"]'), null, 'dialog removed on close');
+      assert.equal(document.activeElement, trigger, 'focus returned to the opener');
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('the shell carries landmarks, a skip link and a polite live region', async () => {
+    const { document, cleanup } = await mount('ok');
+    try {
+      assert.ok(document.querySelector('main#main'), 'a <main> landmark exists');
+      assert.ok(document.querySelector('nav'), 'a <nav> landmark exists');
+      assert.ok(document.querySelector('a.skip-link[href="#main"]'), 'the skip link targets #main');
+      assert.ok(
+        document.querySelector('#toast-root[role="status"][aria-live="polite"]'),
+        'toasts are announced through a polite live region',
+      );
+    } finally {
+      cleanup();
+    }
+  });
+});

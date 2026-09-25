@@ -13,7 +13,7 @@ gate or in `beta:selfcheck`, which CI runs) so a regression cannot slip back in.
 | P2‑1 | Security / output escaping (XSS, `javascript:` hrefs) | ✅ done — found & fixed one real vuln |
 | P2‑2 | Storage & session robustness (corrupt/quota, fetch races, Unicode) | ✅ done — no new defects; pinned by 4 integration tests |
 | P2‑3 | Data-output correctness (PDF structure, full-fixture export round-trips) | ✅ done — integration seam pinned; per-format/PDF already unit-covered |
-| P2‑4 | Accessibility deep-dive (axe-core in CI, contrast, focus order) | pending |
+| P2‑4 | Accessibility deep-dive (focus behaviour, landmarks, live region) | ✅ done — jsdom-verifiable behaviour pinned; contrast/axe belong to the browser run |
 | P2‑5 | Performance (100+ repos render, bundle budget, debounce) | pending |
 | P2‑6 | i18n polish (plurals, date formats, long DE strings) | pending |
 
@@ -94,3 +94,31 @@ selection→compose pipeline with all 12 repositories:
   the Markdown carries **12 numbered chapter sections**.
 
 `beta:selfcheck` is 20/20; the release gate stays 714/714.
+
+## P2‑4 — Accessibility ✅
+
+**Audit.** `tests/a11y.test.js` already pins accessible names (shell + drawer +
+every card), label/control association, alt text, valid ARIA references,
+document language/title, unique ids and per-locale control names. The shared
+`ui/Overlay.js` is correctly built: `role="dialog"` + `aria-modal`, focus moved
+in (via `requestAnimationFrame`) and trapped (Tab/Shift-Tab cycle), a stacked
+`Escape` handler, and focus returned to the opener on close. `index.html`
+carries a `skip-link`, a `<main id="main">` landmark and a `#toast-root`
+`role="status" aria-live="polite"` region.
+
+**What jsdom can additionally prove** (and no static check catches) — two
+integration tests in `beta/runner/selfcheck.mjs` ("accessibility behaviour"):
+
+- opening the settings drawer **moves focus into the dialog**, and closing it
+  **returns focus to the element that opened it**;
+- the shell exposes a `<main>` and `<nav>` landmark, a skip link targeting
+  `#main`, and the polite live region the toasts ride on.
+
+**Honest scope note.** Contrast ratios and full axe rules need a real rendering
+engine, so they are *not* asserted here — they belong to the browser run, not
+jsdom. The overlay's `Escape`-to-close is also browser-verified rather than
+asserted in jsdom, because that handler binds to the `window` present at
+module-import time and a synthetic event on a later test window would not reach
+it; the synchronous focus-restore on `close()` is what the test pins.
+
+`beta:selfcheck` is 22/22; the release gate stays 714/714.
