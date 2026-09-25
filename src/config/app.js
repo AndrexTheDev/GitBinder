@@ -17,6 +17,15 @@ export const APP_NAME = 'GitBinder';
  * few hundred bytes of the drawing itself.
  */
 export const BRAND_MARK = '/brand/mark.svg';
+
+/**
+ * The mark's aspect ratio (width / height).
+ *
+ * It is a book spine, so it is tall and narrow — 1:3.34. Kept as a constant
+ * because three components need to reserve the right box before the image has
+ * loaded; getting it wrong makes the navbar reflow when the SVG arrives.
+ */
+export const BRAND_MARK_RATIO = 64 / 214;
 export const APP_VERSION = '0.1.0';
 export const APP_TAGLINE_KEY = 'meta.tagline';
 

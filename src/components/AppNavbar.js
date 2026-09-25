@@ -13,7 +13,7 @@ import { h, setText } from '../core/dom.js';
 import { UI_EVENTS } from '../core/events.js';
 import { APP_NAME } from '../config/app.js';
 import { icon } from './ui/Icon.js';
-import { BRAND_MARK } from '../config/app.js';
+import { BRAND_MARK, BRAND_MARK_RATIO } from '../config/app.js';
 import { LanguageToggle } from './LanguageToggle.js';
 
 /**
@@ -64,9 +64,12 @@ export function AppNavbar(ctx) {
         src: BRAND_MARK,
         alt: '',
         'aria-hidden': 'true',
-        class: 'h-10 w-auto',
-        width: '40',
-        height: '40',
+        // Taller than the text it sits beside, because the mark is a narrow
+        // spine: at 44 px tall it is only 13 px wide, which reads as a
+        // deliberate vertical rule rather than a squashed thumbnail.
+        class: 'h-11 w-auto',
+        width: String(Math.round(44 * BRAND_MARK_RATIO)),
+        height: '44',
       }),
     ),
     h('span', { class: 'flex min-w-0 flex-col leading-tight' }, wordmark, tagline),

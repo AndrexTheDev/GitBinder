@@ -1,62 +1,95 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="GitBinder">
-  <title>GitBinder</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 214" width="64" height="214" role="img" aria-label="Code &amp; Story — a GitBinder book spine">
+  <title>Code &amp; Story — GitBinder</title>
   <!--
-    The GitBinder mark: a bound spine, navy cloth with cream tooling.
+    GitBinder's mark: a bound book spine, navy cloth with cream tooling.
 
-    Two things are deliberate and worth not "fixing":
+    Faithful to the reference artwork supplied for the project. Order, top to
+    bottom: page edges combed through the head block, a raised band, a double
+    dashed rule, the title, the subtitle, a further rule, the branch motif,
+    then a rule, the tail band, the roll and the imprint block.
 
-      · **The spine is wider than a real one.** A true-to-life 1:4 spine is
-        under 4 px at favicon size and turns to mush. Widening it to a bit
-        over a third of the canvas is what keeps the head bands and the
-        branch legible at 16 px, which is the size that matters most.
+    Proportions matter here and are preserved — the spine is a narrow 1:3.8
+    column, the bands protrude past the cloth on both sides, and the motif
+    occupies the middle two-fifths of the height.
 
-      · **It is drawn, not shipped as a bitmap.** Plain shapes stay crisp
-        from a favicon to a poster and cost a few hundred bytes instead of a
-        network request.
+    Filled shapes and text rather than a traced bitmap: it stays crisp from a
+    thumbnail to a poster, costs a few hundred bytes, and needs no request.
 
-    Reading order: page edges combed through the head, a raised band, the
-    branch motif, a second band, then the gilded rule where an imprint line
-    would sit.
+    Text is set in the same serif stack the book stylesheet uses, and pinned
+    with textLength, so the lockup keeps its layout on every system instead of
+    reflowing with whatever serif the browser happens to pick.
   -->
-  <g fill="none" stroke-linecap="round">
-    <!-- Cloth -->
-    <rect x="19.5" y="2" width="25" height="60" rx="3.2" fill="#1E3A5F" stroke="none" />
+  <defs>
+    <style>
+      .navy { fill: #1A3A63; }
+      .cream { fill: #F8F3E4; }
+      .title {
+        font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, ui-serif, 'Times New Roman', serif;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .subtitle,
+      .imprint {
+        font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, ui-serif, 'Times New Roman', serif;
+        font-weight: 600;
+      }
+    </style>
+  </defs>
 
-    <!-- Page edges, combed through the head of the spine -->
-    <g stroke="#F8F3E4" stroke-width="1.6" opacity="0.9">
-      <path d="M24.4 4.2v6.4M29 3.7v7.4M33.7 3.5v7.8M38.4 3.7v7.4M43 4.2v6.4" />
-    </g>
+  <!-- ── Cloth ──────────────────────────────────────────────────────────── -->
+  <path class="navy" d="M9.5 8H54.5A3.5 3.5 0 0 1 58 11.5V203Q32 208.6 6 203V11.5A3.5 3.5 0 0 1 9.5 8Z" />
 
-    <!-- Raised bands at head and foot -->
-    <g fill="#1E3A5F" stroke="none">
-      <rect x="17.8" y="14.4" width="28.4" height="2.9" rx="1.45" />
-      <rect x="17.8" y="50.6" width="28.4" height="2.9" rx="1.45" />
-    </g>
-
-    <!-- Stitching beneath each band -->
-    <g stroke="#F8F3E4" stroke-width="1.25" stroke-dasharray="3 2.6" opacity="0.7">
-      <path d="M23.6 20.2h16.8M23.6 47.4h16.8" />
-    </g>
-
-    <!-- The branch: one stem, alternating shoots, a node at each tip.
-         Deliberately a twig rather than a pair of mirrored curves —
-         mirroring two strands closes them into a leaf, which is what an
-         earlier attempt looked like. Alternating shoots stay readable at
-         favicon size. -->
-    <g stroke="#F8F3E4" stroke-width="1.5">
-      <path d="M32 23.4v22.4" />
-      <path d="M32 27.6 26.6 30.9M32 33 37.4 36.3M32 38.4 26.6 41.7M32 43.8 37.4 47.1" />
-    </g>
-    <g fill="#F8F3E4" stroke="none">
-      <circle cx="32" cy="23.6" r="1.5" />
-      <circle cx="32" cy="45.6" r="1.5" />
-      <circle cx="26.4" cy="31" r="1.25" />
-      <circle cx="37.6" cy="36.4" r="1.25" />
-      <circle cx="26.4" cy="41.8" r="1.25" />
-      <circle cx="37.6" cy="47.2" r="1.25" />
-    </g>
-
-    <!-- Gilded rule closing the foot, where the imprint line would sit -->
-    <rect x="27.4" y="56.6" width="9.2" height="1.4" rx="0.7" fill="#C08A2E" stroke="none" opacity="0.95" />
+  <!-- ── Page edges, combed through the head block ──────────────────────── -->
+  <g stroke="#F8F3E4" stroke-width="2.1" opacity="0.92">
+    <path d="M10.8 9.6v21M15.5 9.2v21.4M20.2 9v21.6M24.9 8.9v21.7M29.6 8.8v21.8M34.4 8.8v21.8M39.1 8.9v21.7M43.8 9v21.6M48.5 9.2v21.4M53.2 9.6v21" />
   </g>
+
+  <!-- ── Raised bands: wider than the cloth, rounded ends ───────────────── -->
+  <rect class="navy" x="2" y="34.6" width="60" height="3.4" rx="1.7" />
+  <rect class="navy" x="2" y="176.4" width="60" height="3.4" rx="1.7" />
+
+  <!-- ── Double dashed rules: long dashes above, short below ────────────── -->
+  <g stroke="#F8F3E4" opacity="0.85">
+    <path stroke-width="1.2" stroke-dasharray="5.2 3" d="M10 41.4h44" />
+    <path stroke-width="1" stroke-dasharray="2.6 2.2" d="M10 44.2h44" />
+    <path stroke-width="1.2" stroke-dasharray="5.2 3" d="M10 86.6h44" />
+    <path stroke-width="1" stroke-dasharray="2.6 2.2" d="M10 89.4h44" />
+    <path stroke-width="1.2" stroke-dasharray="5.2 3" d="M10 174h44" />
+    <path stroke-width="1" stroke-dasharray="2.6 2.2" d="M10 176.8h44" />
+  </g>
+
+  <!-- ── Title block ────────────────────────────────────────────────────── -->
+  <text class="title cream" x="32" y="56" text-anchor="middle" font-size="12.4" textLength="46" lengthAdjust="spacingAndGlyphs">CODE &amp;</text>
+  <text class="title cream" x="32" y="67.4" text-anchor="middle" font-size="12.4" textLength="36" lengthAdjust="spacingAndGlyphs">STORY</text>
+  <text class="subtitle cream" x="32" y="80.4" text-anchor="middle" font-size="3.9" textLength="42" lengthAdjust="spacingAndGlyphs" opacity="0.95">A BINDING OF IDEAS</text>
+
+  <!-- ── The branch: a stem, two mirrored vines, a node at every turn ───── -->
+  <g stroke="#F8F3E4" stroke-width="1.15" fill="none">
+    <path d="M32 94.6v70.2" />
+    <!-- Two strands in counter-phase, so they cross in the middle and read as
+         a braid. Mirroring the bows without the crossing closes them into a
+         leaf/lens; the crossing is what makes it a tangle of vines rather
+         than an outline, and it is what the reference artwork shows. -->
+    <path d="M32 98.6C24.2 108.4 24.2 118.4 32 126.6 39.8 134.8 39.8 144.8 32 152.6" />
+    <path d="M32 98.6C39.8 108.4 39.8 118.4 32 126.6 24.2 134.8 24.2 144.8 32 152.6" />
+  </g>
+  <g class="cream">
+    <circle cx="32" cy="95" r="1.5" />
+    <circle cx="32" cy="164.6" r="1.5" />
+    <!-- outward bulges -->
+    <circle cx="26.2" cy="113.4" r="1.35" />
+    <circle cx="37.8" cy="137.8" r="1.35" />
+    <!-- the crossings, wider than the line so they read as knots -->
+    <circle cx="32" cy="126.6" r="1.45" />
+    <circle cx="32" cy="108" r="1.1" />
+    <circle cx="32" cy="143.4" r="1.1" />
+  </g>
+
+  <!-- ── Tail: the roll of the spine, then the imprint block ────────────── -->
+  <g stroke="#F8F3E4" stroke-width="0.9" fill="none" opacity="0.8">
+    <path d="M9 182.6q23-2.6 46 0" />
+    <path d="M9 185.4q23-2.6 46 0" />
+  </g>
+  <text class="imprint cream" x="32" y="196.6" text-anchor="middle" font-size="4.4" textLength="41" lengthAdjust="spacingAndGlyphs" opacity="0.95">GITBIND PRESS</text>
+  <text class="imprint cream" x="32" y="203.4" text-anchor="middle" font-size="4.4" textLength="27" lengthAdjust="spacingAndGlyphs" opacity="0.95">EST. 2026</text>
 </svg>

@@ -427,13 +427,19 @@
     outline-offset: 2.5mm;
   }
 
-  /* Deliberately short: the cover is a fixed A4 page with a fixed amount of
-     copy, so the mark gets a 14 mm slot and the title keeps its room. */
+  /* The cover is where the mark gets to be itself: an A4 page has room for the
+     spine at a size where the title, the braid and the imprint are all
+     legible. Height drives the width through the intrinsic ratio (1:3.34), so
+     this is a ~10 mm wide column of navy.
+
+     Budgeted, not guessed: at the worst case the frame's content comes to
+     roughly 170 mm — a three-line title and a three-line bio included — and
+     the cover has 208 mm to work with, so this leaves about 28 mm of slack. */
   .book-cover__mark {
     display: block;
     width: auto;
-    height: 14mm;
-    margin: 0 auto 4mm;
+    height: 34mm;
+    margin: 0 auto 6mm;
   }
 
   .book-cover__title {
