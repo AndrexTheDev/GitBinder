@@ -185,12 +185,6 @@ export function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(value ?? '').trim());
 }
 
-/** Capitalise the first letter — handy for generated chapter headings. */
-export function sentenceCase(value) {
-  const text = String(value ?? '');
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
 /**
  * Turn a repo name into a chapter title: `my-cool_app` → `My Cool App`.
  *

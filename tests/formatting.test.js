@@ -23,7 +23,6 @@ import {
   formatNumber,
   formatRelativeTime,
   normalizeUrl,
-  sentenceCase,
   slugifyTitle,
   truncate,
 } from '../src/utils/format.js';
@@ -214,37 +213,6 @@ describe('formatRelativeTime', () => {
 /* -------------------------------------------------------------------------- *
  * Strings
  * -------------------------------------------------------------------------- */
-
-describe('sentenceCase', () => {
-  test('a lower-case string is capitalised for display', () => {
-    assert.equal(sentenceCase('live'), 'Live');
-    assert.equal(sentenceCase('in development'), 'In development');
-  });
-
-  test('an empty or missing value stays empty', () => {
-    assert.equal(sentenceCase(''), '');
-    assert.equal(sentenceCase(null), '');
-    assert.equal(sentenceCase(undefined), '');
-  });
-
-  test('it only touches the first character', () => {
-    // "MVP" and "API" survive because nothing is lower-cased; the function is
-    // for display, not for normalising somebody's words. It is also not clever
-    // about camelCase — "iOS build" becomes "IOS build", which is what
-    // "capitalise the first letter" means and why this is only used on
-    // lower-case labels like the status ids.
-    assert.equal(sentenceCase('MVP ready'), 'MVP ready');
-    assert.equal(sentenceCase('iOS build'), 'IOS build');
-  });
-
-  test('leading whitespace stays, so callers trim first', () => {
-    assert.equal(sentenceCase('  spaced  '), '  spaced  ');
-  });
-
-  test('it tolerates a non-string', () => {
-    assert.equal(typeof sentenceCase(42), 'string');
-  });
-});
 
 describe('normalizeUrl', () => {
   test('an absolute URL comes back in canonical form', () => {

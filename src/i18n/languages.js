@@ -15,9 +15,15 @@ export const LANGUAGES = [
   { code: 'de', label: 'DE', nativeLabel: 'Deutsch', englishLabel: 'German' },
 ];
 
+/**
+ * The languages the dictionaries actually ship.
+ *
+ * One constant, not two: `FALLBACK_LANGUAGE` is also what a cold start uses
+ * when the browser asks for a language nobody has translated, so a separate
+ * "default" would only be a second place to keep in sync.
+ */
 export const SUPPORTED_LANGUAGES = Object.freeze(LANGUAGES.map((language) => language.code));
 export const FALLBACK_LANGUAGE = 'en';
-export const DEFAULT_LANGUAGE = 'en';
 
 /** @returns {LanguageMeta|undefined} */
 export function languageMeta(code) {

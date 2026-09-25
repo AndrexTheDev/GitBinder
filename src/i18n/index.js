@@ -57,5 +57,5 @@ export function detectInitialLanguage(env = {}) {
 }
 
 // Re-exported for consumers: LANGUAGES, SUPPORTED_LANGUAGES, FALLBACK_LANGUAGE,
-// DEFAULT_LANGUAGE, languageMeta(), languageName().
+// languageMeta(), languageName() — tested in tests/languages.test.js.
 export * from './languages.js';
