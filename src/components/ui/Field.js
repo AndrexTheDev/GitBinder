@@ -32,9 +32,17 @@ export function createFieldShell(options) {
   const { t, label, labelKey, hint, hintKey, optional = false, optionalLabel } = options;
   const id = options.id ?? nextId();
 
+  // A real `<label for>` rather than a styled `<span>`. The span looked
+  // identical and read the same to a sighted visitor, but it associated nothing
+  // with the control: a screen reader announced the GitHub username field as an
+  // unlabelled text input whose only clue was the placeholder (`e.g.
+  // AndrexTheDev`), and clicking the visible label did not focus the field.
+  // `createCheckbox()` below already did this correctly — this is the same
+  // thing, for the other three control types.
   const labelText = label ?? (labelKey ? t(labelKey) : '');
-  const labelEl = h('span', {
+  const labelEl = h('label', {
     class: 'label',
+    for: id,
     ...(labelKey ? { 'data-i18n': labelKey } : {}),
     text: labelText,
   });
@@ -78,6 +86,15 @@ export function createFieldShell(options) {
     controlSlot,
     /** @param {string|null} message */
     setError(message) {
+      // The control is inside `controlSlot`, and it is the thing a screen
+      // reader needs told: `role="alert"` on the message announces it, but
+      // `aria-invalid` is what marks the field itself as the problem.
+      const control = controlSlot.querySelector('input, select, textarea');
+      if (control) {
+        if (message) control.setAttribute('aria-invalid', 'true');
+        else control.removeAttribute('aria-invalid');
+      }
+
       if (!message) {
         errorEl.classList.add('hidden');
         errorEl.classList.remove('flex');
