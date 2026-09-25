@@ -6,9 +6,57 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join, relative } from 'node:path';
+
 import { createTranslator, detectInitialLanguage, LOCALES, SUPPORTED_LANGUAGES } from '../src/i18n/index.js';
-import { createI18n } from '../src/core/i18n.js';
+import { createI18n, I18N_TARGETS } from '../src/core/i18n.js';
+import { GITHUB_ERROR_KINDS } from '../src/services/github.js';
+import { STATUS_REASONS } from '../src/services/status.js';
+import { APP_TAGLINE_KEY, REPO_STATUS_IDS } from '../src/config/app.js';
 import { createDocumentStub, createNavigator } from './helpers/memoryStorage.js';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+/** Every `.js` under `src/`, plus the static shell. */
+function sourceFiles() {
+  const out = [join(ROOT, 'index.html')];
+  (function walk(dir) {
+    for (const entry of readdirSync(dir)) {
+      const path = join(dir, entry);
+      if (statSync(path).isDirectory()) walk(path);
+      else if (/\.[jt]s$/.test(path)) out.push(path);
+    }
+  })(join(ROOT, 'src'));
+  return out;
+}
+
+/** Strip comments so a key quoted in prose is not mistaken for a call site. */
+const stripComments = (source) =>
+  source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+
+/**
+ * Match an i18n attribute in either syntax the codebase uses: the HTML form
+ * `data-i18n="key"` in the static shell, and the object-literal form
+ * `'data-i18n': 'key'` that `h()` takes in the components.
+ */
+function bindingPattern(attribute) {
+  return new RegExp(`['"]?${attribute}['"]?\\s*[:=]\\s*['"]([^'"]+)['"]`, 'g');
+}
+
+/** Resolve a dot path, or `undefined`. */
+function lookup(dict, key) {
+  return key.split('.').reduce((acc, part) => (acc == null ? acc : acc[part]), dict);
+}
+
+/** A key is present if it resolves, or if it is an `Intl.PluralRules` base. */
+function resolves(dict, key) {
+  if (typeof lookup(dict, key) === 'string') return true;
+  return ['one', 'other', 'zero', 'two', 'few', 'many'].some(
+    (form) => typeof lookup(dict, `${key}.${form}`) === 'string',
+  );
+}
 
 /** Flatten `{ a: { b: 'x' } }` → `['a.b']` */
 function flatten(value, prefix = '', out = []) {
@@ -159,5 +207,141 @@ describe('i18n.applyTo — DOM bindings', () => {
     assert.equal(save.textContent, 'Speichern');
     assert.equal(input.getAttribute('placeholder'), 'z. B. AndrexTheDev');
     assert.equal(aria.getAttribute('aria-label'), 'Einstellungen');
+  });
+
+  test('rewrites a <meta> content binding', () => {
+    // The description is the one string a reader meets outside the page — in a
+    // search result or a link preview — so it has to follow the locale like the
+    // title does, rather than staying English for a German visitor.
+    const doc = createDocumentStub([
+      { tag: 'meta', attributes: { name: 'description', 'data-i18n-content': 'meta.description' } },
+    ]);
+
+    const i18n = createTranslator({ locale: 'en', document: doc });
+    i18n.applyTo(doc);
+
+    const meta = doc.querySelectorAll('*')[0];
+    assert.equal(meta.getAttribute('content'), LOCALES.en.meta.description);
+
+    i18n.setLocale('de');
+    assert.equal(meta.getAttribute('content'), LOCALES.de.meta.description);
+    assert.notEqual(LOCALES.de.meta.description, LOCALES.en.meta.description, 'the locales should differ');
+  });
+});
+
+/* -------------------------------------------------------------------------- *
+ * Call sites
+ * -------------------------------------------------------------------------- */
+
+describe('every key the code asks for exists', () => {
+  // Key parity is checked above, but parity between two dictionaries says
+  // nothing about whether either one holds the keys the app actually asks for.
+  // A key that exists in neither locale fails soft at runtime: the translator
+  // logs a warning and the interface prints the raw key — `summary.author.label`
+  // in the middle of a form. Nothing throws, no test fails, and the only way to
+  // notice is to read every screen in both languages.
+  //
+  // Comments are stripped first, so a key named in a doc example is not treated
+  // as a call site.
+
+  const corpus = sourceFiles().map((file) => stripComments(readFileSync(file, 'utf8')));
+
+  const attributes = [
+    'data-i18n',
+    ...I18N_TARGETS.filter((target) => target !== 'text').map((target) => `data-i18n-${target}`),
+  ];
+
+  const literals = new Set();
+  for (const source of corpus) {
+    for (const match of source.matchAll(/\bt\(\s*'([^']+)'/g)) literals.add(match[1]);
+    for (const attribute of attributes) {
+      for (const match of source.matchAll(bindingPattern(attribute))) literals.add(match[1]);
+    }
+  }
+
+  test('a static t() call resolves in every locale', () => {
+    assert.ok(literals.size > 100, `expected a substantial number of keys, found ${literals.size}`);
+    for (const key of literals) {
+      for (const [locale, dict] of Object.entries(LOCALES)) {
+        assert.ok(resolves(dict, key), `"${key}" is used in the code but missing from ${locale}`);
+      }
+    }
+  });
+
+  test('a data-i18n binding resolves in every locale', () => {
+    // The declarative half of the same contract — 100-odd attributes in `src/`
+    // and the static shell, none of which go through a `t()` call at all.
+    const bound = new Set();
+    for (const source of corpus) {
+      for (const attribute of attributes) {
+        for (const match of source.matchAll(bindingPattern(attribute))) bound.add(match[1]);
+      }
+    }
+    assert.ok(bound.size >= 20, `expected the shell and components to bind keys, found ${bound.size}`);
+    for (const key of bound) {
+      for (const [locale, dict] of Object.entries(LOCALES)) {
+        assert.ok(resolves(dict, key), `data-i18n="${key}" has no entry in ${locale}`);
+      }
+    }
+  });
+
+  test('every GitHub error kind has a message', () => {
+    // `GithubError.key` builds `` `errors.${kind}` `` at runtime, so no static
+    // scan can see these call sites — the list has to be walked instead.
+    for (const kind of GITHUB_ERROR_KINDS) {
+      // `aborted` is deliberately remapped to the generic message: a fetch the
+      // user cancelled is not worth an error of its own.
+      const key = kind === 'aborted' ? 'errors.unknown' : `errors.${kind}`;
+      for (const [locale, dict] of Object.entries(LOCALES)) {
+        assert.ok(resolves(dict, key), `GitHub error "${kind}" has no ${locale} message`);
+      }
+    }
+  });
+
+  test('every repository status and status reason is named', () => {
+    for (const id of REPO_STATUS_IDS) {
+      for (const [locale, dict] of Object.entries(LOCALES)) {
+        assert.ok(resolves(dict, `status.${id}`), `status "${id}" has no ${locale} label`);
+      }
+    }
+    // `STATUS_REASONS` has no runtime reader — it exists so that exactly this
+    // coverage can be asserted. Each entry is what `detectStatus()` puts in
+    // `reason`, and the book prints it as the justification for a status.
+    for (const reason of STATUS_REASONS) {
+      for (const [locale, dict] of Object.entries(LOCALES)) {
+        assert.ok(resolves(dict, `status.reasons.${reason}`), `reason "${reason}" has no ${locale} text`);
+      }
+    }
+  });
+
+  test('every named key constant resolves', () => {
+    // `APP_TAGLINE_KEY` exists so the tagline's key is spelled once instead of
+    // twice. A constant that points at nothing is worse than no constant: it
+    // reads as verified and is not.
+    for (const [locale, dict] of Object.entries(LOCALES)) {
+      assert.ok(resolves(dict, APP_TAGLINE_KEY), `APP_TAGLINE_KEY has no ${locale} entry`);
+    }
+  });
+
+  test('a dynamically built key has a namespace to land in', () => {
+    // `t(`export.${format}`)` cannot be checked key by key, but a renamed or
+    // deleted namespace leaves the prefix matching nothing at all — which is
+    // the mistake that actually happens.
+    const prefixes = new Set();
+    for (const source of corpus) {
+      for (const match of source.matchAll(/\bt\(\s*`([^`]*)`/g)) {
+        const head = match[1].split('${')[0];
+        if (head.includes('.')) prefixes.add(head.slice(0, head.lastIndexOf('.') + 1));
+      }
+    }
+    assert.ok(prefixes.size > 0, 'no dynamic keys found — did the pattern change?');
+    for (const prefix of prefixes) {
+      for (const [locale, dict] of Object.entries(LOCALES)) {
+        assert.ok(
+          flatten(dict).some((key) => key.startsWith(prefix)),
+          `no ${locale} key starts with "${prefix}"`,
+        );
+      }
+    }
   });
 });

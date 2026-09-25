@@ -33,6 +33,10 @@ export const I18N_TARGETS = Object.freeze([
   'value',
   'label',
   'data-tooltip',
+  // `content` is for <meta> tags: the document description is the one string in
+  // the shell that a reader sees outside the page itself (in a search result or
+  // a link preview), so it follows the active locale like the title does.
+  'content',
 ]);
 
 const INTERPOLATION = /\{\{\{\s*([\w.]+)\s*(?:\|\s*(\w+)\s*)?\}\}\}|\{\{\s*([\w.]+)\s*\}\}|\{\s*([\w.]+)\s*(?:\|\s*(\w+)\s*)?\}/g;

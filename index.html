@@ -7,9 +7,14 @@
     <meta name="theme-color" content="#141922" />
 
     <title>GitBinder — Your GitHub portfolio as a classic book</title>
+    <!-- The static `content` is the English default, and is what a crawler that
+         does not run JavaScript sees. `data-i18n-content` re-points it at the
+         active locale like the title, so a German visitor's link preview and
+         search result are German too. -->
     <meta
       name="description"
-      content="GitBinder turns your GitHub repositories into a printable Classic Book PDF portfolio. 100% free, 100% client-side — no backend, no tracking."
+      data-i18n-content="meta.description"
+      content="GitBinder is a free, client-side tool that composes your GitHub repositories into a book-like PDF portfolio. Nothing leaves your browser except the requests you trigger yourself."
     />
     <meta name="author" content="AndrexTheDev" />
     <meta name="robots" content="index, follow" />

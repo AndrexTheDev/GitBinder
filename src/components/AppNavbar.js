@@ -11,7 +11,7 @@
 
 import { h, setText } from '../core/dom.js';
 import { UI_EVENTS } from '../core/events.js';
-import { APP_NAME } from '../config/app.js';
+import { APP_NAME, APP_TAGLINE_KEY } from '../config/app.js';
 import { icon } from './ui/Icon.js';
 import { BRAND_MARK, BRAND_MARK_RATIO } from '../config/app.js';
 import { LanguageToggle } from './LanguageToggle.js';
@@ -50,7 +50,7 @@ export function AppNavbar(ctx) {
     {
       href: '#main',
       class: 'group flex min-w-0 items-center gap-2.5 rounded-lg pr-2 focus-visible:outline-none',
-      'aria-label': `${APP_NAME} — ${t('meta.tagline')}`,
+      'aria-label': `${APP_NAME} — ${t(APP_TAGLINE_KEY)}`,
     },
     h(
       'span',
@@ -170,7 +170,7 @@ export function AppNavbar(ctx) {
   /* ── Sync ──────────────────────────────────────────────────────────── */
 
   function syncChrome() {
-    brand.setAttribute('aria-label', `${APP_NAME} — ${t('meta.tagline')}`);
+    brand.setAttribute('aria-label', `${APP_NAME} — ${t(APP_TAGLINE_KEY)}`);
     supportBtn.setAttribute('aria-label', t('a11y.openSupport'));
     supportBtn.setAttribute('data-tooltip', t('nav.support.tooltip'));
     settingsBtn.setAttribute('aria-label', t('a11y.openSettings'));
