@@ -193,9 +193,37 @@ cross-cutting defect to fix next is the mobile navbar overflow.
 
 _sweep captured + visually reviewed; open: F-03.2 (navbar overflow)_
 
+### Rest-module review (second pass)
+
+* **M02 i18n** — German is complete and idiomatic end to end (hero, toolbar,
+  bulk actions, book studio, toasts); no truncated DE labels on desktop.
+* **M04 manager** — search filters live with a clear button and a visible focus
+  ring; sort/hide-forks/bulk controls all render.
+* **M07 settings** — strong privacy story ("stored locally, nothing uploaded"),
+  token field with reveal/verify/remove, scope hint and the obfuscation warning.
+  *Minor:* the "NO TOKEN STORED — PUBLIC REPOSITORIES…" badge clips at the
+  drawer's right edge on desktop.
+* **M11 exports** — the menu lists Markdown/.md, Plain text/.txt, CSV/.csv with
+  icons; export raises a success toast.
+* **M13 legal/contact** — German contact modal is complete, including the
+  hobby-project disclaimer; footer links localise.
+* **M15 responsive** — at 1920 px the content column stays capped and readable;
+  the summary shows status-group chips + ToC. (320/390 px remain blocked by
+  F-03.2, the navbar overflow.)
+* **M16 persistence** — importing a settings file applies it live (UI switched
+  to the imported language) with a success toast; export offers an opt-in
+  "include token" checkbox. Pre-existing toasts keep their original language —
+  acceptable, not a bug.
+
+No new blocking defects surfaced in the second pass; the only cross-cutting
+issue remains **F-03.2 (mobile navbar overflow)**, plus the two cosmetic notes
+above (token badge clip in the drawer; non-retroactive toast language).
+
+---
+
 ## Step 3 — M02 i18n
 
-_not started_
+_reviewed, ✅ (see second-pass notes)_
 
 ## Step 4 — M03 GitHub integration
 
