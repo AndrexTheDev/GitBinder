@@ -15,7 +15,8 @@ import { createI18n, I18N_TARGETS } from '../src/core/i18n.js';
 import { GITHUB_ERROR_KINDS } from '../src/services/github.js';
 import { STATUS_REASONS } from '../src/services/status.js';
 import { APP_TAGLINE_KEY, REPO_STATUS_IDS } from '../src/config/app.js';
-import { createDocumentStub, createNavigator } from './helpers/memoryStorage.js';
+import { createDocumentStub, createNavigator, createMemoryStorage } from './helpers/memoryStorage.js';
+import { createDomEnvironment } from './helpers/dom.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -228,6 +229,53 @@ describe('i18n.applyTo — DOM bindings', () => {
     assert.notEqual(LOCALES.de.meta.description, LOCALES.en.meta.description, 'the locales should differ');
   });
 });
+
+  test('switching language never costs the page a control', async () => {
+    // `applyTo()` writes a text binding with `textContent = ...`, which deletes
+    // every child of the node it is applied to. Put that binding on a wrapper —
+    // as the "Hide forks" label once was, wrapping its own checkbox — and the
+    // first language switch removes the control from the page. Nothing visible
+    // fails; the checkbox is simply gone, and only a German visitor ever finds
+    // out. This boots the real app in a real DOM and switches back and forth.
+    const environment = createDomEnvironment({ languages: ['en-US', 'en'] });
+    const document = environment.document;
+    const { bootstrap } = await import('../src/app.js');
+
+    const app = bootstrap({
+      host: document,
+      storage: createMemoryStorage(),
+      fetch: async () => ({ ok: true, status: 200, headers: new Map(), json: async () => [] }),
+    });
+
+    const CONTROL = 'input, select, textarea, button';
+    const countControls = () => document.querySelectorAll(CONTROL).length;
+    const boundWithChildren = () =>
+      [...document.querySelectorAll('[data-i18n]')]
+        .filter((node) => node.children.length > 0)
+        .map((node) => `<${node.tagName.toLowerCase()}> ${node.getAttribute('data-i18n')}`);
+
+    try {
+      const english = countControls();
+      assert.ok(english > 0, 'the boot rendered no controls at all');
+
+      for (const locale of ['de', 'en', 'de']) {
+        app.ctx.i18n.setLocale(locale);
+        assert.equal(
+          countControls(),
+          english,
+          `switching to "${locale}" changed the number of controls on the page`,
+        );
+        assert.deepEqual(
+          boundWithChildren(),
+          [],
+          `a data-i18n binding sits on an element with children — the switch will eat them`,
+        );
+      }
+    } finally {
+      app.destroy?.();
+      environment.cleanup();
+    }
+  });
 
 /* -------------------------------------------------------------------------- *
  * Call sites

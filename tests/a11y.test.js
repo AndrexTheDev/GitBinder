@@ -195,3 +195,139 @@ describe('the booted application is usable without seeing it', () => {
     assert.deepEqual([...duplicates], []);
   });
 });
+
+/* -------------------------------------------------------------------------- *
+ * The repository cards
+ * -------------------------------------------------------------------------- */
+
+/**
+ * The cards only exist once repositories have been fetched, so they need their
+ * own boot with a stubbed API — the shared environment above never renders one.
+ * They also get their own document: a second app instance in the same DOM
+ * leaves timers behind that outlive the test.
+ */
+describe('every card is operable without seeing it', () => {
+  let localEnv;
+  let localBootstrap;
+  let api;
+
+  /**
+   * Two unremarkable public repositories. Two, not one: the interesting
+   * failures in this file are about telling two cards apart — a shared control
+   * id, a label pointing into the neighbouring card — and a single card cannot
+   * show them.
+   */
+  function stubFetch() {
+    const now = Date.now();
+    let calls = 0;
+    const repository = (id, name, description) => ({
+      id,
+      full_name: `octo/${name}`,
+      name,
+      owner: { login: 'octo' },
+      html_url: `https://github.com/octo/${name}`,
+      description,
+      language: 'TypeScript',
+      stargazers_count: 12,
+      forks_count: 3,
+      open_issues_count: 1,
+      fork: false,
+      private: false,
+      archived: false,
+      disabled: false,
+      default_branch: 'main',
+      homepage: '',
+      topics: [],
+      license: null,
+      size: 100,
+      created_at: new Date(now - 400 * 86_400_000).toISOString(),
+      updated_at: new Date(now - 86_400_000).toISOString(),
+      pushed_at: new Date(now - 86_400_000).toISOString(),
+    });
+    return async () => {
+      calls += 1;
+      return {
+        ok: true,
+        status: 200,
+        headers: new Map([
+          ['x-ratelimit-limit', '60'],
+          ['x-ratelimit-remaining', String(60 - calls)],
+          ['x-ratelimit-reset', String(Math.floor(now / 1000) + 3600)],
+        ]),
+        async json() {
+          return [
+            repository(1, 'alpha', 'From GitHub'),
+            repository(2, 'beta', 'Also from GitHub'),
+          ];
+        },
+      };
+    };
+  }
+
+  before(async () => {
+    localEnv = createDomEnvironment({ languages: ['en-US', 'en'] });
+    ({ bootstrap: localBootstrap } = await import('../src/app.js'));
+    api = localBootstrap({ host: localEnv.document, storage: createMemoryStorage(), fetch: stubFetch() });
+    api.ctx.settings.set('githubUsername', 'octo');
+    await api.fetchRepos({ silent: true });
+    api.components.library.flush();
+  });
+
+  after(() => {
+    api?.destroy?.();
+    localEnv?.cleanup?.();
+  });
+
+  test('a card names every control in it', () => {
+    const card = localEnv.document.querySelector('#library-root .repo-card');
+    assert.ok(card, 'no repository card was rendered');
+
+    const unnamed = [...card.querySelectorAll('input, select, textarea, button')]
+      .filter((el) => !accessibleName(el, localEnv.document))
+      .map((el) => `${el.tagName.toLowerCase()}[${el.type ?? ''}]`);
+    assert.deepEqual(unnamed, [], `unnamed controls in the card: ${unnamed.join(', ')}`);
+  });
+
+  test('every visible label in a card is connected to its control', () => {
+    // `aria-label` names each control for a screen reader, and names the
+    // *repository* on purpose — a list of cards would otherwise offer several
+    // controls all called "Project status". But the visible `<label>` beside it
+    // has to be associated too, or clicking the words does nothing.
+    const doc = localEnv.document;
+    const detached = [];
+    for (const label of doc.querySelectorAll('#library-root label')) {
+      const target = label.getAttribute('for')
+        ? doc.getElementById(label.getAttribute('for'))
+        : label.querySelector('input, select, textarea');
+      if (!target) detached.push((label.textContent ?? '').trim().slice(0, 30));
+    }
+    assert.deepEqual(detached, [], `labels not connected to a control: ${detached.join(', ')}`);
+
+    // Every `for` must point at a control in the same card — not at an id left
+    // over from a card that was re-rendered under it.
+    for (const label of doc.querySelectorAll('#library-root label[for]')) {
+      const target = doc.getElementById(label.getAttribute('for'));
+      assert.ok(target, `label points at missing id ${label.getAttribute('for')}`);
+      assert.equal(
+        target.closest('.repo-card'),
+        label.closest('.repo-card'),
+        `label for ${label.getAttribute('for')} is in a different card than its control`,
+      );
+    }
+  });
+
+  test('two cards never share a control id', () => {
+    // The cards are built by the same factory, so their ids have to be minted
+    // per instance. A duplicated id makes the second card's label point at the
+    // first card's field.
+    const doc = localEnv.document;
+    const ids = [...doc.querySelectorAll('#library-root [id]')].map((el) => el.id);
+    const seen = new Set();
+    const duplicates = new Set();
+    for (const id of ids) {
+      if (seen.has(id)) duplicates.add(id);
+      seen.add(id);
+    }
+    assert.deepEqual([...duplicates], [], `duplicate ids in the library: ${[...duplicates].join(', ')}`);
+  });
+});

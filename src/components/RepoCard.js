@@ -37,7 +37,15 @@ let uid = 0;
 
 export function RepoCard({ repo, t, locale, onPatch }) {
   const slug = repo.slug;
-  const visibilityId = `repo-include-${(uid += 1)}`;
+  const cardId = (uid += 1);
+  const visibilityId = `repo-include-${cardId}`;
+  // The three visible labels below point at their controls with `for`, so
+  // clicking the words focuses the field. The controls keep their `aria-label`
+  // as well: those name the *repository*, which is what tells one card's
+  // "Project status" from the next in a list.
+  const statusId = `repo-status-${cardId}`;
+  const descriptionId = `repo-description-${cardId}`;
+  const notesId = `repo-notes-${cardId}`;
 
   /* ── Include in book ───────────────────────────────────────────────── */
 
@@ -79,6 +87,7 @@ export function RepoCard({ repo, t, locale, onPatch }) {
   const statusSelect = h(
     'select',
     {
+      id: statusId,
       class: 'input py-1 text-xs',
       'aria-label': t('library.row.status.labelFor', { name: repo.name }),
       onChange: (event) => onPatch(slug, { status: event.target.value }),
@@ -106,6 +115,7 @@ export function RepoCard({ repo, t, locale, onPatch }) {
   );
 
   const description = h('textarea', {
+    id: descriptionId,
     class: 'input min-h-[4.5rem] resize-y py-1.5 text-xs leading-relaxed',
     rows: '2',
     maxlength: String(DESCRIPTION_MAX_LENGTH),
@@ -134,6 +144,7 @@ export function RepoCard({ repo, t, locale, onPatch }) {
   const commitNotes = debounce((value) => onPatch(slug, { notes: value === '' ? null : value }), 220);
 
   const notes = h('textarea', {
+    id: notesId,
     class: 'input min-h-[4rem] resize-y py-1.5 text-xs leading-relaxed',
     rows: '2',
     maxlength: String(NOTES_MAX_LENGTH),
@@ -214,7 +225,7 @@ export function RepoCard({ repo, t, locale, onPatch }) {
       h(
         'div',
         { class: 'min-w-0' },
-        h('label', { class: 'mb-1 flex items-center gap-1.5' },
+        h('label', { class: 'mb-1 flex items-center gap-1.5', for: statusId },
           h('span', {
             class: 'text-2xs font-semibold uppercase tracking-wide text-ink-500',
             text: t('library.row.status.label'),
@@ -228,7 +239,7 @@ export function RepoCard({ repo, t, locale, onPatch }) {
       h(
         'div',
         { class: 'min-w-0' },
-        h('label', { class: 'mb-1 block' },
+        h('label', { class: 'mb-1 block', for: descriptionId },
           h('span', {
             class: 'text-2xs font-semibold uppercase tracking-wide text-ink-500',
             text: t('library.row.description.label'),
@@ -248,7 +259,7 @@ export function RepoCard({ repo, t, locale, onPatch }) {
         { class: 'min-w-0 sm:col-span-2' },
         h(
           'label',
-          { class: 'mb-1 flex items-center gap-1.5' },
+          { class: 'mb-1 flex items-center gap-1.5', for: notesId },
           h('span', {
             class: 'text-2xs font-semibold uppercase tracking-wide text-ink-500',
             text: t('library.row.notes.label'),

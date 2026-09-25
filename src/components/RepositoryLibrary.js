@@ -80,15 +80,19 @@ export function RepositoryLibrary(ctx) {
     onChange: (event) => settings.set('library.hideForks', event.target.checked),
   });
 
+  // The `data-i18n` binding belongs on the text `<span>`, never on the label:
+  // `applyTo()` writes a text binding with `textContent = ...`, which would
+  // delete every child of the node it is applied to — and this label *wraps*
+  // the checkbox it describes. Bound to the label, the first language switch
+  // removed the checkbox from the page.
   const hideForksLabel = h(
     'label',
     {
       for: hideForksId,
       class: 'flex cursor-pointer select-none items-center gap-2 whitespace-nowrap rounded-lg border border-paper-300 bg-paper-50 px-2.5 py-1.5 text-xs font-semibold text-ink-600 hover:border-brass-300 hover:bg-brass-50',
-      'data-i18n': 'library.toolbar.hideForks',
     },
     hideForks,
-    h('span', { text: t('library.toolbar.hideForks') }),
+    h('span', { text: t('library.toolbar.hideForks'), 'data-i18n': 'library.toolbar.hideForks' }),
     h('span', { class: 'text-ink-400' }, icon('fork', { size: 13 })),
   );
 
