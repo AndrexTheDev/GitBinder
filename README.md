@@ -92,6 +92,22 @@ optional: without it, Wrangler deploys to whatever branch is checked out, which
 gives you a preview URL while the production host keeps serving the old build —
 a "successful" deploy that changes nothing.
 
+**It must be a _Pages_ project, not a _Worker_.** In the dashboard, *Workers &
+Pages → Create → Pages → Connect to Git* — not the Worker flow. A Worker project
+is easy to spot: its Build settings show a *Deploy command* field and the sidebar
+offers Cron triggers / Queues / Email triggers. From there `npm run build` succeeds
+and the deploy step fails, because `wrangler pages deploy` is being run against a
+Worker named `gitbinder` rather than a Pages project of that name, and
+`wrangler.toml` (`pages_build_output_dir`) is a Pages config that `wrangler deploy`
+rejects. Delete the Worker and create the Pages project; nothing in the repo needs
+to change.
+
+**No runtime variables.** The app is static and makes exactly one outbound call
+(to `api.github.com`) from the visitor's browser. Never add a Cloudflare API token
+— or any credential — to *Variables and secrets*: it is not used, and `vars` are
+baked into the deployment. A token that was pasted anywhere outside the Cloudflare
+dashboard should be rolled immediately.
+
 `public/_headers` ships with the build and locks down the security headers and
 the cache policy.
 
