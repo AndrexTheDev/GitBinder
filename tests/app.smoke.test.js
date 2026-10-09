@@ -571,7 +571,10 @@ describe('repository fetching', () => {
     const links = card.querySelectorAll('a.link-badge');
     assert.equal(links.length, 2, 'a homepage adds a second link badge');
     assert.equal(links[0].getAttribute('href'), 'https://github.com/octo/repo-005');
-    assert.equal(links[1].getAttribute('href'), 'https://repo-005.example.com');
+    // The card routes the owner-controlled homepage through safeUrl(), which
+    // normalises like the book (bare host → trailing slash) — see security test
+    // "a scheme-less homepage reaches the book as the right address".
+    assert.equal(links[1].getAttribute('href'), 'https://repo-005.example.com/');
   });
 
   test('a repository without a homepage only links to GitHub', () => {

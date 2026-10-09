@@ -42,7 +42,7 @@ export default {
     never: 'never',
     enabled: 'Enabled',
     disabled: 'Disabled',
-    characters: '{count} characters',
+    characters: { one: '1 character', other: '{count} characters' },
     showing: 'Showing {shown} of {total}',
   },
 
@@ -137,9 +137,9 @@ export default {
       openOnGithub: 'Repository',
       homepage: 'Live',
       docs: 'Docs',
-      stars: '{count} stars',
-      forks: '{count} forks',
-      issues: '{count} open issues',
+      stars: { one: '1 star', other: '{count} stars' },
+      forks: { one: '1 fork', other: '{count} forks' },
+      issues: { one: '1 open issue', other: '{count} open issues' },
       updated: 'Updated {time}',
       noLicense: 'No license',
       topics: 'Topics',
@@ -196,7 +196,7 @@ export default {
     loading: {
       page: 'Fetching page {page}…',
       pageOf: 'Fetching page {page} of {totalPages}…',
-      count: 'Loaded {count} repositories so far…',
+      count: { one: 'Loaded 1 repository so far…', other: 'Loaded {count} repositories so far…' },
     },
     counts: {
       repos: { one: '1 repository', other: '{count} repositories' },
@@ -364,7 +364,7 @@ export default {
       validSimple: 'Connected as {login}',
       invalid: 'GitHub rejected this token.',
       stored: 'Stored on this device',
-      empty: 'No token stored — public repositories only.',
+      empty: 'No token stored',
       securityNote:
         'The token is obfuscated with a device key before it is written to localStorage, never sent anywhere except api.github.com, and removed when you clear local data. Obfuscation is not encryption: on a shared computer, prefer leaving the field empty.',
       removedOnExport: 'Exports omit the token unless you explicitly enable it below.',

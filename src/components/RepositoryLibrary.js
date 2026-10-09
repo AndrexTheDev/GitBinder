@@ -144,7 +144,9 @@ export function RepositoryLibrary(ctx) {
   });
 
   const counterEl = h('span', { class: 'chip' });
-  const syncEl = h('span', { class: 'flex flex-col items-end gap-0.5' });
+  // The "synchronised … / source" detail is secondary on a phone, and its
+  // long, unbreakable string is what blew out the header at ≤ 390 px (F-03).
+  const syncEl = h('span', { class: 'hidden flex-col items-end gap-0.5 sm:flex' });
 
   /* ── Body ──────────────────────────────────────────────────────────── */
 
@@ -435,7 +437,7 @@ export function RepositoryLibrary(ctx) {
         h('div', { class: 'flex items-center gap-2' }, h('span', { class: 'text-brass-600' }, icon('library', { size: 17 })), titleEl),
         subtitleEl,
       ),
-      h('div', { class: 'flex shrink-0 items-center gap-2' }, counterEl, syncEl),
+      h('div', { class: 'flex min-w-0 flex-wrap items-center justify-end gap-2' }, counterEl, syncEl),
     ),
     h(
       'div',

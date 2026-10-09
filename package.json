@@ -11,7 +11,10 @@
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "test": "node --test \"tests/**/*.test.js\"",
     "deploy": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=gitbinder --branch=main",
-    "deploy:preview": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=gitbinder"
+    "deploy:preview": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=gitbinder",
+    "beta:selfcheck": "node --test beta/runner/selfcheck.mjs",
+    "beta:shots:plan": "node beta/runner/shoot.mjs --dry-run",
+    "beta:shots": "node beta/runner/shoot.mjs --base http://127.0.0.1:4173"
   },
   "dependencies": {
     "lucide": "^1.48.0",

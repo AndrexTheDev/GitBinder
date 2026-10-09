@@ -34,3 +34,7 @@ Thumbs.db
 
 # Test coverage
 coverage/
+
+# Beta run output — PNGs are produced by CI (.github/workflows/screens.yml)
+# and committed there deliberately; a local run stays out of the working tree.
+beta/shots/

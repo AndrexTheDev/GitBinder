@@ -19,11 +19,15 @@ jobs:
 
       - run: npm ci
 
-      - name: Lint the module graph (no unused exports policy is manual)
-        run: npm test
-
+      # Build *before* testing: two assertions in tests/deploy.test.js
+      # ("the built site is entirely self-contained" and "…ships the deploy
+      # files…") skip themselves when dist/ is absent. Testing first meant they
+      # never ran in CI, silently. Build first so the gate is whole. (F-01)
       - name: Build the static bundle
         run: npm run build
+
+      - name: Lint the module graph (no unused exports policy is manual)
+        run: npm test
 
       # Kept as a plain artifact for inspection. `upload-pages-artifact` is
       # for GitHub Pages, which this project does not use — Cloudflare Pages
